@@ -24,6 +24,9 @@ namespace otdgen
 
 
 
+class Conf;
+class Toc;
+
 class GeneratorGitHubMarkDown
 {
 
@@ -31,10 +34,10 @@ class GeneratorGitHubMarkDown
 
 public:
 
-                  GeneratorGitHubMarkDown () = default;
+                  GeneratorGitHubMarkDown (const Conf & conf, Toc & toc);
    virtual        ~GeneratorGitHubMarkDown () = default;
 
-   std::string    process (const Root & root);
+   void           process (const Root & root);
 
 
 
@@ -52,13 +55,25 @@ protected:
 
 private:
 
-   void           process (std::string & html, const Command & command);
-   void           process (std::string & html, const List & list);
-   void           process (std::string & html, const Table & table);
-   void           process (std::string & html, const CodeBlock & codeblock);
-   void           process (std::string & html, const Paragraph & paragraph);
-   void           process_block (std::string & html, const Paragraph & paragraph);
-   void           process_block (std::string & html, const Expression & expression);
+   void           process (const Command & command);
+   void           process (const List & list);
+   void           process (const Table & table);
+   void           process (const CodeBlock & codeblock);
+   void           process (const Paragraph & paragraph);
+   void           process_block (const Paragraph & paragraph);
+   void           process_block (const Expression & expression);
+
+   void           flush ();
+   void           make_dirs (const std::string & filepath);
+
+   const Conf &   _conf;
+   Toc &          _toc;
+
+   std::string    _html;
+
+   std::string    _cur_library;
+   std::string    _cur_book;
+   std::string    _cur_chapter;
 
 
 

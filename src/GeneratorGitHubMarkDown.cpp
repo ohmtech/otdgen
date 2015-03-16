@@ -11,8 +11,14 @@
 
 #include "GeneratorGitHubMarkDown.h"
 
+#include "Conf.h"
+#include "Toc.h"
 #include "Token.h"
 
+#include <fstream>
+#include <iostream>
+
+#include <cstdlib>
 #include <cassert>
 
 
@@ -26,14 +32,26 @@ namespace otdgen
 
 /*
 ==============================================================================
+Name : ctor
+==============================================================================
+*/
+
+GeneratorGitHubMarkDown::GeneratorGitHubMarkDown (const Conf & conf, Toc & toc)
+:  _conf (conf)
+,  _toc (toc)
+{
+}
+
+
+
+/*
+==============================================================================
 Name : process
 ==============================================================================
 */
 
-std::string GeneratorGitHubMarkDown::process (const Root & root)
+void GeneratorGitHubMarkDown::process (const Root & root)
 {
-   std::string html;
-
    for (auto && expression_uptr : root.expressions)
    {
       const auto & expression = *expression_uptr;
@@ -42,39 +60,39 @@ std::string GeneratorGitHubMarkDown::process (const Root & root)
 
       if (command_ptr != nullptr)
       {
-         process (html, *command_ptr);
+         process (*command_ptr);
       }
 
       const List * list_ptr = dynamic_cast <const List *> (&expression);
 
       if (list_ptr != nullptr)
       {
-         process (html, *list_ptr);
+         process (*list_ptr);
       }
 
       const Table * table_ptr = dynamic_cast <const Table *> (&expression);
 
       if (table_ptr!= nullptr)
       {
-         process (html, *table_ptr);
+         process (*table_ptr);
       }
 
       const CodeBlock * codeblock_ptr = dynamic_cast <const CodeBlock *> (&expression);
 
       if (codeblock_ptr != nullptr)
       {
-         process (html, *codeblock_ptr);
+         process (*codeblock_ptr);
       }
 
       const Paragraph * paragraph_ptr = dynamic_cast <const Paragraph *> (&expression);
 
       if (paragraph_ptr != nullptr)
       {
-         process (html, *paragraph_ptr);
+         process (*paragraph_ptr);
       }
    }
 
-   return html;
+   flush ();
 }
 
 
@@ -95,42 +113,79 @@ Name : process
 ==============================================================================
 */
 
-void  GeneratorGitHubMarkDown::process (std::string & html, const Command & command)
+void  GeneratorGitHubMarkDown::process (const Command & command)
 {
-   std::string sub_html;
-
    const Paragraph & paragraph
       = dynamic_cast <const Paragraph &> (**command.bodies.begin ());
 
-   process_block (sub_html, paragraph);
+   _toc.set_current (command);
 
-   if (command.name == std::string (Token::chapter))
+   if (command.name == std::string (Token::library))
    {
-      html += "<h1>" + sub_html + "</h1>\n\n";
+      flush ();
+
+      auto it = command.options.find ("id");
+      assert (it != command.options.end ());
+
+      _cur_library = it->second;
+   }
+   else if (command.name == std::string (Token::book))
+   {
+      flush ();
+
+      auto it = command.options.find ("id");
+      assert (it != command.options.end ());
+
+      _cur_book = it->second;
+   }
+   else if (command.name == std::string (Token::chapter))
+   {
+      flush ();
+
+      auto it = command.options.find ("id");
+      assert (it != command.options.end ());
+
+      _cur_chapter = it->second;
+
+      _html += "<h1>";
+      process_block (paragraph);
+      _html += "</h1>\n\n";
    }
    else if (command.name == std::string (Token::section))
    {
-      html += "<h2>" + sub_html + "</h2>\n\n";
+      _html += "<h2>";
+      process_block (paragraph);
+      _html += "</h2>\n\n";
    }
    else if (command.name == std::string (Token::subsection))
    {
-      html += "<h3>" + sub_html + "</h3>\n\n";
+      _html += "<h3>";
+      process_block (paragraph);
+      _html += "</h3>\n\n";
    }
    else if (command.name == std::string (Token::subsubsection))
    {
-      html += "<h4>" + sub_html + "</h4>\n\n";
+      _html += "<h4>";
+      process_block (paragraph);
+      _html += "</h4>\n\n";
    }
    else if (command.name == std::string (Token::note))
    {
-      html += "<blockquote><h6>Note</h6> " + sub_html + "</blockquote>\n\n";
+      _html += "<blockquote><h6>Note</h6> ";
+      process_block (paragraph);
+      _html += "</blockquote>\n\n";
    }
    else if (command.name == std::string (Token::important))
    {
-      html += "<blockquote><h6>Important</h6> " + sub_html + "</blockquote>\n\n";
+      _html += "<blockquote><h6>Important</h6> ";
+      process_block (paragraph);
+      _html += "</blockquote>\n\n";
    }
    else if (command.name == std::string (Token::warning))
    {
-      html += "<blockquote><h6>W A R N I N G</h6> " + sub_html + "</blockquote>\n\n";
+      _html += "<blockquote><h6>W A R N I N G</h6> ";
+      process_block (paragraph);
+      _html += "</blockquote>\n\n";
    }
 }
 
@@ -142,15 +197,15 @@ Name : process
 ==============================================================================
 */
 
-void  GeneratorGitHubMarkDown::process (std::string & html, const List & list)
+void  GeneratorGitHubMarkDown::process (const List & list)
 {
    if (list.type == List::Type::Itemize)
    {
-      html += "<ul>\n";
+      _html += "<ul>\n";
    }
    else if (list.type == List::Type::Enumerate)
    {
-      html += "<ol>\n";
+      _html += "<ol>\n";
    }
 
    for (auto && item : list.items)
@@ -159,20 +214,20 @@ void  GeneratorGitHubMarkDown::process (std::string & html, const List & list)
 
       const auto & paragraph = dynamic_cast <const Paragraph &> (expression);
 
-      html += "<li>";
+      _html += "<li>";
 
-      process_block (html, paragraph);
+      process_block (paragraph);
 
-      html += "</li>\n";
+      _html += "</li>\n";
    }
 
    if (list.type == List::Type::Itemize)
    {
-      html += "</ul>\n\n";
+      _html += "</ul>\n\n";
    }
    else if (list.type == List::Type::Enumerate)
    {
-      html += "</ol>\n\n";
+      _html += "</ol>\n\n";
    }
 }
 
@@ -184,31 +239,31 @@ Name : process
 ==============================================================================
 */
 
-void  GeneratorGitHubMarkDown::process (std::string & html, const Table & table)
+void  GeneratorGitHubMarkDown::process (const Table & table)
 {
-   html += "<table>\n";
+   _html += "<table>\n";
 
    for (auto && row_uptr : table.rows)
    {
       const auto & row = dynamic_cast <const Row &> (*row_uptr);
 
-      html += "<tr>\n";
+      _html += "<tr>\n";
 
       for (auto && cell_uptr : row.cells)
       {
          const auto & paragraph = dynamic_cast <const Paragraph &> (*cell_uptr);
 
-         html += "<td>";
+         _html += "<td>";
 
-         process_block (html, paragraph);
+         process_block (paragraph);
 
-         html += "</td>";
+         _html += "</td>";
       }
 
-      html += "</tr>\n";
+      _html += "</tr>\n";
    }
 
-   html += "</table>\n\n";
+   _html += "</table>\n\n";
 }
 
 
@@ -219,25 +274,25 @@ Name : process
 ==============================================================================
 */
 
-void  GeneratorGitHubMarkDown::process (std::string & html, const CodeBlock & codeblock)
+void  GeneratorGitHubMarkDown::process (const CodeBlock & codeblock)
 {
-   html += "```";
+   _html += "```";
 
    auto it = codeblock.options.find ("language");
 
    if (it != codeblock.options.end ())
    {
-      html += it->second;
+      _html += it->second;
    }
 
-   html += "\n";
+   _html += "\n";
 
    for (auto && line : codeblock.lines)
    {
-      html += line.first + "\n";
+      _html += line.first + "\n";
    }
 
-   html += "```\n\n";
+   _html += "```\n\n";
 }
 
 
@@ -248,11 +303,11 @@ Name : process
 ==============================================================================
 */
 
-void  GeneratorGitHubMarkDown::process (std::string & html, const Paragraph & paragraph)
+void  GeneratorGitHubMarkDown::process (const Paragraph & paragraph)
 {
-   html += "<p>";
-   process_block (html, paragraph);
-   html += "</p>\n\n";
+   _html += "<p>";
+   process_block (paragraph);
+   _html += "</p>\n\n";
 }
 
 
@@ -263,13 +318,13 @@ Name : process_block
 ==============================================================================
 */
 
-void  GeneratorGitHubMarkDown::process_block (std::string & html, const Paragraph & paragraph)
+void  GeneratorGitHubMarkDown::process_block (const Paragraph & paragraph)
 {
    for (auto && expression_uptr : paragraph.expressions)
    {
       const auto & expression = *expression_uptr;
 
-      process_block (html, expression);
+      process_block (expression);
    }
 }
 
@@ -281,7 +336,7 @@ Name : process_block
 ==============================================================================
 */
 
-void  GeneratorGitHubMarkDown::process_block (std::string & html, const Expression & expression)
+void  GeneratorGitHubMarkDown::process_block (const Expression & expression)
 {
    const Command * command_ptr = dynamic_cast <const Command *> (&expression);
 
@@ -291,19 +346,19 @@ void  GeneratorGitHubMarkDown::process_block (std::string & html, const Expressi
 
       if (command.name == std::string (Token::code))
       {
-         html += "<code>";
+         _html += "<code>";
 
-         process_block (html, **command.bodies.begin ());
+         process_block (**command.bodies.begin ());
 
-         html += "</code>";
+         _html += "</code>";
       }
       else if (command.name == std::string (Token::emph))
       {
-         html += "<em>";
+         _html += "<em>";
 
-         process_block (html, **command.bodies.begin ());
+         process_block (**command.bodies.begin ());
 
-         html += "</em>";
+         _html += "</em>";
       }
       else if (command.name == std::string (Token::link))
       {
@@ -327,16 +382,18 @@ void  GeneratorGitHubMarkDown::process_block (std::string & html, const Expressi
 
          if (!ide.empty ())
          {
-            html += "<a>"; // for now
+            std::string url = _toc.make_url (ide);
+
+            _html += "<a href=\"" + url + "\">"; // for now
          }
          else if (!href.empty ())
          {
-            html += "<a href=\"http://" + href + "\">";
+            _html += "<a href=\"http://" + href + "\">";
          }
 
-         process_block (html, **command.bodies.begin ());
+         process_block (**command.bodies.begin ());
 
-         html += "</a>";
+         _html += "</a>";
       }
    }
 
@@ -344,15 +401,83 @@ void  GeneratorGitHubMarkDown::process_block (std::string & html, const Expressi
 
    if (paragraph_ptr != nullptr)
    {
-      process_block (html, *paragraph_ptr);
+      process_block (*paragraph_ptr);
    }
 
    const Text * text_ptr = dynamic_cast <const Text *> (&expression);
 
    if (text_ptr != nullptr)
    {
-      html += text_ptr->body;
+      _html += text_ptr->body;
    }
+}
+
+
+
+/*
+==============================================================================
+Name : flush
+==============================================================================
+*/
+
+void  GeneratorGitHubMarkDown::flush ()
+{
+   if (_html.empty ()) return;   // abort
+
+   if (_conf.output_path.empty ())
+   {
+      std::cout << _html;
+
+      std::cout << "==========================\n\n";
+   }
+   else
+   {
+      std::string path;
+      path += _conf.output_path + "/";
+
+      if (_cur_book.empty ())
+      {
+         path += "README.md";
+      }
+      else if (_cur_chapter.empty ())
+      {
+         path += _cur_book + "/README.md";
+      }
+      else
+      {
+         path += _cur_book + "/" + _cur_chapter + ".md";
+      }
+
+      make_dirs (path);
+
+      std::ofstream ofs (path, std::ifstream::binary);
+      assert (ofs);
+
+      ofs.write (&_html [0], int (_html.size ()));
+
+      ofs.close ();
+   }
+
+   _html.clear ();
+}
+
+
+
+/*
+==============================================================================
+Name : filepath
+==============================================================================
+*/
+
+void  GeneratorGitHubMarkDown::make_dirs (const std::string & filepath)
+{
+   size_t pos = filepath.rfind ("/");
+   assert (pos != std::string::npos);
+
+   std::string basepath = filepath.substr (0, pos - 0);
+
+   std::string cmd = "mkdir -p " + basepath;
+   system (cmd.c_str ());
 }
 
 

@@ -12,6 +12,8 @@
    [
       'Central.cpp',
       'Central.h',
+      'Conf.cpp',
+      'Conf.h',
       'Error.cpp',
       'Error.h',
       'Expression.cpp',
@@ -24,6 +26,8 @@
       'SyntaxicAnalyser.cpp',
       'SyntaxicAnalyser.h',
       'SyntaxicAnalyser.hpp',
+      'Toc.cpp',
+      'Toc.h',
       'Token.cpp',
       'Token.h',
    ],

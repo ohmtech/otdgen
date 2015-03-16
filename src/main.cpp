@@ -10,8 +10,10 @@
 /*\\\ INCLUDE FILES \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\*/
 
 #include "Central.h"
+#include "Conf.h"
 #include "GeneratorGitHubMarkDown.h"
 #include "LexicalAnalyser.h"
+#include "Toc.h"
 #include "TestLexicalAnalyser.h"
 #include "TestSyntaxicAnalyser.h"
 
@@ -24,7 +26,7 @@
 /*\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\*/
 
 void  test ();
-void  run (const std::string & path);
+void  run (const otdgen::Conf & conf, const std::string & path);
 void  usage ();
 
 /*
@@ -64,7 +66,7 @@ Name : run
 ==============================================================================
 */
 
-void  run (const std::string & path)
+void  run (const otdgen::Conf & conf, const std::string & path)
 {
    using namespace otdgen;
 
@@ -74,10 +76,11 @@ void  run (const std::string & path)
 
       Root root = central.process (path);
 
-      GeneratorGitHubMarkDown generator;
-      std::string output = generator.process (root);
+      Toc toc (conf);
+      toc.process (root);
 
-      std::cout << output << std::endl;
+      GeneratorGitHubMarkDown generator (conf, toc);
+      generator.process (root);
    }
    catch (...)
    {
@@ -124,7 +127,9 @@ int   main (int argc, const char * argv[])
    }
    else
    {
-      run (arg);
+      otdgen::Conf conf;
+      conf.output_path = "/Users/raf/Desktop/dev/flip/documentation/markdown";
+      run (conf, arg);
    }
 
    return 0;
