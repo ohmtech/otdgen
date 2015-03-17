@@ -113,23 +113,24 @@ Name : main
 
 int   main (int argc, const char * argv[])
 {
-   if (argc != 2)
+   otdgen::Conf conf;
+
+   bool ok_flag = conf.parse (argc, argv);
+
+   if (!ok_flag)
    {
       usage ();
       return -1;
    }
 
-   std::string arg = argv [1];
 
-   if (arg == "--selftest")
+   if (conf.self_test)
    {
       test ();
    }
    else
    {
-      otdgen::Conf conf;
-      conf.output_path = "/Users/raf/Desktop/dev/flip/documentation/markdown";
-      run (conf, arg);
+      run (conf, conf.file);
    }
 
    return 0;

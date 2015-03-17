@@ -39,6 +39,11 @@ public:
                   Conf () = default;
    virtual        ~Conf () = default;
 
+   bool           parse (int argc, const char * argv[]);
+
+   bool           self_test = false;
+
+   std::string    file;
    Format         format = Format::GitHubMarkDown;
    bool           single_page = false;
    std::string    output_path;
