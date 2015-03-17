@@ -216,6 +216,8 @@ void  SyntaxicAnalyser::process (Tokens::iterator & it)
          )
       {
          process_command (it);
+
+         if (it == it_end) break;
          ++it;
       }
       else if (
