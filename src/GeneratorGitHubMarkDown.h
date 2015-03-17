@@ -65,6 +65,7 @@ private:
 
    void           flush ();
    void           make_dirs (const std::string & filepath);
+   std::string    make_id ();
 
    const Conf &   _conf;
    Toc &          _toc;
@@ -74,6 +75,9 @@ private:
    std::string    _cur_library;
    std::string    _cur_book;
    std::string    _cur_chapter;
+   std::string    _cur_section;
+   std::string    _cur_subsection;
+   std::string    _cur_subsubsection;
 
 
 

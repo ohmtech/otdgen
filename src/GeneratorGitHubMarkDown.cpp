@@ -147,25 +147,43 @@ void  GeneratorGitHubMarkDown::process (const Command & command)
 
       _cur_chapter = it->second;
 
-      _html += "<h1>";
+      _html += "<h1 id=\"\">";
       process_block (paragraph);
       _html += "</h1>\n\n";
    }
    else if (command.name == std::string (Token::section))
    {
-      _html += "<h2>";
+      auto it = command.options.find ("id");
+      assert (it != command.options.end ());
+
+      _cur_section = it->second;
+      _cur_subsection.clear ();
+      _cur_subsubsection.clear ();
+
+      _html += "<h2 id=\"" + make_id () + "\">";
       process_block (paragraph);
       _html += "</h2>\n\n";
    }
    else if (command.name == std::string (Token::subsection))
    {
-      _html += "<h3>";
+      auto it = command.options.find ("id");
+      assert (it != command.options.end ());
+
+      _cur_subsection = it->second;
+      _cur_subsubsection.clear ();
+
+      _html += "<h3 id=\"" + make_id () + "\">";
       process_block (paragraph);
       _html += "</h3>\n\n";
    }
    else if (command.name == std::string (Token::subsubsection))
    {
-      _html += "<h4>";
+      auto it = command.options.find ("id");
+      assert (it != command.options.end ());
+
+      _cur_subsubsection = it->second;
+
+      _html += "<h4 id=\"" + make_id () + "\">";
       process_block (paragraph);
       _html += "</h4>\n\n";
    }
@@ -478,6 +496,32 @@ void  GeneratorGitHubMarkDown::make_dirs (const std::string & filepath)
 
    std::string cmd = "mkdir -p " + basepath;
    system (cmd.c_str ());
+}
+
+
+
+/*
+==============================================================================
+Name : make_id
+==============================================================================
+*/
+
+std::string GeneratorGitHubMarkDown::make_id ()
+{
+   std::string ret;
+   ret += _cur_section;
+
+   if (!_cur_subsection.empty ())
+   {
+      ret += "-" + _cur_subsection;
+   }
+
+   if (!_cur_subsubsection.empty ())
+   {
+      ret += "-" + _cur_subsubsection;
+   }
+
+   return ret;
 }
 
 

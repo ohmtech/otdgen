@@ -318,13 +318,15 @@ std::string Toc::make_rel_url_github_markdown (const AbsoluteId & ide) const
    }
    else
    {
-      std::string ret = ide [1] + "/" + ide [2] + ".md#content-user";
+      std::string ret = ide [1] + "/" + ide [2] + ".md";
 
       for (size_t i = 3 ; i < DEEPNESS ; ++i)
       {
          if (ide [i].empty ()) break;
 
-         ret += "-" + ide [i];
+         ret += (i == 3) ? "#" : "-";
+
+         ret += ide [i];
       }
 
       return ret;
