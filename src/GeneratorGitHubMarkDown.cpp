@@ -458,19 +458,24 @@ void  GeneratorGitHubMarkDown::process_navigation ()
    std::string url_prev = _toc.make_url_previous_chapter ();
    std::string url_next = _toc.make_url_next_chapter ();
 
-   _html += "<p>";
+   _html += "<p><sup>";
 
    if (!url_prev.empty ())
    {
-      _html += "<a href=\"" + url_prev + "\"><sup>previous</sup></a>";
+      _html += "<a href=\"" + url_prev + "\">previous</a>";
+   }
+
+   if ((!url_prev.empty ()) && (!url_next.empty ()))
+   {
+      _html += " | ";
    }
 
    if (!url_next.empty ())
    {
-      _html += "<a href=\"" + url_next + "\"><sup>next</sup></a>";
+      _html += "<a href=\"" + url_next + "\">next</a>";
    }
 
-   _html += "</p>\n\n";
+   _html += "</sup></p>\n\n";
 }
 
 
