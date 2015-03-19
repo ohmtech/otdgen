@@ -46,7 +46,9 @@ bool  Conf::parse (int argc, const char * argv[])
 
          if (pos == std::string::npos)
          {
-            options [arg] = "";
+            std::string key = arg.substr (2);
+
+            options [key] = "";
          }
          else
          {

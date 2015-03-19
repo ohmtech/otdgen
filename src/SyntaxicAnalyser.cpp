@@ -654,12 +654,32 @@ void  SyntaxicAnalyser::process_codeblock (Tokens::iterator & it)
    };
 
    std::string key;
+   bool line_lf_flag = false;
 
    auto state = opt_or_body;
 
    for (; it != it_end ; ++it)
    {
-      if (it->is_whitespaces ()) continue;
+      if (state == body)
+      {
+         if (it->is_whitespaces ())
+         {
+            if (!line_lf_flag)
+            {
+               line_lf_flag  = true;
+               continue;
+            }
+            else
+            {
+               codeblock.lines.emplace_back ("", CodeBlock::Style::Normal);
+               continue;
+            }
+         }
+      }
+      else
+      {
+         if (it->is_whitespaces ()) continue;
+      }
 
       auto & token = *it;
 
@@ -755,6 +775,7 @@ void  SyntaxicAnalyser::process_codeblock (Tokens::iterator & it)
             }
 
             codeblock.lines.emplace_back (line, style);
+            line_lf_flag = false;
          }
       }
       else if (state == caption_or_end)

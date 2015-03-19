@@ -53,6 +53,7 @@ void  TestSyntaxicAnalyser::run ()
    run_018 ();
    run_019 ();
    run_020 ();
+   run_021 ();
 }
 
 
@@ -611,6 +612,39 @@ void  TestSyntaxicAnalyser::run_020 ()
    Root root;
    root.add_paragraph ().add_command ("\\code").add_paragraph ().add_text ("B");
    root.add_codeblock ();
+
+   //syntaxic.root ().trace ();
+
+   assert (root == syntaxic.root ());
+}
+
+
+
+/*
+==============================================================================
+Name : run_021
+==============================================================================
+*/
+
+void  TestSyntaxicAnalyser::run_021 ()
+{
+   std::string source;
+   source += "\\codeblock ***\n";
+   source += "test\n\n";
+   source += "test\n";
+   source += "***\n";
+
+   LexicalAnalyser lexical;
+   auto tokens = lexical.process (source);
+
+   SyntaxicAnalyser syntaxic (tokens, source, "<context>");
+   syntaxic.process ();
+
+   Root root;
+   CodeBlock & codeblock = root.add_codeblock ();
+   codeblock.add_line ("test", CodeBlock::Style::Normal);
+   codeblock.add_line ("", CodeBlock::Style::Normal);
+   codeblock.add_line ("test", CodeBlock::Style::Normal);
 
    //syntaxic.root ().trace ();
 
