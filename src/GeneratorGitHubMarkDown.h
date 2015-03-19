@@ -63,6 +63,8 @@ private:
    void           process_block (const Paragraph & paragraph);
    void           process_block (const Expression & expression);
 
+   void           process_navigation ();
+
    void           flush ();
    void           make_dirs (const std::string & filepath);
    std::string    make_id ();

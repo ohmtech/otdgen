@@ -47,6 +47,9 @@ Name : process
 
 void  Toc::process (const Root & root)
 {
+   _id_set.clear ();
+   _chapter_id_list.clear ();
+
    AbsoluteId cur_id;
 
    for (auto && expression_uptr : root.expressions)
@@ -111,6 +114,69 @@ std::string Toc::make_url (const std::string & ide) const
 
 
 
+/*
+==============================================================================
+Name : make_url_previous_chapter
+==============================================================================
+*/
+
+std::string Toc::make_url_previous_chapter () const
+{
+   AbsoluteId cur_chapter_id = _cur_id;
+   for (size_t i = 3 ; i < DEEPNESS ; ++i)
+   {
+      cur_chapter_id [i].clear ();
+   }
+
+   auto it = std::find (_chapter_id_list.begin (), _chapter_id_list.end (), cur_chapter_id);
+
+   if (it == _chapter_id_list.end ()) return "";
+   if (it == _chapter_id_list.begin ()) return "";
+
+   --it;
+
+   AbsoluteId chapter_id = *it;
+   for (size_t i = 0 ; i < 2 ; ++i)
+   {
+      if (chapter_id [i] != cur_chapter_id [i]) return "";
+   }
+
+   return make_url (*it);
+}
+
+
+
+/*
+==============================================================================
+Name : make_url_next_chapter
+==============================================================================
+*/
+
+std::string Toc::make_url_next_chapter () const
+{
+   AbsoluteId cur_chapter_id = _cur_id;
+   for (size_t i = 3 ; i < DEEPNESS ; ++i)
+   {
+      cur_chapter_id [i].clear ();
+   }
+
+   auto it = std::find (_chapter_id_list.begin (), _chapter_id_list.end (), cur_chapter_id);
+
+   if (it == _chapter_id_list.end ()) return "";
+
+   ++it;
+
+   AbsoluteId chapter_id = *it;
+   for (size_t i = 0 ; i < 2 ; ++i)
+   {
+      if (chapter_id [i] != cur_chapter_id [i]) return "";
+   }
+
+   return make_url (*it);
+}
+
+
+
 /*\\\ INTERNAL \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\*/
 
 
@@ -138,6 +204,11 @@ void  Toc::process (AbsoluteId & cur_id, const Expression & expression)
    process (cur_id, command);
 
    _id_set.insert (cur_id);
+
+   if (command.name == std::string (Token::chapter))
+   {
+      _chapter_id_list.push_back (cur_id);
+   }
 }
 
 

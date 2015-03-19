@@ -118,6 +118,15 @@ void  GeneratorGitHubMarkDown::process (const Command & command)
    const Paragraph & paragraph
       = dynamic_cast <const Paragraph &> (**command.bodies.begin ());
 
+   if (
+      (command.name == std::string (Token::library))
+      || (command.name == std::string (Token::book))
+      || (command.name == std::string (Token::chapter))
+      )
+   {
+      process_navigation ();
+   }
+
    _toc.set_current (command);
 
    if (command.name == std::string (Token::library))
@@ -141,6 +150,10 @@ void  GeneratorGitHubMarkDown::process (const Command & command)
    else if (command.name == std::string (Token::chapter))
    {
       flush ();
+
+      _html += "\n";
+
+      process_navigation ();
 
       auto it = command.options.find ("id");
       assert (it != command.options.end ());
@@ -402,7 +415,7 @@ void  GeneratorGitHubMarkDown::process_block (const Expression & expression)
          {
             std::string url = _toc.make_url (ide);
 
-            _html += "<a href=\"" + url + "\">"; // for now
+            _html += "<a href=\"" + url + "\">";
          }
          else if (!href.empty ())
          {
@@ -430,6 +443,35 @@ void  GeneratorGitHubMarkDown::process_block (const Expression & expression)
    }
 }
 
+
+
+/*
+==============================================================================
+Name : process_navigation
+==============================================================================
+*/
+
+void  GeneratorGitHubMarkDown::process_navigation ()
+{
+   if (_html.empty ()) return;   // abort
+
+   std::string url_prev = _toc.make_url_previous_chapter ();
+   std::string url_next = _toc.make_url_next_chapter ();
+
+   _html += "<p>";
+
+   if (!url_prev.empty ())
+   {
+      _html += "<a href=\"" + url_prev + "\"><sup>previous</sup></a>";
+   }
+
+   if (!url_next.empty ())
+   {
+      _html += "<a href=\"" + url_next + "\"><sup>next</sup></a>";
+   }
+
+   _html += "</p>\n\n";
+}
 
 
 /*

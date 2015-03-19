@@ -14,6 +14,7 @@
 /*\\\ INCLUDE FILES \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\*/
 
 #include <array>
+#include <list>
 #include <set>
 #include <string>
 #include <vector>
@@ -43,6 +44,8 @@ public:
    void           process (const Root & root);
    void           set_current (const Command & command);
    std::string    make_url (const std::string & ide) const;
+   std::string    make_url_previous_chapter () const;
+   std::string    make_url_next_chapter () const;
 
 
 
@@ -78,6 +81,8 @@ private:
    AbsoluteId     _cur_id;
    std::set <AbsoluteId>
                   _id_set;
+   std::list <AbsoluteId>
+                  _chapter_id_list;
 
 
 
