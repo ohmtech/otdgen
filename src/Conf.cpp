@@ -74,6 +74,7 @@ bool  Conf::parse (int argc, const char * argv[])
       bool ok_flag = false;
       ok_flag |= option == "selftest";
       ok_flag |= option == "output";
+      ok_flag |= option == "format";
 
       if (!ok_flag) return false;
 
@@ -84,6 +85,35 @@ bool  Conf::parse (int argc, const char * argv[])
       else if (option == "output")
       {
          output_path = option_pair.second;
+      }
+      else if (option == "format")
+      {
+         std::string value = option_pair.second;
+
+         if (value == "html")
+         {
+            format = Format::Html;
+         }
+         else if (value == "html-singlepage")
+         {
+            format = Format::HtmlSinglePage;
+         }
+         else if (value == "pdf")
+         {
+            format = Format::Pdf;
+         }
+         else if (value == "github")
+         {
+            format = Format::GitHubMarkDown;
+         }
+         else if (value == "docset")
+         {
+            format = Format::DocSet;
+         }
+         else
+         {
+            return false;
+         }
       }
    }
 

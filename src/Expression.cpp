@@ -39,13 +39,13 @@ void  Expression::indent (size_t cnt) const
 
 /*
 ==============================================================================
-Name : Root::add_command
+Name : ExpressionRoot::add_command
 ==============================================================================
 */
 
-Command &   Root::add_command (std::string name)
+ExpressionCommand &  ExpressionRoot::add_command (std::string name)
 {
-   Command * ptr = new Command;
+   ExpressionCommand * ptr = new ExpressionCommand;
    ptr->name = name;
 
    expressions.push_back (std::move (std::unique_ptr <Expression> (ptr)));
@@ -57,13 +57,13 @@ Command &   Root::add_command (std::string name)
 
 /*
 ==============================================================================
-Name : Root::add_codeblock
+Name : ExpressionRoot::add_codeblock
 ==============================================================================
 */
 
-CodeBlock &   Root::add_codeblock ()
+ExpressionCodeBlock &   ExpressionRoot::add_codeblock ()
 {
-   CodeBlock * ptr = new CodeBlock;
+   ExpressionCodeBlock * ptr = new ExpressionCodeBlock;
 
    expressions.push_back (std::move (std::unique_ptr <Expression> (ptr)));
 
@@ -74,13 +74,13 @@ CodeBlock &   Root::add_codeblock ()
 
 /*
 ==============================================================================
-Name : Root::add_include
+Name : ExpressionRoot::add_include
 ==============================================================================
 */
 
-Include &   Root::add_include (std::string path)
+ExpressionInclude &  ExpressionRoot::add_include (std::string path)
 {
-   Include * ptr = new Include;
+   ExpressionInclude * ptr = new ExpressionInclude;
    ptr->path = path;
 
    expressions.push_back (std::move (std::unique_ptr <Expression> (ptr)));
@@ -92,13 +92,13 @@ Include &   Root::add_include (std::string path)
 
 /*
 ==============================================================================
-Name : Root::add_paragraph
+Name : ExpressionRoot::add_paragraph
 ==============================================================================
 */
 
-Paragraph & Root::add_paragraph ()
+ExpressionParagraph &   ExpressionRoot::add_paragraph ()
 {
-   Paragraph * ptr = new Paragraph;
+   ExpressionParagraph * ptr = new ExpressionParagraph;
 
    expressions.push_back (std::move (std::unique_ptr <Expression> (ptr)));
 
@@ -109,14 +109,14 @@ Paragraph & Root::add_paragraph ()
 
 /*
 ==============================================================================
-Name : Root::add_list_itemize
+Name : ExpressionRoot::add_list_itemize
 ==============================================================================
 */
 
-List & Root::add_list_itemize ()
+ExpressionList &  ExpressionRoot::add_list_itemize ()
 {
-   List * ptr = new List;
-   ptr->type = List::Type::Itemize;
+   ExpressionList * ptr = new ExpressionList;
+   ptr->type = ExpressionList::Type::Itemize;
 
    expressions.push_back (std::move (std::unique_ptr <Expression> (ptr)));
 
@@ -127,14 +127,14 @@ List & Root::add_list_itemize ()
 
 /*
 ==============================================================================
-Name : Root::add_list_enumerate
+Name : ExpressionRoot::add_list_enumerate
 ==============================================================================
 */
 
-List & Root::add_list_enumerate ()
+ExpressionList &  ExpressionRoot::add_list_enumerate ()
 {
-   List * ptr = new List;
-   ptr->type = List::Type::Enumerate;
+   ExpressionList * ptr = new ExpressionList;
+   ptr->type = ExpressionList::Type::Enumerate;
 
    expressions.push_back (std::move (std::unique_ptr <Expression> (ptr)));
 
@@ -145,13 +145,13 @@ List & Root::add_list_enumerate ()
 
 /*
 ==============================================================================
-Name : Root::add_table
+Name : ExpressionRoot::add_table
 ==============================================================================
 */
 
-Table &  Root::add_table ()
+ExpressionTable & ExpressionRoot::add_table ()
 {
-   Table * ptr = new Table;
+   ExpressionTable * ptr = new ExpressionTable;
 
    expressions.push_back (std::move (std::unique_ptr <Expression> (ptr)));
 
@@ -162,17 +162,17 @@ Table &  Root::add_table ()
 
 /*
 ==============================================================================
-Name : Root::operator ==
+Name : ExpressionRoot::operator ==
 ==============================================================================
 */
 
-bool  Root::operator == (const Expression & rhs) const
+bool  ExpressionRoot::operator == (const Expression & rhs) const
 {
-   const Root * rhs_ptr = dynamic_cast <const Root *> (&rhs);
+   const ExpressionRoot * rhs_ptr = dynamic_cast <const ExpressionRoot *> (&rhs);
 
    if (rhs_ptr == nullptr) return false;
 
-   const Root & orhs = *rhs_ptr;
+   const ExpressionRoot & orhs = *rhs_ptr;
 
    if (expressions.size () != orhs.expressions.size ()) return false;
 
@@ -195,11 +195,11 @@ bool  Root::operator == (const Expression & rhs) const
 
 /*
 ==============================================================================
-Name : Root::trace
+Name : ExpressionRoot::trace
 ==============================================================================
 */
 
-void  Root::trace (size_t icnt) const
+void  ExpressionRoot::trace (size_t icnt) const
 {
    indent (icnt);
    std::cout << "Root\n";
@@ -219,13 +219,13 @@ void  Root::trace (size_t icnt) const
 
 /*
 ==============================================================================
-Name : Command::add_command
+Name : ExpressionCommand::add_command
 ==============================================================================
 */
 
-Command &   Command::add_command (std::string name_)
+ExpressionCommand &  ExpressionCommand::add_command (std::string name_)
 {
-   Command * ptr = new Command;
+   ExpressionCommand * ptr = new ExpressionCommand;
    ptr->name = name_;
 
    bodies.push_back (std::move (std::unique_ptr <Expression> (ptr)));
@@ -237,13 +237,13 @@ Command &   Command::add_command (std::string name_)
 
 /*
 ==============================================================================
-Name : Command::add_paragraph
+Name : ExpressionCommand::add_paragraph
 ==============================================================================
 */
 
-Paragraph & Command::add_paragraph ()
+ExpressionParagraph &   ExpressionCommand::add_paragraph ()
 {
-   Paragraph * ptr = new Paragraph;
+   ExpressionParagraph * ptr = new ExpressionParagraph;
 
    bodies.push_back (std::move (std::unique_ptr <Expression> (ptr)));
 
@@ -258,13 +258,13 @@ Name : Command::operator ==
 ==============================================================================
 */
 
-bool  Command::operator == (const Expression & rhs) const
+bool  ExpressionCommand::operator == (const Expression & rhs) const
 {
-   const Command * rhs_ptr = dynamic_cast <const Command *> (&rhs);
+   const ExpressionCommand * rhs_ptr = dynamic_cast <const ExpressionCommand *> (&rhs);
 
    if (rhs_ptr == nullptr) return false;
 
-   const Command & orhs = *rhs_ptr;
+   const ExpressionCommand & orhs = *rhs_ptr;
 
    if (name != orhs.name) return false;
    if (options != orhs.options) return false;
@@ -289,11 +289,11 @@ bool  Command::operator == (const Expression & rhs) const
 
 /*
 ==============================================================================
-Name : Command::trace
+Name : ExpressionCommand::trace
 ==============================================================================
 */
 
-void  Command::trace (size_t icnt) const
+void  ExpressionCommand::trace (size_t icnt) const
 {
    indent (icnt);
    std::cout << "Command\n";
@@ -335,13 +335,13 @@ void  Command::trace (size_t icnt) const
 
 /*
 ==============================================================================
-Name : List::add_item
+Name : ExpressionList::add_item
 ==============================================================================
 */
 
-Paragraph & List::add_item ()
+ExpressionParagraph &   ExpressionList::add_item ()
 {
-   Paragraph * ptr = new Paragraph;
+   ExpressionParagraph * ptr = new ExpressionParagraph;
 
    items.push_back (std::move (std::unique_ptr <Expression> (ptr)));
 
@@ -352,17 +352,17 @@ Paragraph & List::add_item ()
 
 /*
 ==============================================================================
-Name : List::operator ==
+Name : ExpressionList::operator ==
 ==============================================================================
 */
 
-bool  List::operator == (const Expression & rhs) const
+bool  ExpressionList::operator == (const Expression & rhs) const
 {
-   const List * rhs_ptr = dynamic_cast <const List *> (&rhs);
+   const ExpressionList * rhs_ptr = dynamic_cast <const ExpressionList *> (&rhs);
 
    if (rhs_ptr == nullptr) return false;
 
-   const List & orhs = *rhs_ptr;
+   const ExpressionList & orhs = *rhs_ptr;
 
    if (type != orhs.type) return false;
    if (items.size () != orhs.items.size ()) return false;
@@ -386,11 +386,11 @@ bool  List::operator == (const Expression & rhs) const
 
 /*
 ==============================================================================
-Name : List::trace
+Name : ExpressionList::trace
 ==============================================================================
 */
 
-void  List::trace (size_t icnt) const
+void  ExpressionList::trace (size_t icnt) const
 {
    indent (icnt);
    std::cout << "List\n";
@@ -425,13 +425,13 @@ void  List::trace (size_t icnt) const
 
 /*
 ==============================================================================
-Name : Table::add_row
+Name : ExpressionTable::add_row
 ==============================================================================
 */
 
-Row & Table::add_row ()
+ExpressionRow &   ExpressionTable::add_row ()
 {
-   Row * ptr = new Row;
+   ExpressionRow * ptr = new ExpressionRow;
 
    rows.push_back (std::move (std::unique_ptr <Expression> (ptr)));
 
@@ -442,17 +442,17 @@ Row & Table::add_row ()
 
 /*
 ==============================================================================
-Name : Table::operator ==
+Name : ExpressionTable::operator ==
 ==============================================================================
 */
 
-bool  Table::operator == (const Expression & rhs) const
+bool  ExpressionTable::operator == (const Expression & rhs) const
 {
-   const Table * rhs_ptr = dynamic_cast <const Table *> (&rhs);
+   const ExpressionTable * rhs_ptr = dynamic_cast <const ExpressionTable *> (&rhs);
 
    if (rhs_ptr == nullptr) return false;
 
-   const Table & orhs = *rhs_ptr;
+   const ExpressionTable & orhs = *rhs_ptr;
 
    if (rows.size () != orhs.rows.size ()) return false;
 
@@ -475,11 +475,11 @@ bool  Table::operator == (const Expression & rhs) const
 
 /*
 ==============================================================================
-Name : Table::trace
+Name : ExpressionTable::trace
 ==============================================================================
 */
 
-void  Table::trace (size_t icnt) const
+void  ExpressionTable::trace (size_t icnt) const
 {
    indent (icnt);
    std::cout << "Table\n";
@@ -504,13 +504,13 @@ void  Table::trace (size_t icnt) const
 
 /*
 ==============================================================================
-Name : Row::add_cell
+Name : ExpressionRow::add_cell
 ==============================================================================
 */
 
-Paragraph & Row::add_cell ()
+ExpressionParagraph &   ExpressionRow::add_cell ()
 {
-   Paragraph * ptr = new Paragraph;
+   ExpressionParagraph * ptr = new ExpressionParagraph;
 
    cells.push_back (std::move (std::unique_ptr <Expression> (ptr)));
 
@@ -521,17 +521,17 @@ Paragraph & Row::add_cell ()
 
 /*
 ==============================================================================
-Name : Row::operator ==
+Name : ExpressionRow::operator ==
 ==============================================================================
 */
 
-bool  Row::operator == (const Expression & rhs) const
+bool  ExpressionRow::operator == (const Expression & rhs) const
 {
-   const Row * rhs_ptr = dynamic_cast <const Row *> (&rhs);
+   const ExpressionRow * rhs_ptr = dynamic_cast <const ExpressionRow *> (&rhs);
 
    if (rhs_ptr == nullptr) return false;
 
-   const Row & orhs = *rhs_ptr;
+   const ExpressionRow & orhs = *rhs_ptr;
 
    if (cells.size () != orhs.cells.size ()) return false;
 
@@ -554,11 +554,11 @@ bool  Row::operator == (const Expression & rhs) const
 
 /*
 ==============================================================================
-Name : Row::trace
+Name : ExpressionRow::trace
 ==============================================================================
 */
 
-void  Row::trace (size_t icnt) const
+void  ExpressionRow::trace (size_t icnt) const
 {
    indent (icnt);
    std::cout << "Row\n";
@@ -583,11 +583,11 @@ void  Row::trace (size_t icnt) const
 
 /*
 ==============================================================================
-Name : CodeBlock::add_line
+Name : ExpressionCodeBlock::add_line
 ==============================================================================
 */
 
-void  CodeBlock::add_line (std::string line, Style style)
+void  ExpressionCodeBlock::add_line (std::string line, Style style)
 {
    lines.emplace_back (line, style);
 }
@@ -596,13 +596,13 @@ void  CodeBlock::add_line (std::string line, Style style)
 
 /*
 ==============================================================================
-Name : Root::add_paragraph
+Name : ExpressionCodeBlock::add_paragraph
 ==============================================================================
 */
 
-Paragraph & CodeBlock::add_paragraph ()
+ExpressionParagraph &   ExpressionCodeBlock::add_paragraph ()
 {
-   Paragraph * ptr = new Paragraph;
+   ExpressionParagraph * ptr = new ExpressionParagraph;
 
    captions.push_back (std::move (std::unique_ptr <Expression> (ptr)));
 
@@ -613,17 +613,17 @@ Paragraph & CodeBlock::add_paragraph ()
 
 /*
 ==============================================================================
-Name : CodeBlock::operator ==
+Name : ExpressionCodeBlock::operator ==
 ==============================================================================
 */
 
-bool  CodeBlock::operator == (const Expression & rhs) const
+bool  ExpressionCodeBlock::operator == (const Expression & rhs) const
 {
-   const CodeBlock * rhs_ptr = dynamic_cast <const CodeBlock *> (&rhs);
+   const ExpressionCodeBlock * rhs_ptr = dynamic_cast <const ExpressionCodeBlock *> (&rhs);
 
    if (rhs_ptr == nullptr) return false;
 
-   const CodeBlock & orhs = *rhs_ptr;
+   const ExpressionCodeBlock & orhs = *rhs_ptr;
 
    if (options != orhs.options) return false;
    if (lines != orhs.lines) return false;
@@ -647,11 +647,11 @@ bool  CodeBlock::operator == (const Expression & rhs) const
 
 /*
 ==============================================================================
-Name : CodeBlock::trace
+Name : ExpressionCodeBlock::trace
 ==============================================================================
 */
 
-void  CodeBlock::trace (size_t icnt) const
+void  ExpressionCodeBlock::trace (size_t icnt) const
 {
    indent (icnt);
    std::cout << "CodeBlock\n";
@@ -723,17 +723,17 @@ void  CodeBlock::trace (size_t icnt) const
 
 /*
 ==============================================================================
-Name : Include::operator ==
+Name : ExpressionInclude::operator ==
 ==============================================================================
 */
 
-bool  Include::operator == (const Expression & rhs) const
+bool  ExpressionInclude::operator == (const Expression & rhs) const
 {
-   const Include * rhs_ptr = dynamic_cast <const Include *> (&rhs);
+   const ExpressionInclude * rhs_ptr = dynamic_cast <const ExpressionInclude *> (&rhs);
 
    if (rhs_ptr == nullptr) return false;
 
-   const Include & orhs = *rhs_ptr;
+   const ExpressionInclude & orhs = *rhs_ptr;
 
    return path == orhs.path;
 }
@@ -742,11 +742,11 @@ bool  Include::operator == (const Expression & rhs) const
 
 /*
 ==============================================================================
-Name : Command::trace
+Name : ExpressionCommand::trace
 ==============================================================================
 */
 
-void  Include::trace (size_t icnt) const
+void  ExpressionInclude::trace (size_t icnt) const
 {
    indent (icnt);
    std::cout << "Include\n";
@@ -759,13 +759,13 @@ void  Include::trace (size_t icnt) const
 
 /*
 ==============================================================================
-Name : Paragraph::add_text
+Name : ExpressionParagraph::add_text
 ==============================================================================
 */
 
-Text &   Paragraph::add_text (std::string text)
+ExpressionText &  ExpressionParagraph::add_text (std::string text)
 {
-   Text * ptr = new Text;
+   ExpressionText * ptr = new ExpressionText;
    ptr->body = text;
 
    expressions.push_back (std::move (std::unique_ptr <Expression> (ptr)));
@@ -777,13 +777,13 @@ Text &   Paragraph::add_text (std::string text)
 
 /*
 ==============================================================================
-Name : Paragraph::add_command
+Name : ExpressionParagraph::add_command
 ==============================================================================
 */
 
-Command & Paragraph::add_command (std::string name)
+ExpressionCommand &  ExpressionParagraph::add_command (std::string name)
 {
-   Command * ptr = new Command;
+   ExpressionCommand * ptr = new ExpressionCommand;
 
    ptr->name = name;
 
@@ -796,17 +796,17 @@ Command & Paragraph::add_command (std::string name)
 
 /*
 ==============================================================================
-Name : Paragraph::operator ==
+Name : ExpressionParagraph::operator ==
 ==============================================================================
 */
 
-bool  Paragraph::operator == (const Expression & rhs) const
+bool  ExpressionParagraph::operator == (const Expression & rhs) const
 {
-   const Paragraph * rhs_ptr = dynamic_cast <const Paragraph *> (&rhs);
+   const ExpressionParagraph * rhs_ptr = dynamic_cast <const ExpressionParagraph *> (&rhs);
 
    if (rhs_ptr == nullptr) return false;
 
-   const Paragraph & orhs = *rhs_ptr;
+   const ExpressionParagraph & orhs = *rhs_ptr;
 
    if (expressions.size () != orhs.expressions.size ()) return false;
 
@@ -829,11 +829,11 @@ bool  Paragraph::operator == (const Expression & rhs) const
 
 /*
 ==============================================================================
-Name : Command::trace
+Name : ExpressionParagraph::trace
 ==============================================================================
 */
 
-void  Paragraph::trace (size_t icnt) const
+void  ExpressionParagraph::trace (size_t icnt) const
 {
    indent (icnt);
    std::cout << "Paragraph\n";
@@ -853,17 +853,17 @@ void  Paragraph::trace (size_t icnt) const
 
 /*
 ==============================================================================
-Name : Text::operator ==
+Name : ExpressionText::operator ==
 ==============================================================================
 */
 
-bool  Text::operator == (const Expression & rhs) const
+bool  ExpressionText::operator == (const Expression & rhs) const
 {
-   const Text * rhs_ptr = dynamic_cast <const Text *> (&rhs);
+   const ExpressionText * rhs_ptr = dynamic_cast <const ExpressionText *> (&rhs);
 
    if (rhs_ptr == nullptr) return false;
 
-   const Text & orhs = *rhs_ptr;
+   const ExpressionText & orhs = *rhs_ptr;
 
    return body == orhs.body;
 }
@@ -872,11 +872,11 @@ bool  Text::operator == (const Expression & rhs) const
 
 /*
 ==============================================================================
-Name : Text::trace
+Name : ExpressionText::trace
 ==============================================================================
 */
 
-void  Text::trace (size_t icnt) const
+void  ExpressionText::trace (size_t icnt) const
 {
    indent (icnt);
    std::cout << "Text\n";

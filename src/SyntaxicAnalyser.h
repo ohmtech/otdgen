@@ -38,7 +38,8 @@ public:
 
    void           process ();
    Tokens         tokens ();
-   Root &         root ();
+   ExpressionRoot &
+                  root ();
 
 
 
@@ -84,7 +85,7 @@ private:
 
    bool           _in_block_flag = false;
 
-   Root           _root;
+   ExpressionRoot _root;
    std::list <Expressions *>
                   _expressions_ptr_stack;
 

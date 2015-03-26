@@ -37,7 +37,7 @@ public:
                   GeneratorGitHubMarkDown (const Conf & conf, Toc & toc);
    virtual        ~GeneratorGitHubMarkDown () = default;
 
-   void           process (const Root & root);
+   void           process (const ExpressionRoot & root);
 
 
 
@@ -55,12 +55,12 @@ protected:
 
 private:
 
-   void           process (const Command & command);
-   void           process (const List & list);
-   void           process (const Table & table);
-   void           process (const CodeBlock & codeblock);
-   void           process (const Paragraph & paragraph);
-   void           process_block (const Paragraph & paragraph);
+   void           process (const ExpressionCommand & command);
+   void           process (const ExpressionList & list);
+   void           process (const ExpressionTable & table);
+   void           process (const ExpressionCodeBlock & codeblock);
+   void           process (const ExpressionParagraph & paragraph);
+   void           process_block (const ExpressionParagraph & paragraph);
    void           process_block (const Expression & expression);
 
    void           process_navigation ();

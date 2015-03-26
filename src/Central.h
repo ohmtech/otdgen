@@ -34,7 +34,7 @@ public:
                   Central () = default;
    virtual        ~Central () = default;
 
-   Root           process (const std::string & path);
+   ExpressionRoot process (const std::string & path);
 
 
 

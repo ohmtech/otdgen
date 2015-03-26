@@ -35,7 +35,7 @@ Name : process
 ==============================================================================
 */
 
-Root  Central::process (const std::string & path)
+ExpressionRoot  Central::process (const std::string & path)
 {
    std::string source;
    bool ok_flag = read (source, path);
@@ -64,13 +64,13 @@ Root  Central::process (const std::string & path)
 
       auto & expression = **it;
 
-      auto include_ptr = dynamic_cast <Include *> (&expression);
+      auto include_ptr = dynamic_cast <ExpressionInclude *> (&expression);
 
       if (include_ptr != nullptr)
       {
          std::string sub_path = resolve (include_ptr->path, path);
 
-         Root sub_root = process (sub_path);
+         ExpressionRoot sub_root = process (sub_path);
 
          root.expressions.erase (it);
 

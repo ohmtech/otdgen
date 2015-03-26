@@ -32,8 +32,10 @@ public:
    enum class Format
    {
                   Html,
+                  HtmlSinglePage,
                   Pdf,
                   GitHubMarkDown,
+                  DocSet,
    };
 
                   Conf () = default;

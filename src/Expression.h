@@ -38,25 +38,32 @@ protected:
 
 using Expressions = std::list <std::shared_ptr <Expression>>;
 
-class Command;
-class CodeBlock;
-class Include;
-class List;
-class Paragraph;
-class Row;
-class Table;
-class Text;
+class ExpressionCommand;
+class ExpressionCodeBlock;
+class ExpressionInclude;
+class ExpressionList;
+class ExpressionParagraph;
+class ExpressionRow;
+class ExpressionTable;
+class ExpressionText;
 
-class Root : public Expression
+class ExpressionRoot : public Expression
 {
 public:
-   Command &      add_command (std::string name);
-   CodeBlock &    add_codeblock ();
-   Include &      add_include (std::string path);
-   Paragraph &    add_paragraph ();
-   List &         add_list_itemize ();
-   List &         add_list_enumerate ();
-   Table &        add_table ();
+   ExpressionCommand &
+                  add_command (std::string name);
+   ExpressionCodeBlock &
+                  add_codeblock ();
+   ExpressionInclude &
+                  add_include (std::string path);
+   ExpressionParagraph &
+                  add_paragraph ();
+   ExpressionList &
+                  add_list_itemize ();
+   ExpressionList &
+                  add_list_enumerate ();
+   ExpressionTable &
+                  add_table ();
 
    // Expression
    virtual bool   operator == (const Expression & rhs) const override;
@@ -66,11 +73,13 @@ public:
 
 }; // class Root
 
-class Command : public Expression
+class ExpressionCommand : public Expression
 {
 public:
-   Command &      add_command (std::string name);
-   Paragraph &    add_paragraph ();
+   ExpressionCommand &
+                  add_command (std::string name);
+   ExpressionParagraph &
+                  add_paragraph ();
 
    // Expression
    virtual bool   operator == (const Expression & rhs) const override;
@@ -83,7 +92,7 @@ public:
 
 }; // class Command
 
-class List : public Expression
+class ExpressionList : public Expression
 {
 public:
    enum class Type
@@ -92,7 +101,8 @@ public:
                   Enumerate,
    };
 
-   Paragraph &    add_item ();
+   ExpressionParagraph &
+                  add_item ();
 
    // Expression
    virtual bool   operator == (const Expression & rhs) const override;
@@ -103,10 +113,11 @@ public:
 
 }; // class List
 
-class Table : public Expression
+class ExpressionTable : public Expression
 {
 public:
-   Row &          add_row ();
+   ExpressionRow &
+                  add_row ();
 
    // Expression
    virtual bool   operator == (const Expression & rhs) const override;
@@ -116,10 +127,11 @@ public:
 
 }; // class Table
 
-class Row : public Expression
+class ExpressionRow : public Expression
 {
 public:
-   Paragraph &   add_cell ();
+   ExpressionParagraph &
+                  add_cell ();
 
    // Expression
    virtual bool   operator == (const Expression & rhs) const override;
@@ -129,7 +141,7 @@ public:
 
 }; // class Row
 
-class CodeBlock : public Expression
+class ExpressionCodeBlock : public Expression
 {
 public:
    enum class Style
@@ -139,7 +151,8 @@ public:
                   Emph,
    };
    void           add_line (std::string line, Style style);
-   Paragraph &    add_paragraph ();
+   ExpressionParagraph &
+                  add_paragraph ();
 
    // Expression
    virtual bool   operator == (const Expression & rhs) const override;
@@ -154,7 +167,7 @@ public:
 
 }; // class CodeBlock
 
-class Include : public Expression
+class ExpressionInclude : public Expression
 {
 public:
    // Expression
@@ -166,11 +179,13 @@ public:
 
 }; // class Include
 
-class Paragraph : public Expression
+class ExpressionParagraph : public Expression
 {
 public:
-   Text &         add_text (std::string text);
-   Command &      add_command (std::string name);
+   ExpressionText &
+                  add_text (std::string text);
+   ExpressionCommand &
+                  add_command (std::string name);
 
    // Expression
    virtual bool   operator == (const Expression & rhs) const override;
@@ -180,7 +195,7 @@ public:
 
 }; // class Paragraph
 
-class Text : public Expression
+class ExpressionText : public Expression
 {
 public:
    // Expression

@@ -50,41 +50,41 @@ Name : process
 ==============================================================================
 */
 
-void GeneratorGitHubMarkDown::process (const Root & root)
+void GeneratorGitHubMarkDown::process (const ExpressionRoot & root)
 {
    for (auto && expression_uptr : root.expressions)
    {
       const auto & expression = *expression_uptr;
 
-      const Command * command_ptr = dynamic_cast <const Command *> (&expression);
+      const ExpressionCommand * command_ptr = dynamic_cast <const ExpressionCommand *> (&expression);
 
       if (command_ptr != nullptr)
       {
          process (*command_ptr);
       }
 
-      const List * list_ptr = dynamic_cast <const List *> (&expression);
+      const ExpressionList * list_ptr = dynamic_cast <const ExpressionList *> (&expression);
 
       if (list_ptr != nullptr)
       {
          process (*list_ptr);
       }
 
-      const Table * table_ptr = dynamic_cast <const Table *> (&expression);
+      const ExpressionTable * table_ptr = dynamic_cast <const ExpressionTable *> (&expression);
 
-      if (table_ptr!= nullptr)
+      if (table_ptr != nullptr)
       {
          process (*table_ptr);
       }
 
-      const CodeBlock * codeblock_ptr = dynamic_cast <const CodeBlock *> (&expression);
+      const ExpressionCodeBlock * codeblock_ptr = dynamic_cast <const ExpressionCodeBlock *> (&expression);
 
       if (codeblock_ptr != nullptr)
       {
          process (*codeblock_ptr);
       }
 
-      const Paragraph * paragraph_ptr = dynamic_cast <const Paragraph *> (&expression);
+      const ExpressionParagraph * paragraph_ptr = dynamic_cast <const ExpressionParagraph *> (&expression);
 
       if (paragraph_ptr != nullptr)
       {
@@ -113,10 +113,10 @@ Name : process
 ==============================================================================
 */
 
-void  GeneratorGitHubMarkDown::process (const Command & command)
+void  GeneratorGitHubMarkDown::process (const ExpressionCommand & command)
 {
-   const Paragraph & paragraph
-      = dynamic_cast <const Paragraph &> (**command.bodies.begin ());
+   const ExpressionParagraph & paragraph
+      = dynamic_cast <const ExpressionParagraph &> (**command.bodies.begin ());
 
    if (
       (command.name == std::string (Token::library))
@@ -228,13 +228,13 @@ Name : process
 ==============================================================================
 */
 
-void  GeneratorGitHubMarkDown::process (const List & list)
+void  GeneratorGitHubMarkDown::process (const ExpressionList & list)
 {
-   if (list.type == List::Type::Itemize)
+   if (list.type == ExpressionList::Type::Itemize)
    {
       _html += "<ul>\n";
    }
-   else if (list.type == List::Type::Enumerate)
+   else if (list.type == ExpressionList::Type::Enumerate)
    {
       _html += "<ol>\n";
    }
@@ -243,7 +243,7 @@ void  GeneratorGitHubMarkDown::process (const List & list)
    {
       const auto & expression = *item;
 
-      const auto & paragraph = dynamic_cast <const Paragraph &> (expression);
+      const auto & paragraph = dynamic_cast <const ExpressionParagraph &> (expression);
 
       _html += "<li>";
 
@@ -252,11 +252,11 @@ void  GeneratorGitHubMarkDown::process (const List & list)
       _html += "</li>\n";
    }
 
-   if (list.type == List::Type::Itemize)
+   if (list.type == ExpressionList::Type::Itemize)
    {
       _html += "</ul>\n\n";
    }
-   else if (list.type == List::Type::Enumerate)
+   else if (list.type == ExpressionList::Type::Enumerate)
    {
       _html += "</ol>\n\n";
    }
@@ -270,19 +270,19 @@ Name : process
 ==============================================================================
 */
 
-void  GeneratorGitHubMarkDown::process (const Table & table)
+void  GeneratorGitHubMarkDown::process (const ExpressionTable & table)
 {
    _html += "<table>\n";
 
    for (auto && row_uptr : table.rows)
    {
-      const auto & row = dynamic_cast <const Row &> (*row_uptr);
+      const auto & row = dynamic_cast <const ExpressionRow &> (*row_uptr);
 
       _html += "<tr>\n";
 
       for (auto && cell_uptr : row.cells)
       {
-         const auto & paragraph = dynamic_cast <const Paragraph &> (*cell_uptr);
+         const auto & paragraph = dynamic_cast <const ExpressionParagraph &> (*cell_uptr);
 
          _html += "<td>";
 
@@ -305,7 +305,7 @@ Name : process
 ==============================================================================
 */
 
-void  GeneratorGitHubMarkDown::process (const CodeBlock & codeblock)
+void  GeneratorGitHubMarkDown::process (const ExpressionCodeBlock & codeblock)
 {
    _html += "```";
 
@@ -334,7 +334,7 @@ Name : process
 ==============================================================================
 */
 
-void  GeneratorGitHubMarkDown::process (const Paragraph & paragraph)
+void  GeneratorGitHubMarkDown::process (const ExpressionParagraph & paragraph)
 {
    _html += "<p>";
    process_block (paragraph);
@@ -349,7 +349,7 @@ Name : process_block
 ==============================================================================
 */
 
-void  GeneratorGitHubMarkDown::process_block (const Paragraph & paragraph)
+void  GeneratorGitHubMarkDown::process_block (const ExpressionParagraph & paragraph)
 {
    for (auto && expression_uptr : paragraph.expressions)
    {
@@ -369,11 +369,11 @@ Name : process_block
 
 void  GeneratorGitHubMarkDown::process_block (const Expression & expression)
 {
-   const Command * command_ptr = dynamic_cast <const Command *> (&expression);
+   const ExpressionCommand * command_ptr = dynamic_cast <const ExpressionCommand *> (&expression);
 
    if (command_ptr != nullptr)
    {
-      const Command & command = *command_ptr;
+      const ExpressionCommand & command = *command_ptr;
 
       if (command.name == std::string (Token::code))
       {
@@ -428,14 +428,14 @@ void  GeneratorGitHubMarkDown::process_block (const Expression & expression)
       }
    }
 
-   const Paragraph * paragraph_ptr = dynamic_cast <const Paragraph *> (&expression);
+   const ExpressionParagraph * paragraph_ptr = dynamic_cast <const ExpressionParagraph *> (&expression);
 
    if (paragraph_ptr != nullptr)
    {
       process_block (*paragraph_ptr);
    }
 
-   const Text * text_ptr = dynamic_cast <const Text *> (&expression);
+   const ExpressionText * text_ptr = dynamic_cast <const ExpressionText *> (&expression);
 
    if (text_ptr != nullptr)
    {

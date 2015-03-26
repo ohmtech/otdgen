@@ -79,7 +79,7 @@ Name : root
 ==============================================================================
 */
 
-Root &   SyntaxicAnalyser::root ()
+ExpressionRoot &   SyntaxicAnalyser::root ()
 {
    return _root;
 }
@@ -277,7 +277,7 @@ Name : process_command
 
 void  SyntaxicAnalyser::process_command (Tokens::iterator & it)
 {
-   Command & command = add_expression <Command> ();
+   ExpressionCommand & command = add_expression <ExpressionCommand> ();
    command.name = *it;
    ++it;
 
@@ -418,15 +418,15 @@ Name : process_list
 
 void  SyntaxicAnalyser::process_list (Tokens::iterator & it)
 {
-   List & list = add_expression <List> ();
+   ExpressionList & list = add_expression <ExpressionList> ();
 
    if (*it == Token::itemize)
    {
-      list.type = List::Type::Itemize;
+      list.type = ExpressionList::Type::Itemize;
    }
    else if (*it == Token::enumerate)
    {
-      list.type = List::Type::Enumerate;
+      list.type = ExpressionList::Type::Enumerate;
    }
 
    ++it;
@@ -510,7 +510,7 @@ Name : process_table
 
 void  SyntaxicAnalyser::process_table (Tokens::iterator & it)
 {
-   Table & table = add_expression <Table> ();
+   ExpressionTable & table = add_expression <ExpressionTable> ();
    ++it;
 
    push_expressions (table.rows);
@@ -557,7 +557,7 @@ void  SyntaxicAnalyser::process_table (Tokens::iterator & it)
                pop_expressions ();
             }
 
-            Row & row = add_expression <Row> ();
+            ExpressionRow & row = add_expression <ExpressionRow> ();
             push_expressions (row.cells);
             row_flag = true;
 
@@ -578,7 +578,7 @@ void  SyntaxicAnalyser::process_table (Tokens::iterator & it)
                pop_expressions ();
             }
 
-            Row & row = add_expression <Row> ();
+            ExpressionRow & row = add_expression <ExpressionRow> ();
             push_expressions (row.cells);
             row_flag = true;
 
@@ -634,7 +634,7 @@ Name : process_codeblock
 
 void  SyntaxicAnalyser::process_codeblock (Tokens::iterator & it)
 {
-   CodeBlock & codeblock = add_expression <CodeBlock> ();
+   ExpressionCodeBlock & codeblock = add_expression <ExpressionCodeBlock> ();
    ++it;
 
    const auto it_end = _tokens.end ();
@@ -671,7 +671,7 @@ void  SyntaxicAnalyser::process_codeblock (Tokens::iterator & it)
             }
             else
             {
-               codeblock.lines.emplace_back ("", CodeBlock::Style::Normal);
+               codeblock.lines.emplace_back ("", ExpressionCodeBlock::Style::Normal);
                continue;
             }
          }
@@ -755,17 +755,17 @@ void  SyntaxicAnalyser::process_codeblock (Tokens::iterator & it)
          {
             std::string line (token);
 
-            CodeBlock::Style style = CodeBlock::Style::Normal;
+            ExpressionCodeBlock::Style style = ExpressionCodeBlock::Style::Normal;
 
             if (ends_with (line, "\\fade"))
             {
                line = line.substr (0, line.size () - 5);
-               style = CodeBlock::Style::Fade;
+               style = ExpressionCodeBlock::Style::Fade;
             }
             else if (ends_with (line, "\\emph"))
             {
                line = line.substr (0, line.size () - 5);
-               style = CodeBlock::Style::Emph;
+               style = ExpressionCodeBlock::Style::Emph;
             }
 
             size_t pos = line.find_last_not_of ("\t ");
@@ -837,7 +837,7 @@ Name : process_include
 
 void  SyntaxicAnalyser::process_include (Tokens::iterator & it)
 {
-   Include & include = add_expression <Include> ();
+   ExpressionInclude & include = add_expression <ExpressionInclude> ();
    ++it;
 
    const auto it_end = _tokens.end ();
@@ -889,7 +889,7 @@ Name : process_paragraph
 
 void  SyntaxicAnalyser::process_paragraph (Tokens::iterator & it)
 {
-   Paragraph & paragraph = add_expression <Paragraph> ();
+   ExpressionParagraph & paragraph = add_expression <ExpressionParagraph> ();
    push_expressions (paragraph.expressions);
 
    const auto it_end = _tokens.end ();
@@ -921,7 +921,7 @@ void  SyntaxicAnalyser::process_paragraph (Tokens::iterator & it)
       {
          if (token_cr_flag) break;
 
-         Text & text = add_expression <Text> ();
+         ExpressionText & text = add_expression <ExpressionText> ();
 
          text.body = " ";
 
@@ -931,7 +931,7 @@ void  SyntaxicAnalyser::process_paragraph (Tokens::iterator & it)
       {
          // interpret as text
 
-         Text & text = add_expression <Text> ();
+         ExpressionText & text = add_expression <ExpressionText> ();
 
          text.body = std::string (token);
       }
@@ -957,8 +957,8 @@ void  SyntaxicAnalyser::process_paragraph (Tokens::iterator & it)
             auto & expression = **eit;
             auto & next_expression = **eit_next;
 
-            Text * text_ptr = dynamic_cast <Text *> (&expression);
-            Text * next_text_ptr = dynamic_cast <Text *> (&next_expression);
+            ExpressionText * text_ptr = dynamic_cast <ExpressionText *> (&expression);
+            ExpressionText * next_text_ptr = dynamic_cast <ExpressionText *> (&next_expression);
 
             if ((text_ptr != nullptr) && (next_text_ptr != nullptr))
             {
@@ -988,7 +988,7 @@ void  SyntaxicAnalyser::process_paragraph (Tokens::iterator & it)
       if (eit != eit_end)
       {
          auto & expression = **eit;
-         Text * text_ptr = dynamic_cast <Text *> (&expression);
+         ExpressionText * text_ptr = dynamic_cast <ExpressionText *> (&expression);
          if (text_ptr != nullptr)
          {
             // trim
@@ -1013,7 +1013,7 @@ void  SyntaxicAnalyser::process_paragraph (Tokens::iterator & it)
          --eit_last;
 
          auto & expression = **eit_last;
-         Text * text_ptr = dynamic_cast <Text *> (&expression);
+         ExpressionText * text_ptr = dynamic_cast <ExpressionText *> (&expression);
          if (text_ptr != nullptr)
          {
             // trim

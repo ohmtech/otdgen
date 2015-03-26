@@ -182,7 +182,7 @@ void  TestSyntaxicAnalyser::run_005 ()
    SyntaxicAnalyser syntaxic (tokens, source, "<context>");
    syntaxic.process ();
 
-   Root root;
+   ExpressionRoot root;
    root.add_paragraph ().add_text ("Hello world !");
 
    //syntaxic.root ().trace ();
@@ -208,7 +208,7 @@ void  TestSyntaxicAnalyser::run_006 ()
    SyntaxicAnalyser syntaxic (tokens, source, "<context>");
    syntaxic.process ();
 
-   Root root;
+   ExpressionRoot root;
    root.add_paragraph ().add_command ("\\code").add_paragraph ().add_text ("c");
 
    //syntaxic.root ().trace ();
@@ -234,8 +234,8 @@ void  TestSyntaxicAnalyser::run_007 ()
    SyntaxicAnalyser syntaxic (tokens, source, "<context>");
    syntaxic.process ();
 
-   Root root;
-   Paragraph & p = root.add_paragraph ();
+   ExpressionRoot root;
+   ExpressionParagraph & p = root.add_paragraph ();
    p.add_text ("A");
    p.add_command ("\\code").add_paragraph ().add_text ("c");
 
@@ -262,8 +262,8 @@ void  TestSyntaxicAnalyser::run_008 ()
    SyntaxicAnalyser syntaxic (tokens, source, "<context>");
    syntaxic.process ();
 
-   Root root;
-   Paragraph & p = root.add_paragraph ();
+   ExpressionRoot root;
+   ExpressionParagraph & p = root.add_paragraph ();
    p.add_text ("A ");
    p.add_command ("\\code").add_paragraph ().add_text ("c");
    p.add_text ("B");
@@ -291,7 +291,7 @@ void  TestSyntaxicAnalyser::run_009 ()
    SyntaxicAnalyser syntaxic (tokens, source, "<context>");
    syntaxic.process ();
 
-   Root root;
+   ExpressionRoot root;
    root.add_paragraph ().add_text ("Hello World");
 
    //syntaxic.root ().trace ();
@@ -317,7 +317,7 @@ void  TestSyntaxicAnalyser::run_010 ()
    SyntaxicAnalyser syntaxic (tokens, source, "<context>");
    syntaxic.process ();
 
-   Root root;
+   ExpressionRoot root;
    root.add_paragraph ().add_text ("Hello");
    root.add_paragraph ().add_text ("World");
 
@@ -344,8 +344,8 @@ void  TestSyntaxicAnalyser::run_011 ()
    SyntaxicAnalyser syntaxic (tokens, source, "<context>");
    syntaxic.process ();
 
-   Root root;
-   Command & command = root.add_command ("\\chapter");
+   ExpressionRoot root;
+   ExpressionCommand & command = root.add_command ("\\chapter");
    command.options ["id"] = "opt";
    command.add_paragraph ().add_text ("Hello world !");
 
@@ -372,10 +372,10 @@ void  TestSyntaxicAnalyser::run_012 ()
    SyntaxicAnalyser syntaxic (tokens, source, "<context>");
    syntaxic.process ();
 
-   Root root;
-   Command & command = root.add_command ("\\chapter");
+   ExpressionRoot root;
+   ExpressionCommand & command = root.add_command ("\\chapter");
    command.options ["id"] = "opt";
-   Paragraph & paragraph = command.add_paragraph ();
+   ExpressionParagraph & paragraph = command.add_paragraph ();
    paragraph.add_text ("Hello ");
    paragraph.add_command ("\\code").add_paragraph ().add_text ("world");
    paragraph.add_text (" !");
@@ -403,7 +403,7 @@ void  TestSyntaxicAnalyser::run_013 ()
    SyntaxicAnalyser syntaxic (tokens, source, "<context>");
    syntaxic.process ();
 
-   Root root;
+   ExpressionRoot root;
    root.add_paragraph ().add_text ("1");
    root.add_paragraph ().add_text ("2");
    root.add_paragraph ().add_text ("3");
@@ -431,8 +431,8 @@ void  TestSyntaxicAnalyser::run_014 ()
    SyntaxicAnalyser syntaxic (tokens, source, "<context>");
    syntaxic.process ();
 
-   Root root;
-   Command & command = root.add_paragraph ().add_command ("\\image");
+   ExpressionRoot root;
+   ExpressionCommand & command = root.add_paragraph ().add_command ("\\image");
    command.add_paragraph ().add_text ("a.pdf");
    command.add_paragraph ().add_text ("caption");
 
@@ -459,8 +459,8 @@ void  TestSyntaxicAnalyser::run_015 ()
    SyntaxicAnalyser syntaxic (tokens, source, "<context>");
    syntaxic.process ();
 
-   Root root;
-   Command & command = root.add_command ("\\subsection");
+   ExpressionRoot root;
+   ExpressionCommand & command = root.add_command ("\\subsection");
    command.options ["id"] = "front";
    command.options ["decoration"] = "box";
    command.add_paragraph ().add_text ("front");
@@ -494,13 +494,13 @@ void  TestSyntaxicAnalyser::run_016 ()
    SyntaxicAnalyser syntaxic (tokens, source, "<context>");
    syntaxic.process ();
 
-   Root root;
-   CodeBlock & codeblock = root.add_codeblock ();
+   ExpressionRoot root;
+   ExpressionCodeBlock & codeblock = root.add_codeblock ();
    codeblock.options ["language"] = "c++";
-   codeblock.add_line ("#include \"blabla\"", CodeBlock::Style::Fade);
-   codeblock.add_line ("foo", CodeBlock::Style::Normal);
-   codeblock.add_line ("// some comment", CodeBlock::Style::Normal);
-   codeblock.add_line ("// some important comment", CodeBlock::Style::Emph);
+   codeblock.add_line ("#include \"blabla\"", ExpressionCodeBlock::Style::Fade);
+   codeblock.add_line ("foo", ExpressionCodeBlock::Style::Normal);
+   codeblock.add_line ("// some comment", ExpressionCodeBlock::Style::Normal);
+   codeblock.add_line ("// some important comment", ExpressionCodeBlock::Style::Emph);
    codeblock.add_paragraph ().add_text ("Example use of it");
 
    //syntaxic.root ().trace ();
@@ -526,7 +526,7 @@ void  TestSyntaxicAnalyser::run_017 ()
    SyntaxicAnalyser syntaxic (tokens, source, "<context>");
    syntaxic.process ();
 
-   Root root;
+   ExpressionRoot root;
    root.add_include ("something.otd");
 
    //syntaxic.root ().trace ();
@@ -552,8 +552,8 @@ void  TestSyntaxicAnalyser::run_018 ()
    SyntaxicAnalyser syntaxic (tokens, source, "<context>");
    syntaxic.process ();
 
-   Root root;
-   Paragraph & paragraph = root.add_paragraph ();
+   ExpressionRoot root;
+   ExpressionParagraph & paragraph = root.add_paragraph ();
    paragraph.add_command ("\\code").add_paragraph ().add_text ("c");
    paragraph.add_command ("\\code").add_paragraph ().add_text ("b");
 
@@ -580,7 +580,7 @@ void  TestSyntaxicAnalyser::run_019 ()
    SyntaxicAnalyser syntaxic (tokens, source, "<context>");
    syntaxic.process ();
 
-   Root root;
+   ExpressionRoot root;
    root.add_paragraph ().add_text ("Hello");
 
    //syntaxic.root ().trace ();
@@ -609,7 +609,7 @@ void  TestSyntaxicAnalyser::run_020 ()
    SyntaxicAnalyser syntaxic (tokens, source, "<context>");
    syntaxic.process ();
 
-   Root root;
+   ExpressionRoot root;
    root.add_paragraph ().add_command ("\\code").add_paragraph ().add_text ("B");
    root.add_codeblock ();
 
@@ -640,11 +640,11 @@ void  TestSyntaxicAnalyser::run_021 ()
    SyntaxicAnalyser syntaxic (tokens, source, "<context>");
    syntaxic.process ();
 
-   Root root;
-   CodeBlock & codeblock = root.add_codeblock ();
-   codeblock.add_line ("test", CodeBlock::Style::Normal);
-   codeblock.add_line ("", CodeBlock::Style::Normal);
-   codeblock.add_line ("test", CodeBlock::Style::Normal);
+   ExpressionRoot root;
+   ExpressionCodeBlock & codeblock = root.add_codeblock ();
+   codeblock.add_line ("test", ExpressionCodeBlock::Style::Normal);
+   codeblock.add_line ("", ExpressionCodeBlock::Style::Normal);
+   codeblock.add_line ("test", ExpressionCodeBlock::Style::Normal);
 
    //syntaxic.root ().trace ();
 

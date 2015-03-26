@@ -12,6 +12,7 @@
 #include "Central.h"
 #include "Conf.h"
 #include "GeneratorGitHubMarkDown.h"
+#include "GeneratorHtml.h"
 #include "LexicalAnalyser.h"
 #include "Toc.h"
 #include "TestLexicalAnalyser.h"
@@ -74,13 +75,26 @@ void  run (const otdgen::Conf & conf, const std::string & path)
    {
       Central central;
 
-      Root root = central.process (path);
+      ExpressionRoot root = central.process (path);
 
       Toc toc (conf);
       toc.process (root);
 
-      GeneratorGitHubMarkDown generator (conf, toc);
-      generator.process (root);
+      if (conf.format == Conf::Format::Html)
+      {
+         GeneratorHtml generator (conf, toc);
+         generator.process (root);
+      }
+      else if (conf.format == Conf::Format::GitHubMarkDown)
+      {
+         GeneratorGitHubMarkDown generator (conf, toc);
+         generator.process (root);
+      }
+      else if (conf.format == Conf::Format::DocSet)
+      {
+         GeneratorHtml generator (conf, toc);
+         generator.process (root);
+      }
    }
    catch (...)
    {
@@ -100,7 +114,7 @@ void  usage ()
 {
    std::cout << "usage:\n";
    std::cout << "  otdgen --selftest\n";
-   std::cout << "  otdgen source_file\n";
+   std::cout << "  otdgen --format=<format> --output=<output> source_file\n";
 }
 
 

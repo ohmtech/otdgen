@@ -20,6 +20,8 @@
       'Expression.h',
       'GeneratorGitHubMarkDown.cpp',
       'GeneratorGitHubMarkDown.h',
+      'GeneratorHtml.cpp',
+      'GeneratorHtml.h',
       'LexicalAnalyser.cpp',
       'LexicalAnalyser.h',
       'main.cpp',
@@ -30,5 +32,7 @@
       'Toc.h',
       'Token.cpp',
       'Token.h',
+
+      'sqlite3.c',
    ],
 }
