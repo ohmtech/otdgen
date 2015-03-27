@@ -73,6 +73,7 @@ private:
    void           post_process (DocBook & book);
    void           post_process (DocChapter & chapter);
    void           post_process (DocBlocks & blocks);
+   void           post_process (DocMethods & methods);
 
    DocLibrary     _library;
    DocBook *      _book_ptr = nullptr;

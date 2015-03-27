@@ -14,6 +14,9 @@
 /*\\\ INCLUDE FILES \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\*/
 
 #include "DocInline.h"
+#include "DocMethod.h"
+#include "DocParameter.h"
+#include "DocType.h"
 #include "GeneratorBase.h"
 
 #include <string>
@@ -31,6 +34,7 @@ namespace otdgen
 class Conf;
 class DocBlocks;
 class DocBook;
+class DocCartouche;
 class DocChapter;
 class DocCodeBlock;
 class DocInformation;
@@ -79,6 +83,10 @@ private:
    void           process (std::string & output, std::vector <std::string> & cur, const DocTable & table);
    void           process (std::string & output, std::vector <std::string> & cur, const DocCodeBlock & codeblock);
    void           process (std::string & output, std::vector <std::string> & cur, const DocParagraph & paragraph);
+   void           process (std::string & output, std::vector <std::string> & cur, const DocCartouche & cartouche);
+   void           process (std::string & output, std::vector <std::string> & cur, const DocParameters & parameters);
+   void           process (std::string & output, std::vector <std::string> & cur, const DocTypes & types);
+   void           process (std::string & output, std::vector <std::string> & cur, const DocMethods & methods);
 
    void           process (std::string & output, std::vector <std::string> & cur, const DocInlines & inlines);
    std::string    make_href (const std::vector <std::string> & cur, const std::string & id);

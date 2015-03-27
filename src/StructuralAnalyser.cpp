@@ -814,6 +814,7 @@ Name : post_process
 void  StructuralAnalyser::post_process (DocChapter & chapter)
 {
    post_process (chapter.blocks);
+   post_process (chapter.methods);
 }
 
 
@@ -858,6 +859,22 @@ void  StructuralAnalyser::post_process (DocBlocks & blocks)
       {
          assert (false);
       }
+   }
+}
+
+
+
+/*
+==============================================================================
+Name : post_process
+==============================================================================
+*/
+
+void  StructuralAnalyser::post_process (DocMethods & methods)
+{
+   for (auto && method : methods)
+   {
+      post_process (method.description);
    }
 }
 

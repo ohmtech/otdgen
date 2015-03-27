@@ -194,11 +194,33 @@ void  GeneratorHtml::process (std::vector <std::string> & cur, const DocChapter 
 
    process_nav (output, chapter);
 
+   if (chapter.type == DocChapter::Type::Class)
+   {
+      if (conf ().format == Conf::Format::DocSet)
+      {
+         output += "<a name=\"//apple_ref/cpp/Class/";
+         output += escape_pourcent (chapter.name);
+         output += "\" class=\"dashAnchor\"></a>\n";
+      }
+   }
+
    output += "<h1>";
    process (output, cur, chapter.title);
    output += "</h1>\n\n";
 
+   if (chapter.type == DocChapter::Type::Class)
+   {
+      process (output, cur, chapter.cartouche);
+   }
+
    process (output, cur, chapter.blocks);
+
+   if (chapter.type == DocChapter::Type::Class)
+   {
+      process (output, cur, chapter.parameters);
+      process (output, cur, chapter.types);
+      process (output, cur, chapter.methods);
+   }
 
    process_nav (output, chapter);
 
@@ -441,6 +463,232 @@ void  GeneratorHtml::process (std::string & output, std::vector <std::string> & 
    process (output, cur, paragraph.body);
 
    output += "</p>\n\n";
+}
+
+
+
+/*
+==============================================================================
+Name : process
+==============================================================================
+*/
+
+void  GeneratorHtml::process (std::string & output, std::vector <std::string> & cur, const DocCartouche & cartouche)
+{
+   output += "<table>";
+
+   if (!cartouche.inherit.empty ())
+   {
+      output += "<tr>";
+      output += "<td><p>Inherits from</p></td>";
+      output += "<td><p><code>" + cartouche.inherit + "</code></p></td>";
+      output += "</tr>\n";
+   }
+
+   if (!cartouche.header.empty ())
+   {
+      output += "<tr>";
+      output += "<td><p>Declared in</p></td>";
+      output += "<td><p><code>" + cartouche.header + "</code></p></td>";
+      output += "</tr>\n";
+   }
+
+   if (!cartouche.guide_id.empty ())
+   {
+      output += "<tr>";
+      output += "<td><p>Companion Guide</p></td>";
+      output += "<td><p>";
+      process (output, cur, cartouche.guide);
+      output += "</p></td>";
+      output += "</tr>\n";
+   }
+
+   output += "</table>\n\n";
+
+   output += "<div class=\"codeblock\"><table>\n";
+   output += "<tr><td><pre>" + escape_xml (cartouche.declaration) + "</pre></td></tr>\n";
+   output += "</table></div>\n\n";
+
+}
+
+
+
+/*
+==============================================================================
+Name : process
+==============================================================================
+*/
+
+void  GeneratorHtml::process (std::string & output, std::vector <std::string> & cur, const DocParameters & parameters)
+{
+   output += "<h2>Template Parameters</h2>\n\n";
+
+   output += "<table>";
+
+   for (auto && parameter : parameters)
+   {
+      if (conf ().format == Conf::Format::DocSet)
+      {
+         output += "<a name=\"//apple_ref/cpp/Parameter/";
+         output += escape_pourcent (parameter.type);
+         output += "\" class=\"dashAnchor\"></a>\n";
+      }
+
+      output += "<tr>";
+      output += "<td><p><code>" + parameter.type + "</code></p></td>";
+      output += "<td><p>";
+      process (output, cur, parameter.body);
+      output += "</p></td>";
+      output += "</tr>\n";
+   }
+
+   output += "</table>\n\n";
+}
+
+
+
+/*
+==============================================================================
+Name : process
+==============================================================================
+*/
+
+void  GeneratorHtml::process (std::string & output, std::vector <std::string> & cur, const DocTypes & types)
+{
+   output += "<h2>Member Types</h2>\n\n";
+
+   output += "<table>";
+
+   for (auto && type : types)
+   {
+      if (conf ().format == Conf::Format::DocSet)
+      {
+         output += "<a name=\"//apple_ref/cpp/Type/";
+         output += escape_pourcent (type.type);
+         output += "\" class=\"dashAnchor\"></a>\n";
+      }
+
+      output += "<tr>";
+      output += "<td><p><code>" + type.type + "</code></p></td>";
+      output += "<td><p>";
+      process (output, cur, type.body);
+      output += "</p></td>";
+      output += "</tr>\n";
+   }
+
+   output += "</table>\n\n";
+}
+
+
+
+/*
+==============================================================================
+Name : process
+==============================================================================
+*/
+
+void  GeneratorHtml::process (std::string & output, std::vector <std::string> & cur, const DocMethods & methods)
+{
+   // synopsys
+
+   output += "<h2>Member Functions Synopsys</h2>\n\n";
+
+   output += "<table>";
+
+   for (auto && method : methods)
+   {
+      if (method.type == DocMethod::Type::Constructor)
+      {
+         output += "<tr>";
+         output += "<td><p>Constructor</p></td>";
+         output += "<td><p>";
+         process (output, cur, method.brief);
+         output += "</p></td>";
+         output += "</tr>\n";
+      }
+      else if (method.type == DocMethod::Type::Destructor)
+      {
+         output += "<tr>";
+         output += "<td><p>Destructor</p></td>";
+         output += "<td><p>";
+         process (output, cur, method.brief);
+         output += "</p></td>";
+         output += "</tr>\n";
+      }
+      else if (method.type == DocMethod::Type::Function)
+      {
+         output += "<tr>";
+         output += "<td><p><code>" + method.name + "</code></p></td>";
+         output += "<td><p>";
+         process (output, cur, method.brief);
+         output += "</p></td>";
+         output += "</tr>\n";
+      }
+      else if (method.type == DocMethod::Type::Division)
+      {
+         output += "</table>\n\n";
+
+         if (conf ().format == Conf::Format::DocSet)
+         {
+            output += "<a name=\"//apple_ref/cpp/Section/";
+            output += escape_pourcent (process_no_style (method.brief));
+            output += "\" class=\"dashAnchor\"></a>\n";
+         }
+
+         output += "<h3>";
+         process (output, cur, method.brief);
+         output += "</h3>\n\n";
+
+         output += "<table>";
+      }
+   }
+
+   output += "</table>\n\n";
+
+   // details
+
+   output += "<h2>Member Functions</h2>\n\n";
+
+   for (auto && method : methods)
+   {
+      if (method.type == DocMethod::Type::Division) continue;
+
+      if (method.type == DocMethod::Type::Constructor)
+      {
+         if (conf ().format == Conf::Format::DocSet)
+         {
+            output += "<a name=\"//apple_ref/cpp/Method/";
+            output += "constructor";
+            output += "\" class=\"dashAnchor\"></a>\n";
+         }
+
+         output += "<h3>Constructor</h3>\n";
+      }
+      else if (method.type == DocMethod::Type::Destructor)
+      {
+         if (conf ().format == Conf::Format::DocSet)
+         {
+            output += "<a name=\"//apple_ref/cpp/Method/";
+            output += "destructor";
+            output += "\" class=\"dashAnchor\"></a>\n";
+         }
+
+         output += "<h3>Destructor</h3>\n";
+      }
+      else if (method.type == DocMethod::Type::Function)
+      {
+         if (conf ().format == Conf::Format::DocSet)
+         {
+            output += "<a name=\"//apple_ref/cpp/Method/";
+            output += escape_pourcent (method.name);
+            output += "\" class=\"dashAnchor\"></a>\n";
+         }
+
+         output += "<h3><code>" + method.name + "</code></h3>\n";
+      }
+
+      process (output, cur, method.description);
+   }
 }
 
 
