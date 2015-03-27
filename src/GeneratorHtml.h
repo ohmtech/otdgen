@@ -13,9 +13,13 @@
 
 /*\\\ INCLUDE FILES \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\*/
 
-#include "Expression.h"
+#include "DocInline.h"
+#include "GeneratorBase.h"
 
 #include <string>
+#include <vector>
+
+#include "sqlite3.h"
 
 
 
@@ -25,9 +29,19 @@ namespace otdgen
 
 
 class Conf;
-class Toc;
+class DocBlocks;
+class DocBook;
+class DocChapter;
+class DocCodeBlock;
+class DocInformation;
+class DocLibrary;
+class DocList;
+class DocParagraph;
+class DocSection;
+class DocTable;
 
 class GeneratorHtml
+:  public GeneratorBase
 {
 
 /*\\\ PUBLIC \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\*/
@@ -37,7 +51,7 @@ public:
                   GeneratorHtml (const Conf & conf, Toc & toc);
    virtual        ~GeneratorHtml () = default;
 
-   void           process (const ExpressionRoot & root);
+   void           process (const DocLibrary & library);
 
 
 
@@ -55,40 +69,33 @@ protected:
 
 private:
 
-   void           process (const ExpressionCommand & command);
-   void           process (const ExpressionList & list);
-   void           process (const ExpressionTable & table);
-   void           process (const ExpressionCodeBlock & codeblock);
-   void           process (const ExpressionParagraph & paragraph);
-   void           process_block (const ExpressionParagraph & paragraph);
-   void           process_block (const Expression & expression);
-   std::string    process_block_no_style (const ExpressionParagraph & paragraph);
-   std::string    process_block_no_style (const Expression & expression);
+   void           process (std::vector <std::string> & cur, const DocBook & book);
+   void           process (std::vector <std::string> & cur, const DocChapter & chapter);
 
-   void           process_navigation ();
+   void           process (std::string & output, std::vector <std::string> & cur, const DocBlocks & blocks);
+   void           process (std::string & output, std::vector <std::string> & cur, const DocSection & section);
+   void           process (std::string & output, std::vector <std::string> & cur, const DocInformation & information);
+   void           process (std::string & output, std::vector <std::string> & cur, const DocList & list);
+   void           process (std::string & output, std::vector <std::string> & cur, const DocTable & table);
+   void           process (std::string & output, std::vector <std::string> & cur, const DocCodeBlock & codeblock);
+   void           process (std::string & output, std::vector <std::string> & cur, const DocParagraph & paragraph);
 
-   void           start ();
-   void           flush ();
-   void           make_plist ();
-   void           make_index ();
-   void           make_dirs (const std::string & filepath);
-   std::string    make_id ();
+   void           process (std::string & output, std::vector <std::string> & cur, const DocInlines & inlines);
+   std::string    make_href (const std::vector <std::string> & cur, const std::string & id);
+   std::string    process_no_style (const DocInlines & inlines);
+
+   void           process_nav (std::string & output, const DocChapter & chapter);
+
+   void           process_header (std::string & output, const std::string & title);
+   void           process_footer (std::string & output);
+
+   void           make_plist (const DocLibrary & library);
+   void           open_index (const DocLibrary & library);
+   void           add_index (std::string name, std::string type, std::string path);
+   void           close_index ();
    std::string    escape_xml (const std::string & txt);
 
-   const Conf &   _conf;
-   Toc &          _toc;
-
-   std::string    _html;
-
-   std::string    _cur_library;
-   std::string    _cur_book;
-   std::string    _cur_chapter;
-   std::string    _cur_section;
-   std::string    _cur_subsection;
-   std::string    _cur_subsubsection;
-
-   std::string    _name_book;
-   std::string    _name_chapter;
+   sqlite3 *      _db_ptr = nullptr;
 
 
 

@@ -12,11 +12,17 @@
 #include "GeneratorGitHubMarkDown.h"
 
 #include "Conf.h"
+#include "DocBlocks.h"
+#include "DocBook.h"
+#include "DocChapter.h"
+#include "DocCodeBlock.h"
+#include "DocInformation.h"
+#include "DocLibrary.h"
+#include "DocList.h"
+#include "DocParagraph.h"
+#include "DocSection.h"
+#include "DocTable.h"
 #include "Toc.h"
-#include "Token.h"
-
-#include <fstream>
-#include <iostream>
 
 #include <cstdlib>
 #include <cassert>
@@ -36,9 +42,8 @@ Name : ctor
 ==============================================================================
 */
 
-GeneratorGitHubMarkDown::GeneratorGitHubMarkDown (const Conf & conf, Toc & toc)
-:  _conf (conf)
-,  _toc (toc)
+GeneratorGitHubMarkDown::GeneratorGitHubMarkDown (const Conf & conf, const Toc & toc)
+:  GeneratorBase (conf, toc)
 {
 }
 
@@ -50,49 +55,29 @@ Name : process
 ==============================================================================
 */
 
-void GeneratorGitHubMarkDown::process (const ExpressionRoot & root)
+void  GeneratorGitHubMarkDown::process (const DocLibrary & library)
 {
-   for (auto && expression_uptr : root.expressions)
+   std::vector <std::string> cur;
+   cur.push_back (library.id);
+
+   // overview
+
+   std::string output;
+
+   output += "<h1>";
+   process (output, cur, library.title);
+   output += "</h1>\n\n";
+
+   process (output, cur, library.overview);
+
+   write ("README.md", output);
+
+   // books
+
+   for (auto && book : library.books)
    {
-      const auto & expression = *expression_uptr;
-
-      const ExpressionCommand * command_ptr = dynamic_cast <const ExpressionCommand *> (&expression);
-
-      if (command_ptr != nullptr)
-      {
-         process (*command_ptr);
-      }
-
-      const ExpressionList * list_ptr = dynamic_cast <const ExpressionList *> (&expression);
-
-      if (list_ptr != nullptr)
-      {
-         process (*list_ptr);
-      }
-
-      const ExpressionTable * table_ptr = dynamic_cast <const ExpressionTable *> (&expression);
-
-      if (table_ptr != nullptr)
-      {
-         process (*table_ptr);
-      }
-
-      const ExpressionCodeBlock * codeblock_ptr = dynamic_cast <const ExpressionCodeBlock *> (&expression);
-
-      if (codeblock_ptr != nullptr)
-      {
-         process (*codeblock_ptr);
-      }
-
-      const ExpressionParagraph * paragraph_ptr = dynamic_cast <const ExpressionParagraph *> (&expression);
-
-      if (paragraph_ptr != nullptr)
-      {
-         process (*paragraph_ptr);
-      }
+      process (cur, book);
    }
-
-   flush ();
 }
 
 
@@ -113,110 +98,99 @@ Name : process
 ==============================================================================
 */
 
-void  GeneratorGitHubMarkDown::process (const ExpressionCommand & command)
+void  GeneratorGitHubMarkDown::process (std::vector <std::string> & cur, const DocBook & book)
 {
-   const ExpressionParagraph & paragraph
-      = dynamic_cast <const ExpressionParagraph &> (**command.bodies.begin ());
+   cur.push_back (book.id);
 
-   if (
-      (command.name == std::string (Token::library))
-      || (command.name == std::string (Token::book))
-      || (command.name == std::string (Token::chapter))
-      )
+   // overview
+
+   std::string output;
+
+   output += "<h1>";
+   process (output, cur, book.title);
+   output += "</h1>\n\n";
+
+   process (output, cur, book.overview);
+
+   write (book.id + "/README.md", output);
+
+   // chapters
+
+   for (auto && chapter : book.chapters)
    {
-      process_navigation ();
+      process (cur, chapter);
    }
 
-   _toc.set_current (command);
+   cur.resize (1);
+}
 
-   if (command.name == std::string (Token::library))
+
+
+/*
+==============================================================================
+Name : process
+==============================================================================
+*/
+
+void  GeneratorGitHubMarkDown::process (std::vector <std::string> & cur, const DocChapter & chapter)
+{
+   cur.push_back (chapter.id);
+
+   std::string output;
+
+   process_nav (output, chapter);
+
+   output += "<h1>";
+   process (output, cur, chapter.title);
+   output += "</h1>\n\n";
+
+   process (output, cur, chapter.blocks);
+
+   process_nav (output, chapter);
+
+   write (chapter.parent ().id + "/" + chapter.id + ".md", output);
+
+   cur.resize (2);
+}
+
+
+
+/*
+==============================================================================
+Name : process
+==============================================================================
+*/
+
+void  GeneratorGitHubMarkDown::process (std::string & output, std::vector <std::string> & cur, const DocBlocks & blocks)
+{
+   for (auto && block : blocks)
    {
-      flush ();
+      switch (block.type)
+      {
+      case DocBlock::Type::Section:
+         process (output, cur, block.cast <DocSection> ());
+         break;
 
-      auto it = command.options.find ("id");
-      assert (it != command.options.end ());
+      case DocBlock::Type::Information:
+         process (output, cur, block.cast <DocInformation> ());
+         break;
 
-      _cur_library = it->second;
-   }
-   else if (command.name == std::string (Token::book))
-   {
-      flush ();
+      case DocBlock::Type::List:
+         process (output, cur, block.cast <DocList> ());
+         break;
 
-      auto it = command.options.find ("id");
-      assert (it != command.options.end ());
+      case DocBlock::Type::Table:
+         process (output, cur, block.cast <DocTable> ());
+         break;
 
-      _cur_book = it->second;
-   }
-   else if (command.name == std::string (Token::chapter))
-   {
-      flush ();
+      case DocBlock::Type::CodeBlock:
+         process (output, cur, block.cast <DocCodeBlock> ());
+         break;
 
-      _html += "\n";
-
-      process_navigation ();
-
-      auto it = command.options.find ("id");
-      assert (it != command.options.end ());
-
-      _cur_chapter = it->second;
-
-      _html += "<h1 id=\"\">";
-      process_block (paragraph);
-      _html += "</h1>\n\n";
-   }
-   else if (command.name == std::string (Token::section))
-   {
-      auto it = command.options.find ("id");
-      assert (it != command.options.end ());
-
-      _cur_section = it->second;
-      _cur_subsection.clear ();
-      _cur_subsubsection.clear ();
-
-      _html += "<h2 id=\"" + make_id () + "\">";
-      process_block (paragraph);
-      _html += "</h2>\n\n";
-   }
-   else if (command.name == std::string (Token::subsection))
-   {
-      auto it = command.options.find ("id");
-      assert (it != command.options.end ());
-
-      _cur_subsection = it->second;
-      _cur_subsubsection.clear ();
-
-      _html += "<h3 id=\"" + make_id () + "\">";
-      process_block (paragraph);
-      _html += "</h3>\n\n";
-   }
-   else if (command.name == std::string (Token::subsubsection))
-   {
-      auto it = command.options.find ("id");
-      assert (it != command.options.end ());
-
-      _cur_subsubsection = it->second;
-
-      _html += "<h4 id=\"" + make_id () + "\">";
-      process_block (paragraph);
-      _html += "</h4>\n\n";
-   }
-   else if (command.name == std::string (Token::note))
-   {
-      _html += "<blockquote><h6>Note</h6> ";
-      process_block (paragraph);
-      _html += "</blockquote>\n\n";
-   }
-   else if (command.name == std::string (Token::important))
-   {
-      _html += "<blockquote><h6>Important</h6> ";
-      process_block (paragraph);
-      _html += "</blockquote>\n\n";
-   }
-   else if (command.name == std::string (Token::warning))
-   {
-      _html += "<blockquote><h6>W A R N I N G</h6> ";
-      process_block (paragraph);
-      _html += "</blockquote>\n\n";
+      case DocBlock::Type::Paragraph:
+         process (output, cur, block.cast <DocParagraph> ());
+         break;
+      }
    }
 }
 
@@ -228,37 +202,105 @@ Name : process
 ==============================================================================
 */
 
-void  GeneratorGitHubMarkDown::process (const ExpressionList & list)
+void  GeneratorGitHubMarkDown::process (std::string & output, std::vector <std::string> & cur, const DocSection & section)
 {
-   if (list.type == ExpressionList::Type::Itemize)
+   switch (section.level)
    {
-      _html += "<ul>\n";
+   case DocSection::Level::Section:
+      cur.resize (3);
+      cur.push_back (section.id);
+      output += "<h2 id=\"" + section.id + "\">";
+      process (output, cur, section.title);
+      output += "</h2>\n\n";
+      break;
+
+   case DocSection::Level::SubSection:
+      cur.resize (4);
+      cur.push_back (section.id_sub);
+      output += "<h3 id=\"" + section.id + "-" + section.id_sub + "\">";
+      process (output, cur, section.title);
+      output += "</h3>\n\n";
+      break;
+
+   case DocSection::Level::SubSubSection:
+      cur.resize (5);
+      cur.push_back (section.id_subsub);
+      output += "<h4 id=\"" + section.id + "-" + section.id_sub + "-" + section.id_subsub + "\">";
+      process (output, cur, section.title);
+      output += "</h4>\n\n";
+      break;
    }
-   else if (list.type == ExpressionList::Type::Enumerate)
+}
+
+
+
+/*
+==============================================================================
+Name : process
+==============================================================================
+*/
+
+void  GeneratorGitHubMarkDown::process (std::string & output, std::vector <std::string> & cur, const DocInformation & information)
+{
+   switch (information.level)
    {
-      _html += "<ol>\n";
+   case DocInformation::Level::Note:
+      output += "<blockquote><h6>Note</h6> ";
+      process (output, cur, information.body);
+      output += "</blockquote>\n\n";
+      break;
+
+   case DocInformation::Level::Important:
+      output += "<blockquote><h6>Important</h6> ";
+      process (output, cur, information.body);
+      output += "</blockquote>\n\n";
+      break;
+
+   case DocInformation::Level::Warning:
+      output += "<blockquote><h6>W A R N I N G</h6> ";
+      process (output, cur, information.body);
+      output += "</blockquote>\n\n";
+      break;
+   }
+}
+
+
+
+/*
+==============================================================================
+Name : process
+==============================================================================
+*/
+
+void  GeneratorGitHubMarkDown::process (std::string & output, std::vector <std::string> & cur, const DocList & list)
+{
+   switch (list.type)
+   {
+   case DocList::Type::Itemization:
+      output += "<ul>\n";
+      break;
+
+   case DocList::Type::Enumeration:
+      output += "<ol>\n";
+      break;
    }
 
    for (auto && item : list.items)
    {
-      const auto & expression = *item;
-
-      const auto & paragraph = dynamic_cast <const ExpressionParagraph &> (expression);
-
-      _html += "<li>";
-
-      process_block (paragraph);
-
-      _html += "</li>\n";
+      output += "<li>";
+      process (output, cur, item);
+      output += "</li>\n";
    }
 
-   if (list.type == ExpressionList::Type::Itemize)
+   switch (list.type)
    {
-      _html += "</ul>\n\n";
-   }
-   else if (list.type == ExpressionList::Type::Enumerate)
-   {
-      _html += "</ol>\n\n";
+   case DocList::Type::Itemization:
+      output += "</ul>\n\n";
+      break;
+
+   case DocList::Type::Enumeration:
+      output += "</ol>\n\n";
+      break;
    }
 }
 
@@ -270,31 +312,27 @@ Name : process
 ==============================================================================
 */
 
-void  GeneratorGitHubMarkDown::process (const ExpressionTable & table)
+void  GeneratorGitHubMarkDown::process (std::string & output, std::vector <std::string> & cur, const DocTable & table)
 {
-   _html += "<table>\n";
+   output += "<table>\n";
 
-   for (auto && row_uptr : table.rows)
+   for (auto && row : table.rows)
    {
-      const auto & row = dynamic_cast <const ExpressionRow &> (*row_uptr);
+      output += "<tr>\n";
 
-      _html += "<tr>\n";
-
-      for (auto && cell_uptr : row.cells)
+      for (auto && cell : row)
       {
-         const auto & paragraph = dynamic_cast <const ExpressionParagraph &> (*cell_uptr);
+         output += "<td>";
 
-         _html += "<td>";
+         process (output, cur, cell);
 
-         process_block (paragraph);
-
-         _html += "</td>";
+         output += "</td>\n";
       }
 
-      _html += "</tr>\n";
+      output += "</tr>\n";
    }
 
-   _html += "</table>\n\n";
+   output += "</table>\n\n";
 }
 
 
@@ -305,25 +343,25 @@ Name : process
 ==============================================================================
 */
 
-void  GeneratorGitHubMarkDown::process (const ExpressionCodeBlock & codeblock)
+void  GeneratorGitHubMarkDown::process (std::string & output, std::vector <std::string> & /* cur */, const DocCodeBlock & codeblock)
 {
-   _html += "```";
-
-   auto it = codeblock.options.find ("language");
-
-   if (it != codeblock.options.end ())
+   switch (codeblock.type)
    {
-      _html += it->second;
-   }
+   case DocCodeBlock::Type::None:
+      output += "```\n";
+      break;
 
-   _html += "\n";
+   case DocCodeBlock::Type::Cpp:
+      output += "```c++\n";
+      break;
+   }
 
    for (auto && line : codeblock.lines)
    {
-      _html += line.first + "\n";
+      output += line.first + "\n";
    }
 
-   _html += "```\n\n";
+   output += "```\n\n";
 }
 
 
@@ -334,112 +372,57 @@ Name : process
 ==============================================================================
 */
 
-void  GeneratorGitHubMarkDown::process (const ExpressionParagraph & paragraph)
+void  GeneratorGitHubMarkDown::process (std::string & output, std::vector <std::string> & cur, const DocParagraph & paragraph)
 {
-   _html += "<p>";
-   process_block (paragraph);
-   _html += "</p>\n\n";
+   output += "<p>";
+
+   process (output, cur, paragraph.body);
+
+   output += "</p>\n\n";
 }
 
 
 
 /*
 ==============================================================================
-Name : process_block
+Name : process
 ==============================================================================
 */
 
-void  GeneratorGitHubMarkDown::process_block (const ExpressionParagraph & paragraph)
+void  GeneratorGitHubMarkDown::process (std::string & output, std::vector <std::string> & cur, const DocInlines & inlines)
 {
-   for (auto && expression_uptr : paragraph.expressions)
+   for (auto && inlinee : inlines)
    {
-      const auto & expression = *expression_uptr;
-
-      process_block (expression);
-   }
-}
-
-
-
-/*
-==============================================================================
-Name : process_block
-==============================================================================
-*/
-
-void  GeneratorGitHubMarkDown::process_block (const Expression & expression)
-{
-   const ExpressionCommand * command_ptr = dynamic_cast <const ExpressionCommand *> (&expression);
-
-   if (command_ptr != nullptr)
-   {
-      const ExpressionCommand & command = *command_ptr;
-
-      if (command.name == std::string (Token::code))
+      switch (inlinee.type)
       {
-         _html += "<code>";
+      case DocInline::Type::Text:
+         output += inlinee.text;
+         break;
 
-         process_block (**command.bodies.begin ());
+      case DocInline::Type::Emphasis:
+         output += "<em>";
+         process (output, cur, inlinee.node);
+         output += "</em>";
+         break;
 
-         _html += "</code>";
+      case DocInline::Type::Code:
+         output += "<code>";
+         process (output, cur, inlinee.node);
+         output += "</code>";
+         break;
+
+      case DocInline::Type::LinkId:
+         output += "<a href=\"" + make_href (cur, inlinee.meta) + "\">";
+         process (output, cur, inlinee.node);
+         output += "</a>";
+         break;
+
+      case DocInline::Type::LinkUrl:
+         output += "<a href=\"http://" + inlinee.meta + "\">";
+         process (output, cur, inlinee.node);
+         output += "</a>";
+         break;
       }
-      else if (command.name == std::string (Token::emph))
-      {
-         _html += "<em>";
-
-         process_block (**command.bodies.begin ());
-
-         _html += "</em>";
-      }
-      else if (command.name == std::string (Token::link))
-      {
-         std::string ide;
-         {
-            auto it = command.options.find ("id");
-            if (it != command.options.end ())
-            {
-               ide = it->second;
-            }
-         }
-
-         std::string href;
-         {
-            auto it = command.options.find ("href");
-            if (it != command.options.end ())
-            {
-               href = it->second;
-            }
-         }
-
-         if (!ide.empty ())
-         {
-            std::string url = _toc.make_url (ide);
-
-            _html += "<a href=\"" + url + "\">";
-         }
-         else if (!href.empty ())
-         {
-            _html += "<a href=\"http://" + href + "\">";
-         }
-
-         process_block (**command.bodies.begin ());
-
-         _html += "</a>";
-      }
-   }
-
-   const ExpressionParagraph * paragraph_ptr = dynamic_cast <const ExpressionParagraph *> (&expression);
-
-   if (paragraph_ptr != nullptr)
-   {
-      process_block (*paragraph_ptr);
-   }
-
-   const ExpressionText * text_ptr = dynamic_cast <const ExpressionText *> (&expression);
-
-   if (text_ptr != nullptr)
-   {
-      _html += text_ptr->body;
    }
 }
 
@@ -447,128 +430,72 @@ void  GeneratorGitHubMarkDown::process_block (const Expression & expression)
 
 /*
 ==============================================================================
-Name : process_navigation
+Name : make_href
 ==============================================================================
 */
 
-void  GeneratorGitHubMarkDown::process_navigation ()
+std::string GeneratorGitHubMarkDown::make_href (const std::vector <std::string> & cur, const std::string & id)
 {
-   if (_html.empty ()) return;   // abort
+   auto full_id = toc ().find (cur, id);
 
-   std::string url_prev = _toc.make_url_previous_chapter ();
-   std::string url_next = _toc.make_url_next_chapter ();
-
-   _html += "<p><sup>";
-
-   if (!url_prev.empty ())
-   {
-      _html += "<a href=\"" + url_prev + "\">previous</a>";
-   }
-
-   if ((!url_prev.empty ()) && (!url_next.empty ()))
-   {
-      _html += " | ";
-   }
-
-   if (!url_next.empty ())
-   {
-      _html += "<a href=\"" + url_next + "\">next</a>";
-   }
-
-   _html += "</sup></p>\n\n";
-}
-
-
-/*
-==============================================================================
-Name : flush
-==============================================================================
-*/
-
-void  GeneratorGitHubMarkDown::flush ()
-{
-   if (_html.empty ()) return;   // abort
-
-   if (_conf.output_path.empty ())
-   {
-      std::cout << _html;
-
-      std::cout << "==========================\n\n";
-   }
-   else
-   {
-      std::string path;
-      path += _conf.output_path + "/";
-
-      if (_cur_book.empty ())
-      {
-         path += "README.md";
-      }
-      else if (_cur_chapter.empty ())
-      {
-         path += _cur_book + "/README.md";
-      }
-      else
-      {
-         path += _cur_book + "/" + _cur_chapter + ".md";
-      }
-
-      make_dirs (path);
-
-      std::ofstream ofs (path, std::ifstream::binary);
-      assert (ofs);
-
-      ofs.write (&_html [0], int (_html.size ()));
-
-      ofs.close ();
-   }
-
-   _html.clear ();
-}
-
-
-
-/*
-==============================================================================
-Name : filepath
-==============================================================================
-*/
-
-void  GeneratorGitHubMarkDown::make_dirs (const std::string & filepath)
-{
-   size_t pos = filepath.rfind ("/");
-   assert (pos != std::string::npos);
-
-   std::string basepath = filepath.substr (0, pos - 0);
-
-   std::string cmd = "mkdir -p " + basepath;
-   system (cmd.c_str ());
-}
-
-
-
-/*
-==============================================================================
-Name : make_id
-==============================================================================
-*/
-
-std::string GeneratorGitHubMarkDown::make_id ()
-{
    std::string ret;
-   ret += _cur_section;
 
-   if (!_cur_subsection.empty ())
+   // go back to library
+
+   if (cur.size () > 1)
    {
-      ret += "-" + _cur_subsection;
+      ret = "../";
    }
 
-   if (!_cur_subsubsection.empty ())
+   // add full path
+
+   if (full_id.size () > 1)
    {
-      ret += "-" + _cur_subsubsection;
+      ret += full_id [1] + "/";
+   }
+
+   if (full_id.size () > 2)
+   {
+      ret += full_id [2] + ".md";
+   }
+
+   for (size_t i = 3 ; i < full_id.size () ; ++i)
+   {
+      ret += (i == 3) ? '#' : '-';
+      ret += full_id [i];
    }
 
    return ret;
+}
+
+
+
+/*
+==============================================================================
+Name : process_nav
+==============================================================================
+*/
+
+void  GeneratorGitHubMarkDown::process_nav (std::string & output, const DocChapter & chapter)
+{
+   output += "<p><sup>";
+
+   if (chapter.has_previous ())
+   {
+      output += "<a href=\"" + chapter.previous ().id + ".md" + "\">previous</a>";
+   }
+
+   if (chapter.has_previous () && chapter.has_next ())
+   {
+      output += " | ";
+   }
+
+   if (chapter.has_next ())
+   {
+      output += "<a href=\"" + chapter.next ().id + ".md" + "\">next</a>";
+   }
+
+   output += "</sup></p>\n\n";
 }
 
 

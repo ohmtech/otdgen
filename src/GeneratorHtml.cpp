@@ -12,13 +12,20 @@
 #include "GeneratorHtml.h"
 
 #include "Conf.h"
+#include "DocBlocks.h"
+#include "DocBook.h"
+#include "DocChapter.h"
+#include "DocCodeBlock.h"
+#include "DocInformation.h"
+#include "DocLibrary.h"
+#include "DocList.h"
+#include "DocParagraph.h"
+#include "DocSection.h"
+#include "DocTable.h"
 #include "Toc.h"
-#include "Token.h"
 
 #include <fstream>
 #include <iostream>
-
-#include "sqlite3.h"
 
 #include <cstdlib>
 #include <cassert>
@@ -39,8 +46,7 @@ Name : ctor
 */
 
 GeneratorHtml::GeneratorHtml (const Conf & conf, Toc & toc)
-:  _conf (conf)
-,  _toc (toc)
+:  GeneratorBase (conf, toc)
 {
 }
 
@@ -52,55 +58,44 @@ Name : process
 ==============================================================================
 */
 
-void GeneratorHtml::process (const ExpressionRoot & root)
+void  GeneratorHtml::process (const DocLibrary & library)
 {
-   for (auto && expression_uptr : root.expressions)
+   std::vector <std::string> cur;
+   cur.push_back (library.id);
+
+   std::string path = "index.html";
+
+   if (conf ().format == Conf::Format::DocSet)
    {
-      const auto & expression = *expression_uptr;
-
-      const ExpressionCommand * command_ptr = dynamic_cast <const ExpressionCommand *> (&expression);
-
-      if (command_ptr != nullptr)
-      {
-         process (*command_ptr);
-      }
-
-      const ExpressionList * list_ptr = dynamic_cast <const ExpressionList *> (&expression);
-
-      if (list_ptr != nullptr)
-      {
-         process (*list_ptr);
-      }
-
-      const ExpressionTable * table_ptr = dynamic_cast <const ExpressionTable *> (&expression);
-
-      if (table_ptr!= nullptr)
-      {
-         process (*table_ptr);
-      }
-
-      const ExpressionCodeBlock * codeblock_ptr = dynamic_cast <const ExpressionCodeBlock *> (&expression);
-
-      if (codeblock_ptr != nullptr)
-      {
-         process (*codeblock_ptr);
-      }
-
-      const ExpressionParagraph * paragraph_ptr = dynamic_cast <const ExpressionParagraph *> (&expression);
-
-      if (paragraph_ptr != nullptr)
-      {
-         process (*paragraph_ptr);
-      }
+      path = library.id + ".docset/Contents/Resources/Documents/" + path;
+      make_plist (library);
+      open_index (library);
    }
 
-   flush ();
+   // overview
 
-   if (_conf.format == Conf::Format::DocSet)
+   std::string output;
+
+   process_header (output, process_no_style (library.title));
+
+   output += "<h1>";
+   process (output, cur, library.title);
+   output += "</h1>\n\n";
+
+   process (output, cur, library.overview);
+
+   process_footer (output);
+
+   write (path, output);
+
+   // books
+
+   for (auto && book : library.books)
    {
-      make_plist ();
-      make_index ();
+      process (cur, book);
    }
+
+   close_index ();
 }
 
 
@@ -121,122 +116,146 @@ Name : process
 ==============================================================================
 */
 
-void  GeneratorHtml::process (const ExpressionCommand & command)
+void  GeneratorHtml::process (std::vector <std::string> & cur, const DocBook & book)
 {
-   const ExpressionParagraph & paragraph
-      = dynamic_cast <const ExpressionParagraph &> (**command.bodies.begin ());
+   cur.push_back (book.id);
 
-   if (
-      (command.name == std::string (Token::library))
-      || (command.name == std::string (Token::book))
-      || (command.name == std::string (Token::chapter))
-      )
+   std::string rel_path = book.id + "/index.html";
+   std::string path = rel_path;
+
+   if (conf ().format == Conf::Format::DocSet)
    {
-      process_navigation ();
+      path = book.parent ().id + ".docset/Contents/Resources/Documents/" + path;
    }
 
-   _toc.set_current (command);
+   // overview
 
-   if (command.name == std::string (Token::library))
+   std::string output;
+
+   process_header (output, process_no_style (book.title));
+
+   output += "<h1>";
+   process (output, cur, book.title);
+   output += "</h1>\n\n";
+
+   process (output, cur, book.overview);
+
+   process_footer (output);
+
+   write (path, output);
+
+   // index
+
+   if (book.type == DocBook::Type::Guide)
    {
-      flush ();
-
-      _name_book.clear ();
-      _name_chapter.clear ();
-
-      start ();
-
-      auto it = command.options.find ("id");
-      assert (it != command.options.end ());
-
-      _cur_library = it->second;
+      add_index (process_no_style (book.title), "Guide", rel_path);
    }
-   else if (command.name == std::string (Token::book))
+
+   // chapters
+
+   for (auto && chapter : book.chapters)
    {
-      flush ();
-
-      _name_book = process_block_no_style (paragraph);
-      _name_chapter.clear ();
-
-      start ();
-
-      auto it = command.options.find ("id");
-      assert (it != command.options.end ());
-
-      _cur_book = it->second;
+      process (cur, chapter);
    }
-   else if (command.name == std::string (Token::chapter))
+
+   // end
+
+   cur.resize (1);
+}
+
+
+
+/*
+==============================================================================
+Name : process
+==============================================================================
+*/
+
+void  GeneratorHtml::process (std::vector <std::string> & cur, const DocChapter & chapter)
+{
+   cur.push_back (chapter.id);
+
+   std::string rel_path = chapter.parent ().id + "/" + chapter.id + ".html";
+   std::string path = rel_path;
+
+   if (conf ().format == Conf::Format::DocSet)
    {
-      flush ();
-
-      _name_chapter = process_block_no_style (paragraph);
-
-      start ();
-
-      process_navigation ();
-
-      auto it = command.options.find ("id");
-      assert (it != command.options.end ());
-
-      _cur_chapter = it->second;
-
-      _html += "<h1>";
-      process_block (paragraph);
-      _html += "</h1>\n\n";
+      path = chapter.parent ().parent ().id + ".docset/Contents/Resources/Documents/" + path;
    }
-   else if (command.name == std::string (Token::section))
+
+   std::string output;
+
+   process_header (
+      output,
+      process_no_style (chapter.parent ().title)
+         + ": "
+         + process_no_style (chapter.title)
+   );
+
+   process_nav (output, chapter);
+
+   output += "<h1>";
+   process (output, cur, chapter.title);
+   output += "</h1>\n\n";
+
+   process (output, cur, chapter.blocks);
+
+   process_nav (output, chapter);
+
+   process_footer (output);
+
+   write (path, output);
+
+   // index
+
+   if (chapter.type == DocChapter::Type::Class)
    {
-      auto it = command.options.find ("id");
-      assert (it != command.options.end ());
-
-      _cur_section = it->second;
-      _cur_subsection.clear ();
-      _cur_subsubsection.clear ();
-
-      _html += "<h2><a name=\"" + make_id () + "\">";
-      process_block (paragraph);
-      _html += "</a></h2>\n\n";
+      add_index (chapter.name, "Class", rel_path);
    }
-   else if (command.name == std::string (Token::subsection))
-   {
-      auto it = command.options.find ("id");
-      assert (it != command.options.end ());
 
-      _cur_subsection = it->second;
-      _cur_subsubsection.clear ();
+   // end
 
-      _html += "<h3><a name=\"" + make_id () + "\">";
-      process_block (paragraph);
-      _html += "</a></h3>\n\n";
-   }
-   else if (command.name == std::string (Token::subsubsection))
-   {
-      auto it = command.options.find ("id");
-      assert (it != command.options.end ());
+   cur.resize (2);
+}
 
-      _cur_subsubsection = it->second;
 
-      _html += "<h4><a name=\"" + make_id () + "\">";
-      process_block (paragraph);
-      _html += "</a></h4>\n\n";
-   }
-   else if (command.name == std::string (Token::note))
+
+/*
+==============================================================================
+Name : process
+==============================================================================
+*/
+
+void  GeneratorHtml::process (std::string & output, std::vector <std::string> & cur, const DocBlocks & blocks)
+{
+   for (auto && block : blocks)
    {
-      _html += "<div class=\"note\"><p><strong>Note:</strong> ";
-      process_block (paragraph);
-      _html += "</p></div>\n\n";
-   }
-   else if (command.name == std::string (Token::important))
-   {
-      _html += "<div class=\"important\"><p><strong>Important:</strong> ";
-      process_block (paragraph);
-      _html += "</p></div>\n\n";
-   }
-   else if (command.name == std::string (Token::warning))
-   {
-      _html += "<div class=\"warning\"><p><strong>WARNING:</strong> ";
-      process_block (paragraph);
-      _html += "</p></div>\n\n";
+      switch (block.type)
+      {
+      case DocBlock::Type::Section:
+         process (output, cur, block.cast <DocSection> ());
+         break;
+
+      case DocBlock::Type::Information:
+         process (output, cur, block.cast <DocInformation> ());
+         break;
+
+      case DocBlock::Type::List:
+         process (output, cur, block.cast <DocList> ());
+         break;
+
+      case DocBlock::Type::Table:
+         process (output, cur, block.cast <DocTable> ());
+         break;
+
+      case DocBlock::Type::CodeBlock:
+         process (output, cur, block.cast <DocCodeBlock> ());
+         break;
+
+      case DocBlock::Type::Paragraph:
+         process (output, cur, block.cast <DocParagraph> ());
+         break;
+      }
    }
 }
 
@@ -248,37 +267,105 @@ Name : process
 ==============================================================================
 */
 
-void  GeneratorHtml::process (const ExpressionList & list)
+void  GeneratorHtml::process (std::string & output, std::vector <std::string> & cur, const DocSection & section)
 {
-   if (list.type == ExpressionList::Type::Itemize)
+   switch (section.level)
    {
-      _html += "<ul>\n";
+   case DocSection::Level::Section:
+      cur.resize (3);
+      cur.push_back (section.id);
+      output += "<h2><a name=\"" + section.id + "\">";
+      process (output, cur, section.title);
+      output += "</a></h2>\n\n";
+      break;
+
+   case DocSection::Level::SubSection:
+      cur.resize (4);
+      cur.push_back (section.id_sub);
+      output += "<h3><a name=\"" + section.id + "-" + section.id_sub + "\">";
+      process (output, cur, section.title);
+      output += "</a></h3>\n\n";
+      break;
+
+   case DocSection::Level::SubSubSection:
+      cur.resize (5);
+      cur.push_back (section.id_subsub);
+      output += "<h4><a name=\"" + section.id + "-" + section.id_sub + "-" + section.id_subsub + "\">";
+      process (output, cur, section.title);
+      output += "</a></h4>\n\n";
+      break;
    }
-   else if (list.type == ExpressionList::Type::Enumerate)
+}
+
+
+
+/*
+==============================================================================
+Name : process
+==============================================================================
+*/
+
+void  GeneratorHtml::process (std::string & output, std::vector <std::string> & cur, const DocInformation & information)
+{
+   switch (information.level)
    {
-      _html += "<ol>\n";
+   case DocInformation::Level::Note:
+      output += "<div class=\"note\"><p><strong>Note:</strong> ";
+      process (output, cur, information.body);
+      output += "</p></div>\n\n";
+      break;
+
+   case DocInformation::Level::Important:
+      output += "<div class=\"note\"><p><strong>Important:</strong> ";
+      process (output, cur, information.body);
+      output += "</p></div>\n\n";
+      break;
+
+   case DocInformation::Level::Warning:
+      output += "<div class=\"note\"><p><strong>WARNING:</strong> ";
+      process (output, cur, information.body);
+      output += "</p></div>\n\n";
+      break;
+   }
+}
+
+
+
+/*
+==============================================================================
+Name : process
+==============================================================================
+*/
+
+void  GeneratorHtml::process (std::string & output, std::vector <std::string> & cur, const DocList & list)
+{
+   switch (list.type)
+   {
+   case DocList::Type::Itemization:
+      output += "<ul>\n";
+      break;
+
+   case DocList::Type::Enumeration:
+      output += "<ol>\n";
+      break;
    }
 
    for (auto && item : list.items)
    {
-      const auto & expression = *item;
-
-      const auto & paragraph = dynamic_cast <const ExpressionParagraph &> (expression);
-
-      _html += "<li>";
-
-      process_block (paragraph);
-
-      _html += "</li>\n";
+      output += "<li>";
+      process (output, cur, item);
+      output += "</li>\n";
    }
 
-   if (list.type == ExpressionList::Type::Itemize)
+   switch (list.type)
    {
-      _html += "</ul>\n\n";
-   }
-   else if (list.type == ExpressionList::Type::Enumerate)
-   {
-      _html += "</ol>\n\n";
+   case DocList::Type::Itemization:
+      output += "</ul>\n\n";
+      break;
+
+   case DocList::Type::Enumeration:
+      output += "</ol>\n\n";
+      break;
    }
 }
 
@@ -290,31 +377,27 @@ Name : process
 ==============================================================================
 */
 
-void  GeneratorHtml::process (const ExpressionTable & table)
+void  GeneratorHtml::process (std::string & output, std::vector <std::string> & cur, const DocTable & table)
 {
-   _html += "<table>\n";
+   output += "<table>\n";
 
-   for (auto && row_uptr : table.rows)
+   for (auto && row : table.rows)
    {
-      const auto & row = dynamic_cast <const ExpressionRow &> (*row_uptr);
+      output += "<tr>\n";
 
-      _html += "<tr>\n";
-
-      for (auto && cell_uptr : row.cells)
+      for (auto && cell : row)
       {
-         const auto & paragraph = dynamic_cast <const ExpressionParagraph &> (*cell_uptr);
+         output += "<td><p>";
 
-         _html += "<td><p>";
+         process (output, cur, cell);
 
-         process_block (paragraph);
-
-         _html += "</p></td>";
+         output += "</p></td>\n";
       }
 
-      _html += "</tr>\n";
+      output += "</tr>\n";
    }
 
-   _html += "</table>\n\n";
+   output += "</table>\n\n";
 }
 
 
@@ -325,16 +408,16 @@ Name : process
 ==============================================================================
 */
 
-void  GeneratorHtml::process (const ExpressionCodeBlock & codeblock)
+void  GeneratorHtml::process (std::string & output, std::vector <std::string> & /* cur */, const DocCodeBlock & codeblock)
 {
-   _html += "<div class=\"codeblock\"><table>\n";
+   output += "<div class=\"codeblock\"><table>\n";
 
    for (auto && line : codeblock.lines)
    {
-      _html += "<tr><td><pre>" + escape_xml (line.first) + "</pre></td></tr>\n";
+      output += "<tr><td><pre>" + escape_xml (line.first) + "</pre></td></tr>\n";
    }
 
-   _html += "</table></div>\n\n";
+   output += "</table></div>\n\n";
 }
 
 
@@ -345,112 +428,57 @@ Name : process
 ==============================================================================
 */
 
-void  GeneratorHtml::process (const ExpressionParagraph & paragraph)
+void  GeneratorHtml::process (std::string & output, std::vector <std::string> & cur, const DocParagraph & paragraph)
 {
-   _html += "<p>";
-   process_block (paragraph);
-   _html += "</p>\n\n";
+   output += "<p>";
+
+   process (output, cur, paragraph.body);
+
+   output += "</p>\n\n";
 }
 
 
 
 /*
 ==============================================================================
-Name : process_block
+Name : process
 ==============================================================================
 */
 
-void  GeneratorHtml::process_block (const ExpressionParagraph & paragraph)
+void  GeneratorHtml::process (std::string & output, std::vector <std::string> & cur, const DocInlines & inlines)
 {
-   for (auto && expression_uptr : paragraph.expressions)
+   for (auto && inlinee : inlines)
    {
-      const auto & expression = *expression_uptr;
-
-      process_block (expression);
-   }
-}
-
-
-
-/*
-==============================================================================
-Name : process_block
-==============================================================================
-*/
-
-void  GeneratorHtml::process_block (const Expression & expression)
-{
-   const ExpressionCommand * command_ptr = dynamic_cast <const ExpressionCommand *> (&expression);
-
-   if (command_ptr != nullptr)
-   {
-      const ExpressionCommand & command = *command_ptr;
-
-      if (command.name == std::string (Token::code))
+      switch (inlinee.type)
       {
-         _html += "<code>";
+      case DocInline::Type::Text:
+         output += inlinee.text;
+         break;
 
-         process_block (**command.bodies.begin ());
+      case DocInline::Type::Emphasis:
+         output += "<em>";
+         process (output, cur, inlinee.node);
+         output += "</em>";
+         break;
 
-         _html += "</code>";
+      case DocInline::Type::Code:
+         output += "<code>";
+         process (output, cur, inlinee.node);
+         output += "</code>";
+         break;
+
+      case DocInline::Type::LinkId:
+         output += "<a href=\"" + make_href (cur, inlinee.meta) + "\">";
+         process (output, cur, inlinee.node);
+         output += "</a>";
+         break;
+
+      case DocInline::Type::LinkUrl:
+         output += "<a href=\"http://" + inlinee.meta + "\">";
+         process (output, cur, inlinee.node);
+         output += "</a>";
+         break;
       }
-      else if (command.name == std::string (Token::emph))
-      {
-         _html += "<em>";
-
-         process_block (**command.bodies.begin ());
-
-         _html += "</em>";
-      }
-      else if (command.name == std::string (Token::link))
-      {
-         std::string ide;
-         {
-            auto it = command.options.find ("id");
-            if (it != command.options.end ())
-            {
-               ide = it->second;
-            }
-         }
-
-         std::string href;
-         {
-            auto it = command.options.find ("href");
-            if (it != command.options.end ())
-            {
-               href = it->second;
-            }
-         }
-
-         if (!ide.empty ())
-         {
-            std::string url = _toc.make_url (ide);
-
-            _html += "<a href=\"" + url + "\">";
-         }
-         else if (!href.empty ())
-         {
-            _html += "<a href=\"http://" + href + "\">";
-         }
-
-         process_block (**command.bodies.begin ());
-
-         _html += "</a>";
-      }
-   }
-
-   const ExpressionParagraph * paragraph_ptr = dynamic_cast <const ExpressionParagraph *> (&expression);
-
-   if (paragraph_ptr != nullptr)
-   {
-      process_block (*paragraph_ptr);
-   }
-
-   const ExpressionText * text_ptr = dynamic_cast <const ExpressionText *> (&expression);
-
-   if (text_ptr != nullptr)
-   {
-      _html += escape_xml (text_ptr->body);
    }
 }
 
@@ -458,19 +486,39 @@ void  GeneratorHtml::process_block (const Expression & expression)
 
 /*
 ==============================================================================
-Name : process_block_no_style
+Name : make_href
 ==============================================================================
 */
 
-std::string  GeneratorHtml::process_block_no_style (const ExpressionParagraph & paragraph)
+std::string GeneratorHtml::make_href (const std::vector <std::string> & cur, const std::string & id)
 {
+   auto full_id = toc ().find (cur, id);
+
    std::string ret;
 
-   for (auto && expression_uptr : paragraph.expressions)
-   {
-      const auto & expression = *expression_uptr;
+   // go back to library
 
-      ret += process_block_no_style (expression);
+   if (cur.size () > 1)
+   {
+      ret = "../";
+   }
+
+   // add full path
+
+   if (full_id.size () > 1)
+   {
+      ret += full_id [1] + "/";
+   }
+
+   if (full_id.size () > 2)
+   {
+      ret += full_id [2] + ".html";
+   }
+
+   for (size_t i = 3 ; i < full_id.size () ; ++i)
+   {
+      ret += (i == 3) ? '#' : '-';
+      ret += full_id [i];
    }
 
    return ret;
@@ -480,46 +528,29 @@ std::string  GeneratorHtml::process_block_no_style (const ExpressionParagraph & 
 
 /*
 ==============================================================================
-Name : process_block_no_style
+Name : process_no_style
 ==============================================================================
 */
 
-std::string  GeneratorHtml::process_block_no_style (const Expression & expression)
+std::string GeneratorHtml::process_no_style (const DocInlines & inlines)
 {
    std::string ret;
 
-   const ExpressionCommand * command_ptr = dynamic_cast <const ExpressionCommand *> (&expression);
-
-   if (command_ptr != nullptr)
+   for (auto && inlinee : inlines)
    {
-      const ExpressionCommand & command = *command_ptr;
-
-      if (command.name == std::string (Token::code))
+      switch (inlinee.type)
       {
-         ret = process_block_no_style (**command.bodies.begin ());
+      case DocInline::Type::Text:
+         ret += inlinee.text;
+         break;
+
+      case DocInline::Type::Emphasis:
+      case DocInline::Type::Code:
+      case DocInline::Type::LinkId:
+      case DocInline::Type::LinkUrl:
+         ret += process_no_style (inlinee.node);
+         break;
       }
-      else if (command.name == std::string (Token::emph))
-      {
-         ret = process_block_no_style (**command.bodies.begin ());
-      }
-      else if (command.name == std::string (Token::link))
-      {
-         ret = process_block_no_style (**command.bodies.begin ());
-      }
-   }
-
-   const ExpressionParagraph * paragraph_ptr = dynamic_cast <const ExpressionParagraph *> (&expression);
-
-   if (paragraph_ptr != nullptr)
-   {
-      ret = process_block_no_style (*paragraph_ptr);
-   }
-
-   const ExpressionText * text_ptr = dynamic_cast <const ExpressionText *> (&expression);
-
-   if (text_ptr != nullptr)
-   {
-      ret = text_ptr->body;
    }
 
    return ret;
@@ -529,216 +560,153 @@ std::string  GeneratorHtml::process_block_no_style (const Expression & expressio
 
 /*
 ==============================================================================
-Name : process_navigation
+Name : process_nav
 ==============================================================================
 */
 
-void  GeneratorHtml::process_navigation ()
+void  GeneratorHtml::process_nav (std::string & output, const DocChapter & chapter)
 {
-   if (_html.empty ()) return;   // abort
+   output += "<div class=\"nav\" align=\"right\">\n";
 
-   std::string url_prev = _toc.make_url_previous_chapter ();
-   std::string url_next = _toc.make_url_next_chapter ();
-
-   _html += "<div class=\"nav\" align=\"right\">\n";
-
-   if (!url_prev.empty ())
+   if (chapter.has_previous ())
    {
-      _html += "<a href=\"" + url_prev + "\">previous</a>";
+      output += "<a href=\"" + chapter.previous ().id + ".html" + "\">previous</a>";
    }
 
-   if ((!url_prev.empty ()) && (!url_next.empty ()))
+   if (chapter.has_previous () && chapter.has_next ())
    {
-      _html += "<span>&nbsp;</span>";
+      output += "<span>&nbsp;</span>";
    }
 
-   if (!url_next.empty ())
+   if (chapter.has_next ())
    {
-      _html += "<a href=\"" + url_next + "\">next</a>";
+      output += "<a href=\"" + chapter.next ().id + ".html" + "\">next</a>";
    }
 
-   _html += "</div>\n\n";
+   output += "</div>\n\n";
 }
 
 
 
 /*
 ==============================================================================
-Name : start
+Name : process_header
 ==============================================================================
 */
 
-void  GeneratorHtml::start ()
+void  GeneratorHtml::process_header (std::string & output, const std::string & title)
 {
-   _html += "<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Strict//EN\"\n";
-   _html += "  \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd\">\n";
-   _html += "<html xmlns=\"http://www.w3.org/1999/xhtml\" xml:lang=\"en\" lang=\"en\" dir=\"ltr\">\n\n";
+   output += "<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Strict//EN\"\n";
+   output += "  \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd\">\n";
+   output += "<html xmlns=\"http://www.w3.org/1999/xhtml\" xml:lang=\"en\" lang=\"en\" dir=\"ltr\">\n\n";
 
-   _html += "<head>\n";
-   _html += "<meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\" />\n";
+   output += "<head>\n";
+   output += "<meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\" />\n";
 
-   _html += "<title>" + _name_book + ": " + _name_chapter + "</title>\n";
+   output += "<title>" + title + "</title>\n";
 
-   _html += "<style>\n";
+   output += "<style>\n";
 
-   _html += "* {font-family: 'Lucida Grande', Helvetica, Arial, sans-serif; margin: 0; padding: 0; }\n";
-   _html += "body {background-color: #fff; }\n";
-   _html += "p {color: black; font-size: 13px; margin-bottom: 10px;}\n";
-   _html += "h1 {color: black; font-size: 28px; margin-bottom: 32px; padding-top: 24px; font-weight: normal; display: block; }\n";
-   _html += "h2 {color: #3c4c6c; display: block; font-size: 24px; font-weight: normal; margin-bottom: 20px; margin-top: 42px; border-bottom-color: #8391a8; border-bottom-style: solid; border-bottom-width: 1px;}\n";
-   _html += "h3 {color: black; font-size: 19px; margin-bottom: 4px; margin-top: 28px; font-weight: normal; display: block; }\n";
-   _html += "a {color: #36c; text-decoration: none; cursor:pointer; }\n";
-   _html += "a:active {color: #36c; text-decoration: none; cursor:pointer; }\n";
-   _html += "a:hover {color: #36c; text-decoration: underline; cursor:pointer; }\n";
-   _html += ".aerr {color: #f00}\n";
+   output += "* {font-family: 'Lucida Grande', Helvetica, Arial, sans-serif; margin: 0; padding: 0; }\n";
+   output += "body {background-color: #fff; }\n";
+   output += "p {color: black; font-size: 13px; margin-bottom: 10px;}\n";
+   output += "h1 {color: black; font-size: 28px; margin-bottom: 32px; padding-top: 24px; font-weight: normal; display: block; }\n";
+   output += "h2 {color: #3c4c6c; display: block; font-size: 24px; font-weight: normal; margin-bottom: 20px; margin-top: 42px; border-bottom-color: #8391a8; border-bottom-style: solid; border-bottom-width: 1px;}\n";
+   output += "h3 {color: black; font-size: 19px; margin-bottom: 4px; margin-top: 28px; font-weight: normal; display: block; }\n";
+   output += "a {color: #36c; text-decoration: none; cursor:pointer; }\n";
+   output += "a:active {color: #36c; text-decoration: none; cursor:pointer; }\n";
+   output += "a:hover {color: #36c; text-decoration: underline; cursor:pointer; }\n";
+   output += ".aerr {color: #f00}\n";
 
-   _html += "h2 a {color: #3c4c6c; text-decoration: none; cursor:auto; }\n";
-   _html += "h2 a:active {color: #3c4c6c; text-decoration: none; cursor:auto; }\n";
-   _html += "h2 a:hover {color: #3c4c6c; text-decoration: none; cursor:auto; }\n";
+   output += "h2 a {color: #3c4c6c; text-decoration: none; cursor:auto; }\n";
+   output += "h2 a:active {color: #3c4c6c; text-decoration: none; cursor:auto; }\n";
+   output += "h2 a:hover {color: #3c4c6c; text-decoration: none; cursor:auto; }\n";
 
-   _html += "h3 a {color: black; text-decoration: none; cursor:auto; }\n";
-   _html += "h3 a:active {color: black; text-decoration: none; cursor:auto; }\n";
-   _html += "h3 a:hover {color: black; text-decoration: none; cursor:auto; }\n";
+   output += "h3 a {color: black; text-decoration: none; cursor:auto; }\n";
+   output += "h3 a:active {color: black; text-decoration: none; cursor:auto; }\n";
+   output += "h3 a:hover {color: black; text-decoration: none; cursor:auto; }\n";
 
-   _html += "footer {font-size: 10px; position: fixed; display: block; bottom: 0px; background-color: #f1f5f9; border-top-color: #c7cfd5; border-top-style: solid; border-top-width: 1px; width: 100%; height:22px; padding-top: 7px; padding-left: 7px;}\n";
-   _html += "div {display: block;}\n";
-   _html += ".codeblock {margin-top:17px; margin-bottom:17px; clear: both; display: block; color: #333; }\n";
-   _html += "pre {font-family: Courier, Consolas, monospace; font-size: 12px; height: 14px; line-height: 14px; margin-bottom: 0px; margin-left: 6px; margin-right: 4px; margin-top: -1px;}\n";
-   _html += "small pre {color:#888;}\n";
-   _html += "emph pre {color:#000;}\n";
-   _html += "table {padding-top:5px; padding-bottom:6px; margin-bottom:12px; background-color: #f1f5f9; border-color: #c7cfd5; border-style: solid; border-width: 1px; width: 100%;}\n";
-   _html += "tr {}\n";
-   _html += "td > p {margin-left: 6px; height: 12px;}\n";
+   output += "footer {font-size: 10px; position: fixed; display: block; bottom: 0px; background-color: #f1f5f9; border-top-color: #c7cfd5; border-top-style: solid; border-top-width: 1px; width: 100%; height:22px; padding-top: 7px; padding-left: 7px;}\n";
+   output += "div {display: block;}\n";
+   output += ".codeblock {margin-top:17px; margin-bottom:17px; clear: both; display: block; color: #333; }\n";
+   output += "pre {font-family: Courier, Consolas, monospace; font-size: 12px; height: 14px; line-height: 14px; margin-bottom: 0px; margin-left: 6px; margin-right: 4px; margin-top: -1px;}\n";
+   output += "small pre {color:#888;}\n";
+   output += "emph pre {color:#000;}\n";
+   output += "table {padding-top:5px; padding-bottom:6px; margin-bottom:12px; background-color: #f1f5f9; border-color: #c7cfd5; border-style: solid; border-width: 1px; width: 100%;}\n";
+   output += "tr {}\n";
+   output += "td > p {margin-left: 6px; height: 12px;}\n";
 
-   _html += ".note {margin-top:21px; margin-bottom:22px; padding-left: 8px; padding-right: 8px; background-color: #fff; border-color: #5088c5; border-style: solid; border-width: 1px; display: block;}\n";
-   _html += ".note strong {margin-right: 8px;}\n";
-   _html += ".note p {margin-top: 7px;}\n";
+   output += ".note {margin-top:21px; margin-bottom:22px; padding-left: 8px; padding-right: 8px; background-color: #fff; border-color: #5088c5; border-style: solid; border-width: 1px; display: block;}\n";
+   output += ".note strong {margin-right: 8px;}\n";
+   output += ".note p {margin-top: 7px;}\n";
 
-   _html += ".important {margin-top:21px; margin-bottom:22px; padding-left: 8px; padding-right: 8px; background-color: #f1f5f9; border-color: #5088c5; border-style: solid; border-width: 1px; display: block;}\n";
-   _html += ".important strong {margin-right: 8px;}\n";
-   _html += ".important p {margin-top: 7px;}\n";
+   output += ".important {margin-top:21px; margin-bottom:22px; padding-left: 8px; padding-right: 8px; background-color: #f1f5f9; border-color: #5088c5; border-style: solid; border-width: 1px; display: block;}\n";
+   output += ".important strong {margin-right: 8px;}\n";
+   output += ".important p {margin-top: 7px;}\n";
 
-   _html += ".warning {margin-top:21px; margin-bottom:22px; padding-left: 8px; padding-right: 8px; background-color: #f8e3e1; border-color: #c5443e; border-style: solid; border-width: 1px; display: block;}\n";
-   _html += ".warning strong {margin-right: 8px;}\n";
-   _html += ".warning p {margin-top: 7px;}\n";
+   output += ".warning {margin-top:21px; margin-bottom:22px; padding-left: 8px; padding-right: 8px; background-color: #f8e3e1; border-color: #c5443e; border-style: solid; border-width: 1px; display: block;}\n";
+   output += ".warning strong {margin-right: 8px;}\n";
+   output += ".warning p {margin-top: 7px;}\n";
 
-   _html += "img {margin-top:10px; margin-bottom:10px;}\n";
+   output += "img {margin-top:10px; margin-bottom:10px;}\n";
 
-   _html += "ul {margin-left: 17px; margin-bottom: 10px;}\n";
-   _html += "ol {margin-left: 17px; margin-bottom: 10px;}\n";
-   _html += "li {color: black; font-size: 13px; margin-bottom: 7px;}\n";
+   output += "ul {margin-left: 17px; margin-bottom: 10px;}\n";
+   output += "ol {margin-left: 17px; margin-bottom: 10px;}\n";
+   output += "li {color: black; font-size: 13px; margin-bottom: 7px;}\n";
 
-   _html += "code {font-family: Courier, Consolas, monospace;}\n";
+   output += "code {font-family: Courier, Consolas, monospace;}\n";
 
-   _html += "#content {padding-left: 26px; padding-right: 26px; position: absolute; top: 30px; left: 30px; width: 750px;}\n";
+   output += "#content {padding-left: 26px; padding-right: 26px; position: absolute; top: 30px; left: 30px; width: 750px;}\n";
 
-   _html += "#toc {width: 230px; position: fixed; top: 30px; background-color: #f1f5f9; height: 100%; border-right-color: #c7cfd5; border-right-style: solid; border-right-width: 1px; padding-left: 0px; padding-top: 17px; overflow: auto;}\n";
+   output += "#toc {width: 230px; position: fixed; top: 30px; background-color: #f1f5f9; height: 100%; border-right-color: #c7cfd5; border-right-style: solid; border-right-width: 1px; padding-left: 0px; padding-top: 17px; overflow: auto;}\n";
 
-   _html += "#toc > ul {list-style-type: none;}\n";
-   _html += "#toc > ul > li {font-size: 11px; }\n";
+   output += "#toc > ul {list-style-type: none;}\n";
+   output += "#toc > ul > li {font-size: 11px; }\n";
 
-   _html += "#toc > ul > li > ul {list-style-type: none; margin-top:8px;}\n";
-   _html += "#toc > ul > li > ul > li {font-size: 11px; }\n";
+   output += "#toc > ul > li > ul {list-style-type: none; margin-top:8px;}\n";
+   output += "#toc > ul > li > ul > li {font-size: 11px; }\n";
 
-   _html += "#toc > p {font-size: 13px; margin-left: 17px;}\n";
+   output += "#toc > p {font-size: 13px; margin-left: 17px;}\n";
 
-   _html += ".codeblock > p {margin-bottom: 3px; font-size: 11px;}\n";
-   _html += ".codeblock > p > strong {margin-right: 10px; color: #222;}\n";
+   output += ".codeblock > p {margin-bottom: 3px; font-size: 11px;}\n";
+   output += ".codeblock > p > strong {margin-right: 10px; color: #222;}\n";
 
-   _html += ".nav {font-size: 10px; margin-top: 20px; }\n";
-   _html += ".nav > span {margin-right: 20px;}\n";
+   output += ".nav {font-size: 10px; margin-top: 20px; }\n";
+   output += ".nav > span {margin-right: 20px;}\n";
 
-   _html += ".bottomspacer {height:100px;}\n";
+   output += ".bottomspacer {height:100px;}\n";
 
-   _html += "#header {width:100%; position: fixed; background-color: #111; height: 30px; z-index: 900;}\n";
+   output += "#header {width:100%; position: fixed; background-color: #111; height: 30px; z-index: 900;}\n";
 
-   _html += "#header > p {color:#fff; font-size: 13px; padding-top: 6px; padding-left: 17px; }\n";
-   _html += "#header > p > a {color:#fff; font-size: 13px; text-decoration: none; cursor:pointer; padding-right: 56px;}\n";
+   output += "#header > p {color:#fff; font-size: 13px; padding-top: 6px; padding-left: 17px; }\n";
+   output += "#header > p > a {color:#fff; font-size: 13px; text-decoration: none; cursor:pointer; padding-right: 56px;}\n";
 
-   _html += ".sectioncode {background-color: #f6f6f6; padding: 12px; margin-top: 18px;}\n";
-   _html += ".sectioncode > h3 {margin-top: 0px; padding-bottom: 8px;}\n";
+   output += ".sectioncode {background-color: #f6f6f6; padding: 12px; margin-top: 18px;}\n";
+   output += ".sectioncode > h3 {margin-top: 0px; padding-bottom: 8px;}\n";
 
-   _html += "</style>\n";
-   _html += "</head>\n\n";
+   output += "</style>\n";
+   output += "</head>\n\n";
 
-   _html += "<body>\n\n";
+   output += "<body>\n\n";
 
-   _html += "<div id=\"content\">\n";
+   output += "<div id=\"content\">\n";
 }
 
 
 
 /*
 ==============================================================================
-Name : flush
+Name : process_footer
 ==============================================================================
 */
 
-void  GeneratorHtml::flush ()
+void  GeneratorHtml::process_footer (std::string & output)
 {
-   if (_html.empty ()) return;   // abort
+   output += "<div class=\"bottomspacer\">&nbsp;</div>\n";
 
-   _html += "<div class=\"bottomspacer\">&nbsp;</div>\n";
-
-   _html += "</div>\n";
-   _html += "</body>\n";
-   _html += "</html>\n";
-
-   if (_conf.output_path.empty ())
-   {
-      std::cout << _html;
-
-      std::cout << "==========================\n\n";
-   }
-   else
-   {
-      std::string path;
-      path += _conf.output_path + "/";
-
-      if (_conf.format == Conf::Format::Html)
-      {
-         if (_cur_book.empty ())
-         {
-            path += "index.html";
-         }
-         else if (_cur_chapter.empty ())
-         {
-            path += _cur_book + "/index.html";
-         }
-         else
-         {
-            path += _cur_book + "/" + _cur_chapter + ".html";
-         }
-      }
-      else if (_conf.format == Conf::Format::DocSet)
-      {
-         path += _cur_library + ".docset/Contents/Resources/Documents/";
-
-         if (_cur_book.empty ())
-         {
-            path += "index.html";
-         }
-         else if (_cur_chapter.empty ())
-         {
-            path += _cur_book + "/index.html";
-         }
-         else
-         {
-            path += _cur_book + "/" + _cur_chapter + ".html";
-         }
-      }
-
-      make_dirs (path);
-
-      std::ofstream ofs (path, std::ifstream::binary);
-      assert (ofs);
-
-      ofs.write (&_html [0], int (_html.size ()));
-
-      ofs.close ();
-   }
-
-   _html.clear ();
+   output += "</div>\n";
+   output += "</body>\n";
+   output += "</html>\n";
 }
 
 
@@ -751,146 +719,100 @@ Reference :
 ==============================================================================
 */
 
-void  GeneratorHtml::make_plist ()
+void  GeneratorHtml::make_plist (const DocLibrary & library)
 {
-   std::string path;
-   path += _conf.output_path + "/";
-   path += _cur_library + ".docset/Contents/Info.plist";
+   std::string path = library.id + ".docset/Contents/Info.plist";
 
-   make_dirs (path);
+   std::string content;
 
-   std::string plist;
+   content += "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n";
+   content += "<!DOCTYPE plist PUBLIC \"-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd\">\n";
+   content += "<plist version=\"1.0\">\n";
+   content += "<dict>\n";
+   content += "	<key>CFBundleIdentifier</key>\n";
+   content += "	<string>" + library.id + "</string>\n";
+   content += "	<key>CFBundleName</key>\n";
+   content += "	<string>" + library.id + "</string>\n";
+   content += "	<key>DocSetPlatformFamily</key>\n";
+   content += "	<string>" + library.id + "</string>\n";
+   content += "	<key>isDashDocset</key>\n";
+   content += "	<true/>\n";
+   content += "</dict>\n";
+   content += "</plist>\n";
 
-   plist += "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n";
-   plist += "<!DOCTYPE plist PUBLIC \"-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd\">\n";
-   plist += "<plist version=\"1.0\">\n";
-   plist += "<dict>\n";
-   plist += "	<key>CFBundleIdentifier</key>\n";
-   plist += "	<string>" + _cur_library + "</string>\n";
-   plist += "	<key>CFBundleName</key>\n";
-   plist += "	<string>" + _cur_library + "</string>\n";
-   plist += "	<key>DocSetPlatformFamily</key>\n";
-   plist += "	<string>" + _cur_library + "</string>\n";
-   plist += "	<key>isDashDocset</key>\n";
-   plist += "	<true/>\n";
-   plist += "</dict>\n";
-   plist += "</plist>\n";
-
-   std::ofstream ofs (path, std::ifstream::binary);
-   assert (ofs);
-
-   ofs.write (&plist [0], int (plist.size ()));
-
-   ofs.close ();
+  write (path, content);
 }
 
 
 
 /*
 ==============================================================================
-Name : make_index
+Name : open_index
 Reference :
    https://kapeli.com/docsets#dashDocset
 ==============================================================================
 */
 
-void  GeneratorHtml::make_index ()
+void  GeneratorHtml::open_index (const DocLibrary & library)
 {
+   close_index ();
+
+   std::string rel_path = library.id + ".docset/Contents/Resources/docSet.dsidx";
+
+   make_dirs (rel_path);
+
    std::string path;
-   path += _conf.output_path + "/";
-   path += _cur_library + ".docset/Contents/Resources/docSet.dsidx";
+   path += conf ().output_path + "/";
+   path += rel_path;
 
    std::string cmd = "rm " + path;
    system (cmd.c_str ());
 
-   sqlite3 * db_ptr = nullptr;
-
-   int err = sqlite3_open (path.c_str (), &db_ptr);
+   int err = sqlite3_open (path.c_str (), &_db_ptr);
    assert (err == 0);
 
-   err = sqlite3_exec (db_ptr, "CREATE TABLE searchIndex(id INTEGER PRIMARY KEY, name TEXT, type TEXT, path TEXT);", nullptr, nullptr, nullptr);
+   err = sqlite3_exec (_db_ptr, "CREATE TABLE searchIndex(id INTEGER PRIMARY KEY, name TEXT, type TEXT, path TEXT);", nullptr, nullptr, nullptr);
    assert (err == 0);
 
-   err = sqlite3_exec (db_ptr, "CREATE UNIQUE INDEX anchor ON searchIndex (name, type, path);", nullptr, nullptr, nullptr);
+   err = sqlite3_exec (_db_ptr, "CREATE UNIQUE INDEX anchor ON searchIndex (name, type, path);", nullptr, nullptr, nullptr);
    assert (err == 0);
-
-   for (auto && pair : _toc.guides ())
-   {
-      std::string expr;
-      expr += "INSERT OR IGNORE INTO searchIndex(name, type, path) VALUES";
-      expr += "('" + pair.first + "', 'Guide', '" + pair.second + "');";
-
-      err = sqlite3_exec (db_ptr, expr.c_str (), nullptr, nullptr, nullptr);
-      assert (err == 0);
-   }
-
-   for (auto && pair : _toc.classes ())
-   {
-      std::string expr;
-      expr += "INSERT OR IGNORE INTO searchIndex(name, type, path) VALUES";
-      expr += "('" + pair.first + "', 'Class', '" + pair.second + "');";
-
-      err = sqlite3_exec (db_ptr, expr.c_str (), nullptr, nullptr, nullptr);
-      assert (err == 0);
-   }
-
-   for (auto && pair : _toc.methods ())
-   {
-      std::string expr;
-      expr += "INSERT OR IGNORE INTO searchIndex(name, type, path) VALUES";
-      expr += "('" + pair.first + "', 'Method', '" + pair.second + "');";
-
-      err = sqlite3_exec (db_ptr, expr.c_str (), nullptr, nullptr, nullptr);
-      assert (err == 0);
-   }
-
-   sqlite3_close (db_ptr);
-   db_ptr = 0;
 }
 
 
 
 /*
 ==============================================================================
-Name : make_dirs
+Name : add_index
 ==============================================================================
 */
 
-void  GeneratorHtml::make_dirs (const std::string & filepath)
+void  GeneratorHtml::add_index (std::string name, std::string type, std::string path)
 {
-   size_t pos = filepath.rfind ("/");
-   assert (pos != std::string::npos);
+   if (_db_ptr == nullptr) return;  // abort
 
-   std::string basepath = filepath.substr (0, pos - 0);
+   std::string expr;
+   expr += "INSERT OR IGNORE INTO searchIndex(name, type, path) VALUES";
+   expr += "('" + name + "', '" + type + "', '" + path + "');";
 
-   std::string cmd = "mkdir -p " + basepath;
-   system (cmd.c_str ());
+   int err = sqlite3_exec (_db_ptr, expr.c_str (), nullptr, nullptr, nullptr);
+   assert (err == 0);
 }
 
 
 
 /*
 ==============================================================================
-Name : make_id
+Name : close_index
 ==============================================================================
 */
 
-std::string GeneratorHtml::make_id ()
+void  GeneratorHtml::close_index ()
 {
-   std::string ret;
-   ret += _cur_section;
-
-   if (!_cur_subsection.empty ())
+   if (_db_ptr != nullptr)
    {
-      ret += "-" + _cur_subsection;
+      sqlite3_close (_db_ptr);
+      _db_ptr = nullptr;
    }
-
-   if (!_cur_subsubsection.empty ())
-   {
-      ret += "-" + _cur_subsubsection;
-   }
-
-   return ret;
 }
 
 

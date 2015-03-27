@@ -14,7 +14,9 @@
 #include "GeneratorGitHubMarkDown.h"
 #include "GeneratorHtml.h"
 #include "LexicalAnalyser.h"
+#include "StructuralAnalyser.h"
 #include "Toc.h"
+
 #include "TestLexicalAnalyser.h"
 #include "TestSyntaxicAnalyser.h"
 
@@ -77,23 +79,26 @@ void  run (const otdgen::Conf & conf, const std::string & path)
 
       ExpressionRoot root = central.process (path);
 
-      Toc toc (conf);
+      Toc toc;
       toc.process (root);
+
+      StructuralAnalyser analyser;
+      DocLibrary library = analyser.process (root);
 
       if (conf.format == Conf::Format::Html)
       {
          GeneratorHtml generator (conf, toc);
-         generator.process (root);
+         generator.process (library);
       }
       else if (conf.format == Conf::Format::GitHubMarkDown)
       {
          GeneratorGitHubMarkDown generator (conf, toc);
-         generator.process (root);
+         generator.process (library);
       }
       else if (conf.format == Conf::Format::DocSet)
       {
          GeneratorHtml generator (conf, toc);
-         generator.process (root);
+         generator.process (library);
       }
    }
    catch (...)
