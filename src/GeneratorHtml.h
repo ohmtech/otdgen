@@ -94,6 +94,7 @@ private:
    void           add_index (std::string name, std::string type, std::string path);
    void           close_index ();
    std::string    escape_xml (const std::string & txt);
+   std::string    escape_pourcent (const std::string & txt);
 
    sqlite3 *      _db_ptr = nullptr;
 

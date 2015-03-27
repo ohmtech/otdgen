@@ -274,6 +274,12 @@ void  GeneratorHtml::process (std::string & output, std::vector <std::string> & 
    case DocSection::Level::Section:
       cur.resize (3);
       cur.push_back (section.id);
+      if (conf ().format == Conf::Format::DocSet)
+      {
+         output += "<a name=\"//apple_ref/cpp/Section/";
+         output += escape_pourcent (process_no_style (section.title));
+         output += "\" class=\"dashAnchor\"></a>\n";
+      }
       output += "<h2><a name=\"" + section.id + "\">";
       process (output, cur, section.title);
       output += "</a></h2>\n\n";
@@ -737,6 +743,8 @@ void  GeneratorHtml::make_plist (const DocLibrary & library)
    content += "	<string>" + library.id + "</string>\n";
    content += "	<key>isDashDocset</key>\n";
    content += "	<true/>\n";
+   content += "	<key>DashDocSetFamily</key>\n";
+   content += "	<string>dashtoc</string>\n";
    content += "</dict>\n";
    content += "</plist>\n";
 
@@ -848,6 +856,109 @@ std::string GeneratorHtml::escape_xml (const std::string & txt)
       else if (c == '>')
       {
          ret += "&gt;";
+      }
+      else
+      {
+         ret.push_back (c);
+      }
+   }
+
+   return ret;
+}
+
+
+
+/*
+==============================================================================
+Name : escape_pourcent
+Reference :
+   http://en.wikipedia.org/wiki/Percent-encoding
+==============================================================================
+*/
+
+std::string GeneratorHtml::escape_pourcent (const std::string & txt)
+{
+   std::string ret;
+
+/*
+!     #     $     &     '     (     )     *     +     ,     /     :     ;     =     ?     @     [     ]
+%21	%23	%24	%26	%27	%28	%29	%2A	%2B	%2C	%2F	%3A	%3B	%3D	%3F	%40	%5B	%5D
+
+*/
+
+   for (auto && c : txt)
+   {
+      if (c == '!')
+      {
+         ret += "%21";
+      }
+      else if (c == '#')
+      {
+         ret += "%23";
+      }
+      else if (c == '$')
+      {
+         ret += "%24";
+      }
+      else if (c == '&')
+      {
+         ret += "%26";
+      }
+      else if (c == '\'')
+      {
+         ret += "%27";
+      }
+      else if (c == '(')
+      {
+         ret += "%28";
+      }
+      else if (c == ')')
+      {
+         ret += "%29";
+      }
+      else if (c == '*')
+      {
+         ret += "%2A";
+      }
+      else if (c == '+')
+      {
+         ret += "%2B";
+      }
+      else if (c == ',')
+      {
+         ret += "%2C";
+      }
+      else if (c == '/')
+      {
+         ret += "%2F";
+      }
+      else if (c == ':')
+      {
+         ret += "%3A";
+      }
+      else if (c == ';')
+      {
+         ret += "%3B";
+      }
+      else if (c == '=')
+      {
+         ret += "%3D";
+      }
+      else if (c == '?')
+      {
+         ret += "%3F";
+      }
+      else if (c == '@')
+      {
+         ret += "%40";
+      }
+      else if (c == '[')
+      {
+         ret += "%5B";
+      }
+      else if (c == ']')
+      {
+         ret += "%5D";
       }
       else
       {
