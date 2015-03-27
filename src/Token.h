@@ -90,6 +90,33 @@ public:
                   warning;
 
    static const Token
+                  namespace_;
+   static const Token
+                  class_;
+   static const Token
+                  inherit;
+   static const Token
+                  header;
+   static const Token
+                  guide;
+   static const Token
+                  declaration;
+   static const Token
+                  parameter;
+   static const Token
+                  type;
+   static const Token
+                  constructor;
+   static const Token
+                  destructor;
+   static const Token
+                  method;
+   static const Token
+                  brief;
+   static const Token
+                  division;
+
+   static const Token
                   itemize;
    static const Token
                   enumerate;

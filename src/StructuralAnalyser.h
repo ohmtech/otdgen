@@ -66,6 +66,9 @@ private:
    void           process_block (const ExpressionParagraph & paragraph);
    void           process_block (const Expression & expression);
 
+   std::string    process_block_no_style (const ExpressionParagraph & paragraph);
+   std::string    process_block_no_style (const Expression & expression);
+
    void           post_process (DocLibrary & library);
    void           post_process (DocBook & book);
    void           post_process (DocChapter & chapter);
@@ -77,6 +80,7 @@ private:
 
    DocInlines *   _inlines_ptr = nullptr;
    DocBlocks *    _blocks_ptr = nullptr;
+   DocMethod *    _method_ptr = nullptr;
 
    std::string    _cur_section;
    std::string    _cur_subsection;

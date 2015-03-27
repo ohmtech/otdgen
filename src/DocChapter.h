@@ -14,7 +14,11 @@
 /*\\\ INCLUDE FILES \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\*/
 
 #include "DocBlocks.h"
+#include "DocCartouche.h"
 #include "DocInline.h"
+#include "DocMethod.h"
+#include "DocParameter.h"
+#include "DocType.h"
 
 #include <list>
 #include <string>
@@ -57,12 +61,16 @@ public:
    const DocChapter &
                   next () const;
 
-   Type           type;
+   Type           type = Type::Normal;
    DocInlines     title;
    std::string    name; // class name
    std::string    id;
 
    DocBlocks      blocks;
+   DocCartouche   cartouche;
+   DocParameters  parameters;
+   DocTypes       types;
+   DocMethods     methods;
 
 
 

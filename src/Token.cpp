@@ -232,6 +232,20 @@ const Token Token::note ("\\note");
 const Token Token::important ("\\important");
 const Token Token::warning ("\\warning");
 
+const Token Token::namespace_ ("\\namespace");
+const Token Token::class_ ("\\class");
+const Token Token::inherit ("\\inherit");
+const Token Token::header ("\\header");
+const Token Token::guide ("\\guide");
+const Token Token::declaration ("\\declaration");
+const Token Token::parameter ("\\parameter");
+const Token Token::type ("\\type");
+const Token Token::constructor ("\\constructor");
+const Token Token::destructor ("\\destructor");
+const Token Token::method ("\\method");
+const Token Token::brief ("\\brief");
+const Token Token::division ("\\division");
+
 const Token Token::itemize ("\\itemize");
 const Token Token::enumerate ("\\enumerate");
 const Token Token::item ("\\item");

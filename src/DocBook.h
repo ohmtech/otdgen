@@ -52,9 +52,10 @@ public:
    DocBook &      operator = (const DocBook & rhs) = default;
    DocBook &      operator = (DocBook && rhs) = default;
 
-   Type           type;
+   Type           type = Type::Reference;
    DocInlines     title;
    std::string    id;
+   std::string    namespace_;
 
    DocBlocks      overview;
    DocChapters    chapters;

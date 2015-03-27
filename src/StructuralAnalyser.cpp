@@ -276,6 +276,131 @@ void  StructuralAnalyser::process (const ExpressionCommand & command)
       process_block (paragraph);
       _inlines_ptr = nullptr;
    }
+   else if (command.name == std::string (Token::namespace_))
+   {
+      _book_ptr->namespace_ = process_block_no_style (paragraph);
+   }
+   else if (command.name == std::string (Token::class_))
+   {
+      std::string name = process_block_no_style (paragraph);
+
+      _chapter_ptr = &*_book_ptr->chapters.emplace (_book_ptr->chapters.end ());
+      _chapter_ptr->id = name;
+      _chapter_ptr->type = DocChapter::Type::Class;
+
+      auto & inlinee = *_chapter_ptr->title.emplace (_chapter_ptr->title.end ());
+      inlinee.type = DocInline::Type::Text;
+      inlinee.text = name + " Class Reference";
+
+      _chapter_ptr->name = name;
+
+      _blocks_ptr = &_chapter_ptr->blocks;
+   }
+   else if (command.name == std::string (Token::inherit))
+   {
+      _chapter_ptr->cartouche.inherit = process_block_no_style (paragraph);
+   }
+   else if (command.name == std::string (Token::header))
+   {
+      _chapter_ptr->cartouche.header = process_block_no_style (paragraph);
+   }
+   else if (command.name == std::string (Token::guide))
+   {
+      auto it = command.options.find ("id");
+      assert (it != command.options.end ());
+
+      _chapter_ptr->cartouche.guide_id = it->second;
+
+      _inlines_ptr = &_chapter_ptr->cartouche.guide;
+      process_block (paragraph);
+      _inlines_ptr = nullptr;
+   }
+   else if (command.name == std::string (Token::declaration))
+   {
+      _chapter_ptr->cartouche.declaration = process_block_no_style (paragraph);
+   }
+   else if (command.name == std::string (Token::parameter))
+   {
+      auto & param = *_chapter_ptr->parameters.emplace (_chapter_ptr->parameters.end ());
+
+      param.type = process_block_no_style (paragraph);
+
+      auto it = command.bodies.begin ();
+      ++it;
+      assert (it != command.bodies.end ());
+
+      const ExpressionParagraph & paragraph2
+         = dynamic_cast <const ExpressionParagraph &> (**it);
+
+      _inlines_ptr = &param.body;
+      process_block (paragraph2);
+      _inlines_ptr = nullptr;
+   }
+   else if (command.name == std::string (Token::type))
+   {
+      auto & type = *_chapter_ptr->types.emplace (_chapter_ptr->types.end ());
+
+      {
+         auto it = command.options.find ("id");
+         if (it != command.options.end ())
+         {
+            type.id = it->second;
+         }
+      }
+
+      type.type = process_block_no_style (paragraph);
+
+      auto it = command.bodies.begin ();
+      ++it;
+      assert (it != command.bodies.end ());
+
+      const ExpressionParagraph & paragraph2
+         = dynamic_cast <const ExpressionParagraph &> (**it);
+
+      _inlines_ptr = &type.body;
+      process_block (paragraph2);
+      _inlines_ptr = nullptr;
+   }
+   else if (command.name == std::string (Token::constructor))
+   {
+      auto & method = *_chapter_ptr->methods.emplace (_chapter_ptr->methods.end ());
+      method.type = DocMethod::Type::Constructor;
+
+      _method_ptr = &method;
+      _blocks_ptr = &_method_ptr->description;
+   }
+   else if (command.name == std::string (Token::destructor))
+   {
+      auto & method = *_chapter_ptr->methods.emplace (_chapter_ptr->methods.end ());
+      method.type = DocMethod::Type::Destructor;
+
+      _method_ptr = &method;
+      _blocks_ptr = &_method_ptr->description;
+   }
+   else if (command.name == std::string (Token::method))
+   {
+      auto & method = *_chapter_ptr->methods.emplace (_chapter_ptr->methods.end ());
+      method.type = DocMethod::Type::Function;
+      method.name = process_block_no_style (paragraph);
+
+      _method_ptr = &method;
+      _blocks_ptr = &_method_ptr->description;
+   }
+   else if (command.name == std::string (Token::brief))
+   {
+      _inlines_ptr = &_method_ptr->brief;
+      process_block (paragraph);
+      _inlines_ptr = nullptr;
+   }
+   else if (command.name == std::string (Token::division))
+   {
+      auto & method = *_chapter_ptr->methods.emplace (_chapter_ptr->methods.end ());
+      method.type = DocMethod::Type::Division;
+
+      _inlines_ptr = &method.brief;
+      process_block (paragraph);
+      _inlines_ptr = nullptr;
+   }
 }
 
 
@@ -525,6 +650,75 @@ void  StructuralAnalyser::process_block (const Expression & expression)
       inlinee.type = DocInline::Type::Text;
       inlinee.text = text_ptr->body;
    }
+}
+
+
+
+/*
+==============================================================================
+Name : process_block_no_style
+==============================================================================
+*/
+
+std::string StructuralAnalyser::process_block_no_style (const ExpressionParagraph & paragraph)
+{
+   std::string ret;
+
+   for (auto && expression_uptr : paragraph.expressions)
+   {
+      const auto & expression = *expression_uptr;
+
+      ret += process_block_no_style (expression);
+   }
+
+   return ret;
+}
+
+
+
+/*
+==============================================================================
+Name : process_block_no_style
+==============================================================================
+*/
+
+std::string StructuralAnalyser::process_block_no_style (const Expression & expression)
+{
+   const ExpressionCommand * command_ptr = dynamic_cast <const ExpressionCommand *> (&expression);
+
+   if (command_ptr != nullptr)
+   {
+      const ExpressionCommand & command = *command_ptr;
+
+      if (command.name == std::string (Token::code))
+      {
+         return process_block_no_style (**command.bodies.begin ());
+      }
+      else if (command.name == std::string (Token::emph))
+      {
+         return process_block_no_style (**command.bodies.begin ());
+      }
+      else if (command.name == std::string (Token::link))
+      {
+         return process_block_no_style (**command.bodies.begin ());
+      }
+   }
+
+   const ExpressionParagraph * paragraph_ptr = dynamic_cast <const ExpressionParagraph *> (&expression);
+
+   if (paragraph_ptr != nullptr)
+   {
+      return process_block_no_style (*paragraph_ptr);
+   }
+
+   const ExpressionText * text_ptr = dynamic_cast <const ExpressionText *> (&expression);
+
+   if (text_ptr != nullptr)
+   {
+      return text_ptr->body;
+   }
+
+   return "";
 }
 
 
