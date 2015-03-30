@@ -315,10 +315,6 @@ void  StructuralAnalyser::process (const ExpressionCommand & command)
       process_block (paragraph);
       _inlines_ptr = nullptr;
    }
-   else if (command.name == std::string (Token::declaration))
-   {
-      _chapter_ptr->cartouche.declaration = process_block_no_style (paragraph);
-   }
    else if (command.name == std::string (Token::parameter))
    {
       auto & param = *_chapter_ptr->parameters.emplace (_chapter_ptr->parameters.end ());
@@ -483,41 +479,51 @@ Name : process
 
 void  StructuralAnalyser::process (const ExpressionCodeBlock & codeblock)
 {
-   DocCodeBlock & block = dynamic_cast <DocCodeBlock &> (**_blocks_ptr->_content.insert (
-      _blocks_ptr->_content.end (), std::make_shared <DocCodeBlock> ()
-   ));
-
-   block.type = DocCodeBlock::Type::None;
-
-   auto it = codeblock.options.find ("language");
-
-   if (it != codeblock.options.end ())
+   if (codeblock.cartouche)
    {
-      if (it->second == "c++")
+      for (auto && line : codeblock.lines)
       {
-         block.type = DocCodeBlock::Type::Cpp;
+         _chapter_ptr->cartouche.declarations.push_back (line.first);
       }
    }
-
-   for (auto && line : codeblock.lines)
+   else
    {
-      auto & pair = *block.lines.emplace (block.lines.end ());
+      DocCodeBlock & block = dynamic_cast <DocCodeBlock &> (**_blocks_ptr->_content.insert (
+         _blocks_ptr->_content.end (), std::make_shared <DocCodeBlock> ()
+      ));
 
-      pair.first = line.first;
+      block.type = DocCodeBlock::Type::None;
 
-      switch (line.second)
+      auto it = codeblock.options.find ("language");
+
+      if (it != codeblock.options.end ())
       {
-      case ExpressionCodeBlock::Style::Normal:
-         pair.second = DocCodeBlock::LineType::Normal;
-         break;
+         if (it->second == "c++")
+         {
+            block.type = DocCodeBlock::Type::Cpp;
+         }
+      }
 
-      case ExpressionCodeBlock::Style::Emph:
-         pair.second = DocCodeBlock::LineType::Emphasis;
-         break;
+      for (auto && line : codeblock.lines)
+      {
+         auto & pair = *block.lines.emplace (block.lines.end ());
 
-      case ExpressionCodeBlock::Style::Fade:
-         pair.second = DocCodeBlock::LineType::Fade;
-         break;
+         pair.first = line.first;
+
+         switch (line.second)
+         {
+         case ExpressionCodeBlock::Style::Normal:
+            pair.second = DocCodeBlock::LineType::Normal;
+            break;
+
+         case ExpressionCodeBlock::Style::Emph:
+            pair.second = DocCodeBlock::LineType::Emphasis;
+            break;
+
+         case ExpressionCodeBlock::Style::Fade:
+            pair.second = DocCodeBlock::LineType::Fade;
+            break;
+         }
       }
    }
 }

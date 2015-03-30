@@ -43,7 +43,8 @@ public:
    std::string    header;
    std::string    guide_id;
    DocInlines     guide;
-   std::string    declaration;
+   std::list <std::string>
+                  declarations;
 
 
 

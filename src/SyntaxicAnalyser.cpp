@@ -219,7 +219,6 @@ void  SyntaxicAnalyser::process (Tokens::iterator & it)
          || (token == Token::inherit)
          || (token == Token::header)
          || (token == Token::guide)
-         || (token == Token::declaration)
          || (token == Token::parameter)
          || (token == Token::type)
          || (token == Token::constructor)
@@ -245,7 +244,10 @@ void  SyntaxicAnalyser::process (Tokens::iterator & it)
       {
          process_table (it);
       }
-      else if (token == Token::codeblock)
+      else if (
+         (token == Token::codeblock)
+         || (token == Token::declaration)
+         )
       {
          process_codeblock (it);
       }
@@ -658,6 +660,11 @@ Name : process_codeblock
 void  SyntaxicAnalyser::process_codeblock (Tokens::iterator & it)
 {
    ExpressionCodeBlock & codeblock = add_expression <ExpressionCodeBlock> ();
+   if (*it == Token::declaration)
+   {
+      codeblock.options ["language"] = "c++";
+      codeblock.cartouche = true;
+   }
    ++it;
 
    const auto it_end = _tokens.end ();

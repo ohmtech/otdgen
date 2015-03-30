@@ -505,10 +505,17 @@ void  GeneratorHtml::process (std::string & output, std::vector <std::string> & 
 
    output += "</table>\n\n";
 
-   output += "<div class=\"codeblock\"><table>\n";
-   output += "<tr><td><pre>" + escape_xml (cartouche.declaration) + "</pre></td></tr>\n";
-   output += "</table></div>\n\n";
+   if (!cartouche.declarations.empty ())
+   {
+      output += "<div class=\"codeblock\"><table>\n";
 
+      for (auto && line : cartouche.declarations)
+      {
+         output += "<tr><td><pre>" + escape_xml (line) + "</pre></td></tr>\n";
+      }
+
+      output += "</table></div>\n\n";
+   }
 }
 
 
@@ -602,12 +609,18 @@ void  GeneratorHtml::process (std::string & output, std::vector <std::string> & 
 
    output += "<h2>Member Functions Synopsys</h2>\n\n";
 
-   output += "<table>";
+   bool first_flag = true;
 
    for (auto && method : methods)
    {
       if (method.type == DocMethod::Type::Constructor)
       {
+         if (first_flag)
+         {
+            first_flag = false;
+            output += "<table>";
+         }
+
          output += "<tr>";
          output += "<td><p><a href=\"#member-function-constructor\">Constructor</a></p></td>";
          output += "<td><p>";
@@ -617,6 +630,12 @@ void  GeneratorHtml::process (std::string & output, std::vector <std::string> & 
       }
       else if (method.type == DocMethod::Type::Destructor)
       {
+         if (first_flag)
+         {
+            first_flag = false;
+            output += "<table>";
+         }
+
          output += "<tr>";
          output += "<td><p><a href=\"#member-function-destructor\">Destructor</a></p></td>";
          output += "<td><p>";
@@ -626,6 +645,12 @@ void  GeneratorHtml::process (std::string & output, std::vector <std::string> & 
       }
       else if (method.type == DocMethod::Type::Function)
       {
+         if (first_flag)
+         {
+            first_flag = false;
+            output += "<table>";
+         }
+
          output += "<tr>";
          output += "<td><p><code><a href=\"#member-function-" + escape_pourcent (method.name) + "\">" + method.name + "</a></code></p></td>";
          output += "<td><p>";
@@ -635,7 +660,10 @@ void  GeneratorHtml::process (std::string & output, std::vector <std::string> & 
       }
       else if (method.type == DocMethod::Type::Division)
       {
-         output += "</table>\n\n";
+         if (!first_flag)
+         {
+            output += "</table>\n\n";
+         }
 
          if (conf ().format == Conf::Format::DocSet)
          {
@@ -649,6 +677,7 @@ void  GeneratorHtml::process (std::string & output, std::vector <std::string> & 
          output += "</h3>\n\n";
 
          output += "<table>";
+         first_flag = false;
       }
    }
 

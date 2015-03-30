@@ -163,6 +163,7 @@ public:
    std::list <std::pair <std::string, Style>>
                   lines;
    Expressions    captions;
+   bool           cartouche = false;
 
 
 }; // class CodeBlock

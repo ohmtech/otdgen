@@ -433,9 +433,17 @@ void  GeneratorGitHubMarkDown::process (std::string & output, std::vector <std::
 
    output += "</table>\n\n";
 
-   output += "```c++\n";;
-   output += cartouche.declaration + "\n";
-   output += "```\n\n";
+   if (!cartouche.declarations.empty ())
+   {
+      output += "```c++\n";
+
+      for (auto && line : cartouche.declarations)
+      {
+         output += line + "\n";
+      }
+
+      output += "```\n\n";
+   }
 
 }
 
@@ -516,12 +524,18 @@ void  GeneratorGitHubMarkDown::process (std::string & output, std::vector <std::
 
    output += "<h2>Member Functions Synopsys</h2>\n\n";
 
-   output += "<table>";
+   bool first_flag = true;
 
    for (auto && method : methods)
    {
       if (method.type == DocMethod::Type::Constructor)
       {
+         if (first_flag)
+         {
+            first_flag = false;
+            output += "<table>";
+         }
+
          output += "<tr>";
          output += "<td><a href=\"#member-function-constructor\">Constructor</a></td>";
          output += "<td>";
@@ -531,6 +545,12 @@ void  GeneratorGitHubMarkDown::process (std::string & output, std::vector <std::
       }
       else if (method.type == DocMethod::Type::Destructor)
       {
+         if (first_flag)
+         {
+            first_flag = false;
+            output += "<table>";
+         }
+
          output += "<tr>";
          output += "<td><a href=\"#member-function-destructor\">Destructor</a></td>";
          output += "<td>";
@@ -540,6 +560,12 @@ void  GeneratorGitHubMarkDown::process (std::string & output, std::vector <std::
       }
       else if (method.type == DocMethod::Type::Function)
       {
+         if (first_flag)
+         {
+            first_flag = false;
+            output += "<table>";
+         }
+
          output += "<tr>";
          output += "<td><code><a href=\"#member-function-" + escape_pourcent (method.name) + "\">" + method.name + "</a></code></td>";
          output += "<td>";
@@ -549,13 +575,17 @@ void  GeneratorGitHubMarkDown::process (std::string & output, std::vector <std::
       }
       else if (method.type == DocMethod::Type::Division)
       {
-         output += "</table>\n\n";
+         if (!first_flag)
+         {
+            output += "</table>\n\n";
+         }
 
          output += "<h3>";
          process (output, cur, method.brief);
          output += "</h3>\n\n";
 
          output += "<table>";
+         first_flag = false;
       }
    }
 
