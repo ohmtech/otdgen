@@ -569,7 +569,16 @@ void  GeneratorHtml::process (std::string & output, std::vector <std::string> & 
       }
 
       output += "<tr>";
-      output += "<td><p><code>" + type.type + "</code></p></td>";
+
+      if (type.id.empty ())
+      {
+         output += "<td><p><code>" + type.type + "</code></p></td>";
+      }
+      else
+      {
+         output += "<td><p><a href=\"" + make_href (cur, type.id) + "\"><code>" + type.type + "</code></a></p</td>";
+      }
+
       output += "<td><p>";
       process (output, cur, type.body);
       output += "</p></td>";

@@ -483,7 +483,16 @@ void  GeneratorGitHubMarkDown::process (std::string & output, std::vector <std::
    for (auto && type : types)
    {
       output += "<tr>";
-      output += "<td><code>" + type.type + "</code></td>";
+
+      if (type.id.empty ())
+      {
+         output += "<td><code>" + type.type + "</code></td>";
+      }
+      else
+      {
+         output += "<td><a href=\"" + make_href (cur, type.id) + "\"><code>" + type.type + "</code></a></td>";
+      }
+
       output += "<td>";
       process (output, cur, type.body);
       output += "</td>";
