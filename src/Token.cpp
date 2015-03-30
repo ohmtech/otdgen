@@ -170,6 +170,7 @@ bool  Token::is_value () const
    {
       bool ok_flag = false;
       ok_flag |= (c >= 'a') && (c <= 'z');
+      ok_flag |= (c >= 'A') && (c <= 'Z');
       ok_flag |= (c >= '0') && (c <= '9');
       ok_flag |= (c == '_');
       ok_flag |= (c == '/');
