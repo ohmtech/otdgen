@@ -285,7 +285,15 @@ void  StructuralAnalyser::process (const ExpressionCommand & command)
       std::string name = process_block_no_style (paragraph);
 
       _chapter_ptr = &*_book_ptr->chapters.emplace (_book_ptr->chapters.end ());
-      _chapter_ptr->id = name;
+      auto it = command.options.find ("id");
+      if (it != command.options.end ())
+      {
+         _chapter_ptr->id = it->second;
+      }
+      else
+      {
+         _chapter_ptr->id = name;
+      }
       _chapter_ptr->type = DocChapter::Type::Class;
 
       auto & inlinee = *_chapter_ptr->title.emplace (_chapter_ptr->title.end ());
