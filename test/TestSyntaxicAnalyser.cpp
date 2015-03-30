@@ -54,6 +54,7 @@ void  TestSyntaxicAnalyser::run ()
    run_019 ();
    run_020 ();
    run_021 ();
+   run_022 ();
 }
 
 
@@ -645,6 +646,33 @@ void  TestSyntaxicAnalyser::run_021 ()
    codeblock.add_line ("test", ExpressionCodeBlock::Style::Normal);
    codeblock.add_line ("", ExpressionCodeBlock::Style::Normal);
    codeblock.add_line ("test", ExpressionCodeBlock::Style::Normal);
+
+   //syntaxic.root ().trace ();
+
+   assert (root == syntaxic.root ());
+}
+
+
+
+/*
+==============================================================================
+Name : run_022
+==============================================================================
+*/
+
+void  TestSyntaxicAnalyser::run_022 ()
+{
+   std::string source;
+   source += "\\constructor {}\n";
+
+   LexicalAnalyser lexical;
+   auto tokens = lexical.process (source);
+
+   SyntaxicAnalyser syntaxic (tokens, source, "<context>");
+   syntaxic.process ();
+
+   ExpressionRoot root;
+   root.add_command ("\\constructor").add_paragraph ();
 
    //syntaxic.root ().trace ();
 

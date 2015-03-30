@@ -386,6 +386,8 @@ void  SyntaxicAnalyser::process_command (Tokens::iterator & it)
       }
       else if (state == body)
       {
+         size_t nbr_bodies = command.bodies.size ();
+
          push_expressions (command.bodies);
 
          bool in_block_flag = _in_block_flag;
@@ -396,6 +398,13 @@ void  SyntaxicAnalyser::process_command (Tokens::iterator & it)
          _in_block_flag = in_block_flag;
 
          pop_expressions ();
+
+         if (nbr_bodies == command.bodies.size ())
+         {
+            // add an empty one
+
+            command.add_paragraph ();
+         }
 
          state = end_body;
       }
