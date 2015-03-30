@@ -144,7 +144,19 @@ void  GeneratorGitHubMarkDown::process (std::vector <std::string> & cur, const D
    process (output, cur, chapter.title);
    output += "</h1>\n\n";
 
+   if (chapter.type == DocChapter::Type::Class)
+   {
+      process (output, cur, chapter.cartouche);
+   }
+
    process (output, cur, chapter.blocks);
+
+   if (chapter.type == DocChapter::Type::Class)
+   {
+      process (output, cur, chapter.parameters);
+      process (output, cur, chapter.types);
+      process (output, cur, chapter.methods);
+   }
 
    process_nav (output, chapter);
 
@@ -379,6 +391,190 @@ void  GeneratorGitHubMarkDown::process (std::string & output, std::vector <std::
    process (output, cur, paragraph.body);
 
    output += "</p>\n\n";
+}
+
+
+
+/*
+==============================================================================
+Name : process
+==============================================================================
+*/
+
+void  GeneratorGitHubMarkDown::process (std::string & output, std::vector <std::string> & cur, const DocCartouche & cartouche)
+{
+   output += "<table>";
+
+   if (!cartouche.inherit.empty ())
+   {
+      output += "<tr>";
+      output += "<td>Inherits from</td>";
+      output += "<td><code>" + cartouche.inherit + "</code></td>";
+      output += "</tr>\n";
+   }
+
+   if (!cartouche.header.empty ())
+   {
+      output += "<tr>";
+      output += "<td>Declared in</td>";
+      output += "<td><code>" + cartouche.header + "</code></td>";
+      output += "</tr>\n";
+   }
+
+   if (!cartouche.guide_id.empty ())
+   {
+      output += "<tr>";
+      output += "<td>Companion Guide</td>";
+      output += "<td>";
+      process (output, cur, cartouche.guide);
+      output += "</td>";
+      output += "</tr>\n";
+   }
+
+   output += "</table>\n\n";
+
+   output += "```c++\n";;
+   output += cartouche.declaration + "\n";
+   output += "```\n\n";
+
+}
+
+
+
+/*
+==============================================================================
+Name : process
+==============================================================================
+*/
+
+void  GeneratorGitHubMarkDown::process (std::string & output, std::vector <std::string> & cur, const DocParameters & parameters)
+{
+   output += "<h2>Template Parameters</h2>\n\n";
+
+   output += "<table>";
+
+   for (auto && parameter : parameters)
+   {
+      output += "<tr>";
+      output += "<td><code>" + parameter.type + "</code></td>";
+      output += "<td>";
+      process (output, cur, parameter.body);
+      output += "</td>";
+      output += "</tr>\n";
+   }
+
+   output += "</table>\n\n";
+}
+
+
+
+/*
+==============================================================================
+Name : process
+==============================================================================
+*/
+
+void  GeneratorGitHubMarkDown::process (std::string & output, std::vector <std::string> & cur, const DocTypes & types)
+{
+   output += "<h2>Member Types</h2>\n\n";
+
+   output += "<table>";
+
+   for (auto && type : types)
+   {
+      output += "<tr>";
+      output += "<td><code>" + type.type + "</code></td>";
+      output += "<td>";
+      process (output, cur, type.body);
+      output += "</td>";
+      output += "</tr>\n";
+   }
+
+   output += "</table>\n\n";
+}
+
+
+
+/*
+==============================================================================
+Name : process
+==============================================================================
+*/
+
+void  GeneratorGitHubMarkDown::process (std::string & output, std::vector <std::string> & cur, const DocMethods & methods)
+{
+   // synopsys
+
+   output += "<h2>Member Functions Synopsys</h2>\n\n";
+
+   output += "<table>";
+
+   for (auto && method : methods)
+   {
+      if (method.type == DocMethod::Type::Constructor)
+      {
+         output += "<tr>";
+         output += "<td>Constructor</td>";
+         output += "<td>";
+         process (output, cur, method.brief);
+         output += "</td>";
+         output += "</tr>\n";
+      }
+      else if (method.type == DocMethod::Type::Destructor)
+      {
+         output += "<tr>";
+         output += "<td>Destructor</td>";
+         output += "<td>";
+         process (output, cur, method.brief);
+         output += "</td>";
+         output += "</tr>\n";
+      }
+      else if (method.type == DocMethod::Type::Function)
+      {
+         output += "<tr>";
+         output += "<td><code>" + method.name + "</code></td>";
+         output += "<td>";
+         process (output, cur, method.brief);
+         output += "</td>";
+         output += "</tr>\n";
+      }
+      else if (method.type == DocMethod::Type::Division)
+      {
+         output += "</table>\n\n";
+
+         output += "<h3>";
+         process (output, cur, method.brief);
+         output += "</h3>\n\n";
+
+         output += "<table>";
+      }
+   }
+
+   output += "</table>\n\n";
+
+   // details
+
+   output += "<h2>Member Functions</h2>\n\n";
+
+   for (auto && method : methods)
+   {
+      if (method.type == DocMethod::Type::Division) continue;
+
+      if (method.type == DocMethod::Type::Constructor)
+      {
+         output += "<h3>Constructor</h3>\n";
+      }
+      else if (method.type == DocMethod::Type::Destructor)
+      {
+         output += "<h3>Destructor</h3>\n";
+      }
+      else if (method.type == DocMethod::Type::Function)
+      {
+         output += "<h3><code>" + method.name + "</code></h3>\n";
+      }
+
+      process (output, cur, method.description);
+   }
 }
 
 
