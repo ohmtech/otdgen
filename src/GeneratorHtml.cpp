@@ -600,7 +600,7 @@ void  GeneratorHtml::process (std::string & output, std::vector <std::string> & 
       if (method.type == DocMethod::Type::Constructor)
       {
          output += "<tr>";
-         output += "<td><p>Constructor</p></td>";
+         output += "<td><p><a href=\"#member-function-constructor\">Constructor</a></p></td>";
          output += "<td><p>";
          process (output, cur, method.brief);
          output += "</p></td>";
@@ -609,7 +609,7 @@ void  GeneratorHtml::process (std::string & output, std::vector <std::string> & 
       else if (method.type == DocMethod::Type::Destructor)
       {
          output += "<tr>";
-         output += "<td><p>Destructor</p></td>";
+         output += "<td><p><a href=\"#member-function-destructor\">Destructor</a></p></td>";
          output += "<td><p>";
          process (output, cur, method.brief);
          output += "</p></td>";
@@ -618,7 +618,7 @@ void  GeneratorHtml::process (std::string & output, std::vector <std::string> & 
       else if (method.type == DocMethod::Type::Function)
       {
          output += "<tr>";
-         output += "<td><p><code>" + method.name + "</code></p></td>";
+         output += "<td><p><code><a href=\"#member-function-" + escape_pourcent (method.name) + "\">" + method.name + "</a></code></p></td>";
          output += "<td><p>";
          process (output, cur, method.brief);
          output += "</p></td>";
@@ -662,7 +662,7 @@ void  GeneratorHtml::process (std::string & output, std::vector <std::string> & 
             output += "\" class=\"dashAnchor\"></a>\n";
          }
 
-         output += "<h3>Constructor</h3>\n";
+         output += "<h3 id=\"member-function-constructor\">Constructor</h3>\n";
       }
       else if (method.type == DocMethod::Type::Destructor)
       {
@@ -673,7 +673,7 @@ void  GeneratorHtml::process (std::string & output, std::vector <std::string> & 
             output += "\" class=\"dashAnchor\"></a>\n";
          }
 
-         output += "<h3>Destructor</h3>\n";
+         output += "<h3 id=\"member-function-destructor\">Destructor</h3>\n";
       }
       else if (method.type == DocMethod::Type::Function)
       {
@@ -684,7 +684,7 @@ void  GeneratorHtml::process (std::string & output, std::vector <std::string> & 
             output += "\" class=\"dashAnchor\"></a>\n";
          }
 
-         output += "<h3><code>" + method.name + "</code></h3>\n";
+         output += "<h3 id=\"member-function-" + escape_pourcent (method.name) + "\"><code>" + method.name + "</code></h3>\n";
       }
 
       process (output, cur, method.description);
@@ -1069,152 +1069,6 @@ void  GeneratorHtml::close_index ()
       sqlite3_close (_db_ptr);
       _db_ptr = nullptr;
    }
-}
-
-
-
-/*
-==============================================================================
-Name : escape_xml
-==============================================================================
-*/
-
-std::string GeneratorHtml::escape_xml (const std::string & txt)
-{
-   std::string ret;
-
-   for (auto && c : txt)
-   {
-      if (c == '"')
-      {
-         ret += "&quot;";
-      }
-      else if (c == '&')
-      {
-         ret += "&amp;";
-      }
-      else if (c == '\'')
-      {
-         ret += "&apos;";
-      }
-      else if (c == '<')
-      {
-         ret += "&lt;";
-      }
-      else if (c == '>')
-      {
-         ret += "&gt;";
-      }
-      else
-      {
-         ret.push_back (c);
-      }
-   }
-
-   return ret;
-}
-
-
-
-/*
-==============================================================================
-Name : escape_pourcent
-Reference :
-   http://en.wikipedia.org/wiki/Percent-encoding
-==============================================================================
-*/
-
-std::string GeneratorHtml::escape_pourcent (const std::string & txt)
-{
-   std::string ret;
-
-/*
-!     #     $     &     '     (     )     *     +     ,     /     :     ;     =     ?     @     [     ]
-%21	%23	%24	%26	%27	%28	%29	%2A	%2B	%2C	%2F	%3A	%3B	%3D	%3F	%40	%5B	%5D
-
-*/
-
-   for (auto && c : txt)
-   {
-      if (c == '!')
-      {
-         ret += "%21";
-      }
-      else if (c == '#')
-      {
-         ret += "%23";
-      }
-      else if (c == '$')
-      {
-         ret += "%24";
-      }
-      else if (c == '&')
-      {
-         ret += "%26";
-      }
-      else if (c == '\'')
-      {
-         ret += "%27";
-      }
-      else if (c == '(')
-      {
-         ret += "%28";
-      }
-      else if (c == ')')
-      {
-         ret += "%29";
-      }
-      else if (c == '*')
-      {
-         ret += "%2A";
-      }
-      else if (c == '+')
-      {
-         ret += "%2B";
-      }
-      else if (c == ',')
-      {
-         ret += "%2C";
-      }
-      else if (c == '/')
-      {
-         ret += "%2F";
-      }
-      else if (c == ':')
-      {
-         ret += "%3A";
-      }
-      else if (c == ';')
-      {
-         ret += "%3B";
-      }
-      else if (c == '=')
-      {
-         ret += "%3D";
-      }
-      else if (c == '?')
-      {
-         ret += "%3F";
-      }
-      else if (c == '@')
-      {
-         ret += "%40";
-      }
-      else if (c == '[')
-      {
-         ret += "%5B";
-      }
-      else if (c == ']')
-      {
-         ret += "%5D";
-      }
-      else
-      {
-         ret.push_back (c);
-      }
-   }
-
-   return ret;
 }
 
 

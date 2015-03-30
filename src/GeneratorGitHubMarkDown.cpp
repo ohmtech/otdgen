@@ -514,7 +514,7 @@ void  GeneratorGitHubMarkDown::process (std::string & output, std::vector <std::
       if (method.type == DocMethod::Type::Constructor)
       {
          output += "<tr>";
-         output += "<td>Constructor</td>";
+         output += "<td><a href=\"#member-function-constructor\">Constructor</a></td>";
          output += "<td>";
          process (output, cur, method.brief);
          output += "</td>";
@@ -523,7 +523,7 @@ void  GeneratorGitHubMarkDown::process (std::string & output, std::vector <std::
       else if (method.type == DocMethod::Type::Destructor)
       {
          output += "<tr>";
-         output += "<td>Destructor</td>";
+         output += "<td><a href=\"#member-function-destructor\">Destructor</a></td>";
          output += "<td>";
          process (output, cur, method.brief);
          output += "</td>";
@@ -532,7 +532,7 @@ void  GeneratorGitHubMarkDown::process (std::string & output, std::vector <std::
       else if (method.type == DocMethod::Type::Function)
       {
          output += "<tr>";
-         output += "<td><code>" + method.name + "</code></td>";
+         output += "<td><code><a href=\"#member-function-" + escape_pourcent (method.name) + "\">" + method.name + "</a></code></td>";
          output += "<td>";
          process (output, cur, method.brief);
          output += "</td>";
@@ -562,15 +562,15 @@ void  GeneratorGitHubMarkDown::process (std::string & output, std::vector <std::
 
       if (method.type == DocMethod::Type::Constructor)
       {
-         output += "<h3>Constructor</h3>\n";
+         output += "<h3 id=\"member-function-constructor\">Constructor</h3>\n";
       }
       else if (method.type == DocMethod::Type::Destructor)
       {
-         output += "<h3>Destructor</h3>\n";
+         output += "<h3 id=\"member-function-destructor\">Destructor</h3>\n";
       }
       else if (method.type == DocMethod::Type::Function)
       {
-         output += "<h3><code>" + method.name + "</code></h3>\n";
+         output += "<h3 id=\"member-function-" + escape_pourcent (method.name) + "\"><code>" + method.name + "</code></h3>\n";
       }
 
       process (output, cur, method.description);

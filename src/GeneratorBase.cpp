@@ -128,6 +128,146 @@ const Toc & GeneratorBase::toc () const
 
 
 
+/*
+==============================================================================
+Name : escape_xml
+==============================================================================
+*/
+
+std::string GeneratorBase::escape_xml (const std::string & txt)
+{
+   std::string ret;
+
+   for (auto && c : txt)
+   {
+      if (c == '"')
+      {
+         ret += "&quot;";
+      }
+      else if (c == '&')
+      {
+         ret += "&amp;";
+      }
+      else if (c == '\'')
+      {
+         ret += "&apos;";
+      }
+      else if (c == '<')
+      {
+         ret += "&lt;";
+      }
+      else if (c == '>')
+      {
+         ret += "&gt;";
+      }
+      else
+      {
+         ret.push_back (c);
+      }
+   }
+
+   return ret;
+}
+
+
+
+/*
+==============================================================================
+Name : escape_pourcent
+Reference :
+   http://en.wikipedia.org/wiki/Percent-encoding
+==============================================================================
+*/
+
+std::string GeneratorBase::escape_pourcent (const std::string & txt)
+{
+   std::string ret;
+
+   for (auto && c : txt)
+   {
+      if (c == '!')
+      {
+         ret += "%21";
+      }
+      else if (c == '#')
+      {
+         ret += "%23";
+      }
+      else if (c == '$')
+      {
+         ret += "%24";
+      }
+      else if (c == '&')
+      {
+         ret += "%26";
+      }
+      else if (c == '\'')
+      {
+         ret += "%27";
+      }
+      else if (c == '(')
+      {
+         ret += "%28";
+      }
+      else if (c == ')')
+      {
+         ret += "%29";
+      }
+      else if (c == '*')
+      {
+         ret += "%2A";
+      }
+      else if (c == '+')
+      {
+         ret += "%2B";
+      }
+      else if (c == ',')
+      {
+         ret += "%2C";
+      }
+      else if (c == '/')
+      {
+         ret += "%2F";
+      }
+      else if (c == ':')
+      {
+         ret += "%3A";
+      }
+      else if (c == ';')
+      {
+         ret += "%3B";
+      }
+      else if (c == '=')
+      {
+         ret += "%3D";
+      }
+      else if (c == '?')
+      {
+         ret += "%3F";
+      }
+      else if (c == '@')
+      {
+         ret += "%40";
+      }
+      else if (c == '[')
+      {
+         ret += "%5B";
+      }
+      else if (c == ']')
+      {
+         ret += "%5D";
+      }
+      else
+      {
+         ret.push_back (c);
+      }
+   }
+
+   return ret;
+}
+
+
+
 /*\\\ PRIVATE \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\*/
 
 

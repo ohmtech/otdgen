@@ -50,6 +50,9 @@ protected:
    const Conf &   conf () const;
    const Toc &    toc () const;
 
+   std::string    escape_xml (const std::string & txt);
+   std::string    escape_pourcent (const std::string & txt);
+
 
 
 /*\\\ PRIVATE \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\*/
