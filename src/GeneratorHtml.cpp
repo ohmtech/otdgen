@@ -528,6 +528,8 @@ Name : process
 
 void  GeneratorHtml::process (std::string & output, std::vector <std::string> & cur, const DocParameters & parameters)
 {
+   if (parameters.empty ()) return; // abort
+
    output += "<h2>Template Parameters</h2>\n\n";
 
    output += "<table>";
@@ -562,6 +564,8 @@ Name : process
 
 void  GeneratorHtml::process (std::string & output, std::vector <std::string> & cur, const DocTypes & types)
 {
+   if (types.empty ()) return; // abort
+
    output += "<h2>Member Types</h2>\n\n";
 
    output += "<table>";
