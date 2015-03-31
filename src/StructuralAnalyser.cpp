@@ -367,41 +367,50 @@ void  StructuralAnalyser::process (const ExpressionCommand & command)
    }
    else if (command.name == std::string (Token::constructor))
    {
-      auto & method = *_chapter_ptr->methods.emplace (_chapter_ptr->methods.end ());
-      method.type = DocMethod::Type::Constructor;
+      auto & member = *_chapter_ptr->members.emplace (_chapter_ptr->members.end ());
+      member.type = DocMember::Type::Constructor;
 
-      _method_ptr = &method;
-      _blocks_ptr = &_method_ptr->description;
+      _member_ptr = &member;
+      _blocks_ptr = &_member_ptr->description;
    }
    else if (command.name == std::string (Token::destructor))
    {
-      auto & method = *_chapter_ptr->methods.emplace (_chapter_ptr->methods.end ());
-      method.type = DocMethod::Type::Destructor;
+      auto & member = *_chapter_ptr->members.emplace (_chapter_ptr->members.end ());
+      member.type = DocMember::Type::Destructor;
 
-      _method_ptr = &method;
-      _blocks_ptr = &_method_ptr->description;
+      _member_ptr = &member;
+      _blocks_ptr = &_member_ptr->description;
    }
    else if (command.name == std::string (Token::method))
    {
-      auto & method = *_chapter_ptr->methods.emplace (_chapter_ptr->methods.end ());
-      method.type = DocMethod::Type::Function;
-      method.name = process_block_no_style (paragraph);
+      auto & member = *_chapter_ptr->members.emplace (_chapter_ptr->members.end ());
+      member.type = DocMember::Type::Function;
+      member.name = process_block_no_style (paragraph);
 
-      _method_ptr = &method;
-      _blocks_ptr = &_method_ptr->description;
+      _member_ptr = &member;
+      _blocks_ptr = &_member_ptr->description;
+   }
+   else if (command.name == std::string (Token::variable))
+   {
+      auto & member = *_chapter_ptr->members.emplace (_chapter_ptr->members.end ());
+      member.type = DocMember::Type::Variable;
+      member.name = process_block_no_style (paragraph);
+
+      _member_ptr = &member;
+      _blocks_ptr = &_member_ptr->description;
    }
    else if (command.name == std::string (Token::brief))
    {
-      _inlines_ptr = &_method_ptr->brief;
+      _inlines_ptr = &_member_ptr->brief;
       process_block (paragraph);
       _inlines_ptr = nullptr;
    }
    else if (command.name == std::string (Token::division))
    {
-      auto & method = *_chapter_ptr->methods.emplace (_chapter_ptr->methods.end ());
-      method.type = DocMethod::Type::Division;
+      auto & member = *_chapter_ptr->members.emplace (_chapter_ptr->members.end ());
+      member.type = DocMember::Type::Division;
 
-      _inlines_ptr = &method.brief;
+      _inlines_ptr = &member.brief;
       process_block (paragraph);
       _inlines_ptr = nullptr;
    }
@@ -828,7 +837,7 @@ Name : post_process
 void  StructuralAnalyser::post_process (DocChapter & chapter)
 {
    post_process (chapter.blocks);
-   post_process (chapter.methods);
+   post_process (chapter.members);
 }
 
 
@@ -884,11 +893,11 @@ Name : post_process
 ==============================================================================
 */
 
-void  StructuralAnalyser::post_process (DocMethods & methods)
+void  StructuralAnalyser::post_process (DocMembers & members)
 {
-   for (auto && method : methods)
+   for (auto && member : members)
    {
-      post_process (method.description);
+      post_process (member.description);
    }
 }
 

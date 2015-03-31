@@ -16,7 +16,7 @@
 #include "DocBlocks.h"
 #include "DocCartouche.h"
 #include "DocInline.h"
-#include "DocMethod.h"
+#include "DocMember.h"
 #include "DocParameter.h"
 #include "DocType.h"
 
@@ -70,7 +70,7 @@ public:
    DocCartouche   cartouche;
    DocParameters  parameters;
    DocTypes       types;
-   DocMethods     methods;
+   DocMembers     members;
 
 
 

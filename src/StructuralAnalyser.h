@@ -73,7 +73,7 @@ private:
    void           post_process (DocBook & book);
    void           post_process (DocChapter & chapter);
    void           post_process (DocBlocks & blocks);
-   void           post_process (DocMethods & methods);
+   void           post_process (DocMembers & members);
 
    DocLibrary     _library;
    DocBook *      _book_ptr = nullptr;
@@ -81,7 +81,7 @@ private:
 
    DocInlines *   _inlines_ptr = nullptr;
    DocBlocks *    _blocks_ptr = nullptr;
-   DocMethod *    _method_ptr = nullptr;
+   DocMember *    _member_ptr = nullptr;
 
    std::string    _cur_section;
    std::string    _cur_subsection;

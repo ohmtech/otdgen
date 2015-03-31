@@ -112,6 +112,8 @@ public:
    static const Token
                   method;
    static const Token
+                  variable;
+   static const Token
                   brief;
    static const Token
                   division;

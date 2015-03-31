@@ -1,6 +1,6 @@
 /*****************************************************************************
 
-      DocMethod.h
+      DocMember.h
       Copyright (c) 2015 Raphael DINGE
 
 *Tab=3***********************************************************************/
@@ -25,7 +25,7 @@ namespace otdgen
 
 
 
-class DocMethod
+class DocMember
 :  public DocBlock
 {
 
@@ -38,16 +38,17 @@ public:
                   Constructor,
                   Destructor,
                   Function,
+                  Variable,
                   Division,
    };
 
-                  DocMethod () = default;
-                  DocMethod (const DocMethod & rhs) = default;
-                  DocMethod (DocMethod && rhs) = default;
-   virtual        ~DocMethod () = default;
+                  DocMember () = default;
+                  DocMember (const DocMember & rhs) = default;
+                  DocMember (DocMember && rhs) = default;
+   virtual        ~DocMember () = default;
 
-   DocMethod &    operator = (const DocMethod & rhs) = default;
-   DocMethod &    operator = (DocMethod && rhs) = default;
+   DocMember &    operator = (const DocMember & rhs) = default;
+   DocMember &    operator = (DocMember && rhs) = default;
 
    Type           type;
    std::string    name;
@@ -75,14 +76,14 @@ private:
 /*\\\ FORBIDDEN MEMBER FUNCTIONS \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\*/
 
 private:
-   bool           operator == (const DocMethod & rhs);
-   bool           operator != (const DocMethod & rhs);
+   bool           operator == (const DocMember & rhs);
+   bool           operator != (const DocMember & rhs);
 
 
 
-}; // class DocMethod
+}; // class DocMember
 
-using DocMethods = std::list <DocMethod>;
+using DocMembers = std::list <DocMember>;
 
 
 
@@ -90,7 +91,7 @@ using DocMethods = std::list <DocMethod>;
 
 
 
-// #include "DocMethod.hpp"
+// #include "DocMember.hpp"
 
 
 

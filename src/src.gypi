@@ -28,7 +28,7 @@
       'DocInline.h',
       'DocLibrary.h',
       'DocList.h',
-      'DocMethod.h',
+      'DocMember.h',
       'DocParagraph.h',
       'DocParameter.h',
       'DocSection.h',

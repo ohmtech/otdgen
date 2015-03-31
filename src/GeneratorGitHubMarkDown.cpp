@@ -155,7 +155,7 @@ void  GeneratorGitHubMarkDown::process (std::vector <std::string> & cur, const D
    {
       process (output, cur, chapter.parameters);
       process (output, cur, chapter.types);
-      process (output, cur, chapter.methods);
+      process (output, cur, chapter.members);
    }
 
    process_nav (output, chapter);
@@ -522,101 +522,183 @@ Name : process
 ==============================================================================
 */
 
-void  GeneratorGitHubMarkDown::process (std::string & output, std::vector <std::string> & cur, const DocMethods & methods)
+void  GeneratorGitHubMarkDown::process (std::string & output, std::vector <std::string> & cur, const DocMembers & members)
 {
+   bool in_table_flag = false;
+
+   enum class State
+   {
+      None,
+      Functions,
+      Variables,
+   };
+
+   State state = State::None;
+   std::string division;
+
    // synopsys
 
-   output += "<h2>Member Functions Synopsys</h2>\n\n";
-
-   bool first_flag = true;
-
-   for (auto && method : methods)
-   {
-      if (method.type == DocMethod::Type::Constructor)
+   auto adjust_state = [&in_table_flag, &state, &division, &output](State target){
+      if (state != target)
       {
-         if (first_flag)
+         if (in_table_flag)
          {
-            first_flag = false;
-            output += "<table>";
+            in_table_flag = false;
+            output += "</table>\n\n";
          }
+
+         state = target;
+
+         switch (target)
+         {
+         case State::Functions:
+            output += "<h2>Member Functions Synopsys</h2>\n\n";
+            break;
+
+         case State::Variables:
+            output += "<h2>Member Variables Synopsys</h2>\n\n";
+            break;
+
+         default:
+            assert (false);
+            break;
+         }
+         output += division;
+         division.clear ();
+      }
+
+      if (!in_table_flag)
+      {
+         in_table_flag = true;
+         output += "<table>";
+      }
+   };
+
+   for (auto && member : members)
+   {
+      if (member.type == DocMember::Type::Constructor)
+      {
+         adjust_state (State::Functions);
 
          output += "<tr>";
          output += "<td><a href=\"#member-function-constructor\">Constructor</a></td>";
          output += "<td>";
-         process (output, cur, method.brief);
+         process (output, cur, member.brief);
          output += "</td>";
          output += "</tr>\n";
       }
-      else if (method.type == DocMethod::Type::Destructor)
+      else if (member.type == DocMember::Type::Destructor)
       {
-         if (first_flag)
-         {
-            first_flag = false;
-            output += "<table>";
-         }
+         adjust_state (State::Functions);
 
          output += "<tr>";
          output += "<td><a href=\"#member-function-destructor\">Destructor</a></td>";
          output += "<td>";
-         process (output, cur, method.brief);
+         process (output, cur, member.brief);
          output += "</td>";
          output += "</tr>\n";
       }
-      else if (method.type == DocMethod::Type::Function)
+      else if (member.type == DocMember::Type::Function)
       {
-         if (first_flag)
-         {
-            first_flag = false;
-            output += "<table>";
-         }
+         adjust_state (State::Functions);
 
          output += "<tr>";
-         output += "<td><code><a href=\"#member-function-" + escape_pourcent (method.name) + "\">" + method.name + "</a></code></td>";
+         output += "<td><code><a href=\"#member-function-" + escape_pourcent (member.name) + "\">" + member.name + "</a></code></td>";
          output += "<td>";
-         process (output, cur, method.brief);
+         process (output, cur, member.brief);
          output += "</td>";
          output += "</tr>\n";
       }
-      else if (method.type == DocMethod::Type::Division)
+      else if (member.type == DocMember::Type::Variable)
       {
-         if (!first_flag)
+         adjust_state (State::Variables);
+
+         output += "<tr>";
+         output += "<td><code><a href=\"#member-variable-" + escape_pourcent (member.name) + "\">" + member.name + "</a></code></td>";
+         output += "<td>";
+         process (output, cur, member.brief);
+         output += "</td>";
+         output += "</tr>\n";
+      }
+      else if (member.type == DocMember::Type::Division)
+      {
+         if (in_table_flag)
          {
+            in_table_flag = false;
             output += "</table>\n\n";
          }
 
-         output += "<h3>";
-         process (output, cur, method.brief);
-         output += "</h3>\n\n";
+         division += "<h3>";
+         process (division, cur, member.brief);
+         division += "</h3>\n\n";
 
-         output += "<table>";
-         first_flag = false;
+         if (state != State::None)
+         {
+            output += division;
+            division.clear ();
+         }
       }
    }
 
-   output += "</table>\n\n";
+   if (in_table_flag)
+   {
+      output += "</table>\n\n";
+   }
 
    // details
 
-   output += "<h2>Member Functions</h2>\n\n";
+  state = State::None;
 
-   for (auto && method : methods)
+   for (auto && member : members)
    {
-      if (method.type == DocMethod::Type::Division) continue;
+      if (member.type == DocMember::Type::Division) continue;
 
-      if (method.type == DocMethod::Type::Constructor)
+      if (member.type == DocMember::Type::Constructor)
       {
+         if (state != State::Functions)
+         {
+            output += "<h2>Member Functions</h2>\n\n";
+
+            state = State::Functions;
+         }
+
          output += "<h3 id=\"member-function-constructor\">Constructor</h3>\n";
       }
-      else if (method.type == DocMethod::Type::Destructor)
+      else if (member.type == DocMember::Type::Destructor)
       {
+         if (state != State::Functions)
+         {
+            output += "<h2>Member Functions</h2>\n\n";
+
+            state = State::Functions;
+         }
+
          output += "<h3 id=\"member-function-destructor\">Destructor</h3>\n";
       }
-      else if (method.type == DocMethod::Type::Function)
+      else if (member.type == DocMember::Type::Function)
       {
-         output += "<h3 id=\"member-function-" + escape_pourcent (method.name) + "\"><code>" + method.name + "</code></h3>\n";
+         if (state != State::Functions)
+         {
+            output += "<h2>Member Functions</h2>\n\n";
+
+            state = State::Functions;
+         }
+
+         output += "<h3 id=\"member-function-" + escape_pourcent (member.name) + "\"><code>" + member.name + "</code></h3>\n";
+      }
+      else if (member.type == DocMember::Type::Variable)
+      {
+         if (state != State::Variables)
+         {
+            output += "<h2>Member Variables</h2>\n\n";
+
+            state = State::Variables;
+         }
+
+         output += "<h3 id=\"member-variable-" + escape_pourcent (member.name) + "\"><code>" + member.name + "</code></h3>\n";
       }
 
-      process (output, cur, method.description);
+      process (output, cur, member.description);
    }
 }
 

@@ -14,7 +14,7 @@
 /*\\\ INCLUDE FILES \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\*/
 
 #include "DocInline.h"
-#include "DocMethod.h"
+#include "DocMember.h"
 #include "DocParameter.h"
 #include "DocType.h"
 #include "GeneratorBase.h"
@@ -86,7 +86,7 @@ private:
    void           process (std::string & output, std::vector <std::string> & cur, const DocCartouche & cartouche);
    void           process (std::string & output, std::vector <std::string> & cur, const DocParameters & parameters);
    void           process (std::string & output, std::vector <std::string> & cur, const DocTypes & types);
-   void           process (std::string & output, std::vector <std::string> & cur, const DocMethods & methods);
+   void           process (std::string & output, std::vector <std::string> & cur, const DocMembers & members);
 
    void           process (std::string & output, std::vector <std::string> & cur, const DocInlines & inlines);
    std::string    make_href (const std::vector <std::string> & cur, const std::string & id);
