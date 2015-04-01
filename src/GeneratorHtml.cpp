@@ -344,13 +344,13 @@ void  GeneratorHtml::process (std::string & output, std::vector <std::string> & 
       break;
 
    case DocInformation::Level::Important:
-      output += "<div class=\"note\"><p><strong>Important:</strong> ";
+      output += "<div class=\"important\"><p><strong>Important:</strong> ";
       process (output, cur, information.body);
       output += "</p></div>\n\n";
       break;
 
    case DocInformation::Level::Warning:
-      output += "<div class=\"note\"><p><strong>WARNING:</strong> ";
+      output += "<div class=\"warning\"><p><strong>WARNING:</strong> ";
       process (output, cur, information.body);
       output += "</p></div>\n\n";
       break;
@@ -740,6 +740,7 @@ void  GeneratorHtml::process (std::string & output, std::vector <std::string> & 
    // details
 
    state = State::None;
+   bool first_flag = true;
 
    for (auto && member : members)
    {
@@ -761,6 +762,9 @@ void  GeneratorHtml::process (std::string & output, std::vector <std::string> & 
             output += "\" class=\"dashAnchor\"></a>\n";
          }
 
+         if (!first_flag) output += "<hr />";
+         first_flag = false;
+
          output += "<h3 id=\"member-function-constructor\">Constructor</h3>\n";
       }
       else if (member.type == DocMember::Type::Destructor)
@@ -778,6 +782,9 @@ void  GeneratorHtml::process (std::string & output, std::vector <std::string> & 
             output += "destructor";
             output += "\" class=\"dashAnchor\"></a>\n";
          }
+
+         if (!first_flag) output += "<hr />";
+         first_flag = false;
 
          output += "<h3 id=\"member-function-destructor\">Destructor</h3>\n";
       }
@@ -797,6 +804,9 @@ void  GeneratorHtml::process (std::string & output, std::vector <std::string> & 
             output += "\" class=\"dashAnchor\"></a>\n";
          }
 
+         if (!first_flag) output += "<hr />";
+         first_flag = false;
+
          output += "<h3 id=\"member-function-" + escape_pourcent (member.name) + "\"><code>" + member.name + "</code></h3>\n";
       }
       else if (member.type == DocMember::Type::Variable)
@@ -814,6 +824,9 @@ void  GeneratorHtml::process (std::string & output, std::vector <std::string> & 
             output += escape_pourcent (member.name);
             output += "\" class=\"dashAnchor\"></a>\n";
          }
+
+         if (!first_flag) output += "<hr />";
+         first_flag = false;
 
          output += "<h3 id=\"member-variable-" + escape_pourcent (member.name) + "\"><code>" + member.name + "</code></h3>\n";
       }
@@ -1068,6 +1081,8 @@ void  GeneratorHtml::process_header (std::string & output, const std::string & t
 
    output += ".sectioncode {background-color: #f6f6f6; padding: 12px; margin-top: 18px;}\n";
    output += ".sectioncode > h3 {margin-top: 0px; padding-bottom: 8px;}\n";
+
+   output += "hr { display: block; height: 1px; border: 0; border-top: 1px solid #eee; margin: 28px 0; padding: 0; }";
 
    output += "</style>\n";
    output += "</head>\n\n";
