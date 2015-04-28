@@ -281,6 +281,13 @@ std::string Toc::make_undecorated_name (const ExpressionCommand & command)
       {
          name += expr_text_ptr->body;
       }
+
+      const auto * expr_command_ptr = dynamic_cast <const ExpressionCommand *> (&expr);
+
+      if (expr_command_ptr != nullptr)
+      {
+         name += make_undecorated_name (*expr_command_ptr);
+      }
    }
 
    return name;
