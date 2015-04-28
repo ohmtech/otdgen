@@ -84,6 +84,70 @@ std::vector <std::string>  Toc::find (std::vector <std::string> cur, const std::
 
 
 
+/*
+==============================================================================
+Name : get_name
+Description :
+   Returns the undecorated title for the full id 'cur'
+==============================================================================
+*/
+
+std::string Toc::get_name (std::vector <std::string> cur) const
+{
+   auto it = _id_name_map.find (cur);
+
+   if (it != _id_name_map.end ())
+   {
+      return it->second;
+   }
+
+   return "";
+}
+
+
+
+/*
+==============================================================================
+Name : get_toc
+Description :
+   Returns the partial toc matching 'cur'
+==============================================================================
+*/
+
+std::list <std::pair <std::vector <std::string>, std::string>> Toc::get_toc (std::vector <std::string> cur) const
+{
+   std::list <std::pair <std::vector <std::string>, std::string>> ret;
+
+   for (auto && pair : _id_name_list)
+   {
+      auto sub_cur = pair.first;
+
+      if (sub_cur.size () < cur.size ()) continue;
+
+      auto name = pair.second;
+
+      bool match_flag = true;
+
+      for (size_t i = 0 ; i < cur.size () ; ++i)
+      {
+         if (sub_cur [i] != cur [i])
+         {
+            match_flag = false;
+            break;
+         }
+      }
+
+      if (match_flag)
+      {
+         ret.push_back (std::make_pair (sub_cur, name));
+      }
+   }
+
+   return ret;
+}
+
+
+
 /*\\\ INTERNAL \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\*/
 
 
@@ -108,9 +172,17 @@ void  Toc::process (std::vector <std::string> & cur_id, const Expression & expre
 
    const ExpressionCommand & command = *command_ptr;
 
-   process (cur_id, command);
+   bool ok_flag = process (cur_id, command);
 
-   _id_set.insert (cur_id);
+   if (ok_flag)
+   {
+      _id_set.insert (cur_id);
+
+      std::string name = make_undecorated_name (command);
+
+      _id_name_map [cur_id] = name;
+      _id_name_list.push_back (std::make_pair (cur_id, name));
+   }
 }
 
 
@@ -121,7 +193,7 @@ Name : process
 ==============================================================================
 */
 
-void  Toc::process (std::vector <std::string> & cur_id, const ExpressionCommand & command)
+bool  Toc::process (std::vector <std::string> & cur_id, const ExpressionCommand & command)
 {
    auto it = command.options.find ("id");
 
@@ -131,24 +203,11 @@ void  Toc::process (std::vector <std::string> & cur_id, const ExpressionCommand 
    {
       if (command.name == std::string (Token::class_))
       {
-         const ExpressionParagraph & paragraph
-            = dynamic_cast <const ExpressionParagraph &> (**command.bodies.begin ());
-
-         for (const auto & expr_sptr : paragraph.expressions)
-         {
-            const auto & expr = *expr_sptr;
-
-            const auto * expr_text_ptr = dynamic_cast <const ExpressionText *> (&expr);
-
-            if (expr_text_ptr != nullptr)
-            {
-               ide += expr_text_ptr->body;
-            }
-         }
+         ide = make_undecorated_name (command);
       }
       else
       {
-         return;  // abort
+         return false;  // abort
       }
    }
    else
@@ -188,11 +247,43 @@ void  Toc::process (std::vector <std::string> & cur_id, const ExpressionCommand 
    }
    else
    {
-      return;  // abort
+      return false;  // abort
    }
 
    cur_id.resize (level);
    cur_id.push_back (ide);
+
+   return true;
+}
+
+
+
+/*
+==============================================================================
+Name : make_undecorated_name
+==============================================================================
+*/
+
+std::string Toc::make_undecorated_name (const ExpressionCommand & command)
+{
+   std::string name;
+
+   const ExpressionParagraph & paragraph
+      = dynamic_cast <const ExpressionParagraph &> (**command.bodies.begin ());
+
+   for (const auto & expr_sptr : paragraph.expressions)
+   {
+      const auto & expr = *expr_sptr;
+
+      const auto * expr_text_ptr = dynamic_cast <const ExpressionText *> (&expr);
+
+      if (expr_text_ptr != nullptr)
+      {
+         name += expr_text_ptr->body;
+      }
+   }
+
+   return name;
 }
 
 

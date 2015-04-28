@@ -13,6 +13,8 @@
 
 /*\\\ INCLUDE FILES \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\*/
 
+#include <list>
+#include <map>
 #include <set>
 #include <string>
 #include <vector>
@@ -42,6 +44,9 @@ public:
 
    std::vector <std::string>
                   find (std::vector <std::string> cur, const std::string & ide) const;
+   std::string    get_name (std::vector <std::string> cur) const;
+   std::list <std::pair <std::vector <std::string>, std::string>>
+                  get_toc (std::vector <std::string> cur) const;
 
 
 
@@ -60,13 +65,20 @@ protected:
 private:
 
    void           process (std::vector <std::string> & cur_id, const Expression & expression);
-   void           process (std::vector <std::string> & cur_id, const ExpressionCommand & command);
+   bool           process (std::vector <std::string> & cur_id, const ExpressionCommand & command);
+
+   std::string    make_undecorated_name (const ExpressionCommand & command);
 
    std::vector <std::string>
                   split (const std::string & ide) const;
 
    std::set <std::vector <std::string>>
                   _id_set;
+
+   std::map <std::vector <std::string>, std::string>
+                  _id_name_map;
+   std::list <std::pair <std::vector <std::string>, std::string>>
+                  _id_name_list;
 
 
 

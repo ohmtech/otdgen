@@ -76,7 +76,7 @@ void  GeneratorHtml::process (const DocLibrary & library)
 
    std::string output;
 
-   process_header (output, process_no_style (library.title));
+   process_header (output, cur);
 
    output += "<h1>";
    process (output, cur, library.title);
@@ -132,7 +132,7 @@ void  GeneratorHtml::process (std::vector <std::string> & cur, const DocBook & b
 
    std::string output;
 
-   process_header (output, process_no_style (book.title));
+   process_header (output, cur);
 
    output += "<h1>";
    process (output, cur, book.title);
@@ -185,12 +185,7 @@ void  GeneratorHtml::process (std::vector <std::string> & cur, const DocChapter 
 
    std::string output;
 
-   process_header (
-      output,
-      process_no_style (chapter.parent ().title)
-         + ": "
-         + process_no_style (chapter.title)
-   );
+   process_header (output, cur);
 
    process_nav (output, chapter);
 
@@ -892,6 +887,19 @@ std::string GeneratorHtml::make_href (const std::vector <std::string> & cur, con
 {
    auto full_id = toc ().find (cur, id);
 
+   return make_href (cur, full_id);
+}
+
+
+
+/*
+==============================================================================
+Name : make_href
+==============================================================================
+*/
+
+std::string GeneratorHtml::make_href (const std::vector <std::string> & cur, const std::vector <std::string> & full_id)
+{
    std::string ret;
 
    // go back to library
@@ -996,8 +1004,25 @@ Name : process_header
 ==============================================================================
 */
 
-void  GeneratorHtml::process_header (std::string & output, const std::string & title)
+void  GeneratorHtml::process_header (std::string & output, const std::vector <std::string> & cur)
 {
+   bool toc_flag = (cur.size () > 1) && (conf ().format == Conf::Format::Html);
+
+   std::string title;
+
+   if (cur.size () <= 2)
+   {
+      title += toc ().get_name (cur);
+   }
+   else
+   {
+      auto cur2 = cur;
+      cur2.pop_back ();
+      title += toc ().get_name (cur2);
+      title += ": ";
+      title += toc ().get_name (cur);
+   }
+
    output += "<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Strict//EN\"\n";
    output += "  \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd\">\n";
    output += "<html xmlns=\"http://www.w3.org/1999/xhtml\" xml:lang=\"en\" lang=\"en\" dir=\"ltr\">\n\n";
@@ -1058,7 +1083,14 @@ void  GeneratorHtml::process_header (std::string & output, const std::string & t
 
    output += "code {font-family: Courier, Consolas, monospace;}\n";
 
-   output += "#content {padding-left: 26px; padding-right: 26px; position: absolute; top: 30px; left: 30px; width: 750px;}\n";
+   if (toc_flag)
+   {
+      output += "#content {padding-left: 26px; padding-right: 26px; position: absolute; top: 30px; left: 230px; width: 750px;}\n";
+   }
+   else
+   {
+      output += "#content {padding-left: 26px; padding-right: 26px; position: absolute; top: 30px; left: 30px; width: 750px;}\n";
+   }
 
    output += "#toc {width: 230px; position: fixed; top: 30px; background-color: #f1f5f9; height: 100%; border-right-color: #c7cfd5; border-right-style: solid; border-right-width: 1px; padding-left: 0px; padding-top: 17px; overflow: auto;}\n";
 
@@ -1092,6 +1124,69 @@ void  GeneratorHtml::process_header (std::string & output, const std::string & t
    output += "</head>\n\n";
 
    output += "<body>\n\n";
+
+   if (toc_flag)
+   {
+      auto cur_library = cur;
+      cur_library.resize (1);
+      auto a_library = make_href (cur, cur_library);
+
+      auto cur_book = cur;
+      cur_book.resize (2);
+      auto a_book = make_href (cur, cur_book);
+
+      output += "<div id=\"header\">\n";
+      output += "<div style=\"width: 1006px;\"></div>\n";
+      output += "<p>";
+      output += "<a href=\"" + a_library + "\">" + toc ().get_name (cur_library) + "</a>";
+      output += "<a href=\"" + a_book + "\">" + toc ().get_name (cur_book) + "</a>";
+      output += "</p>\n";
+      output += "</div>\n";
+
+      output += "<div id=\"toc\">\n";
+
+      output += "<p>" + toc ().get_name (cur_book) + "</p>\n";
+      output += "<ul>\n";
+
+      auto sub_toc = toc ().get_toc (cur_book);
+
+      for (auto && item : sub_toc)
+      {
+         auto sub_cur = item.first;
+
+         if (sub_cur.size () != 3) continue;
+
+         auto sub_name = item.second;
+
+         output += "<li>";
+         output += "<a href=\"" + make_href (cur, sub_cur) + "\">" + toc ().get_name (sub_cur) + "</a>";
+
+         if (sub_cur == cur)
+         {
+            output += "\t<ul>\n";
+
+            auto sub_sub_toc = toc ().get_toc (sub_cur);
+
+            for (auto && sub_item : sub_sub_toc)
+            {
+               auto sub_sub_cur = sub_item.first;
+
+               if (sub_sub_cur.size () != 4) continue;
+
+               output += "\t<li>";
+               output += "<a href=\"" + make_href (cur, sub_sub_cur) + "\">" + toc ().get_name (sub_sub_cur) + "</a>";
+               output += "</li>\n";
+            }
+
+            output += "\t</ul>\n";
+         }
+
+         output += "</li>\n";
+      }
+
+      output += "</ul>\n";
+      output += "</div>\n\n";
+   }
 
    output += "<div id=\"content\">\n";
 }

@@ -90,11 +90,12 @@ private:
 
    void           process (std::string & output, std::vector <std::string> & cur, const DocInlines & inlines);
    std::string    make_href (const std::vector <std::string> & cur, const std::string & id);
+   std::string    make_href (const std::vector <std::string> & cur, const std::vector <std::string> & full_id);
    std::string    process_no_style (const DocInlines & inlines);
 
    void           process_nav (std::string & output, const DocChapter & chapter);
 
-   void           process_header (std::string & output, const std::string & title);
+   void           process_header (std::string & output, const std::vector <std::string> & cur);
    void           process_footer (std::string & output);
 
    void           make_plist (const DocLibrary & library);
