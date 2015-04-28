@@ -912,6 +912,10 @@ std::string GeneratorHtml::make_href (const std::vector <std::string> & cur, con
    {
       ret += full_id [2] + ".html";
    }
+   else
+   {
+      ret += "index.html";
+   }
 
    for (size_t i = 3 ; i < full_id.size () ; ++i)
    {
