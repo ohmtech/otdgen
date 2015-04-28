@@ -124,9 +124,37 @@ Name : process
 void  Toc::process (std::vector <std::string> & cur_id, const ExpressionCommand & command)
 {
    auto it = command.options.find ("id");
-   if (it == command.options.end ()) return; // abort
 
-   const std::string & ide = it->second;
+   std::string ide;
+
+   if (it == command.options.end ())
+   {
+      if (command.name == std::string (Token::class_))
+      {
+         const ExpressionParagraph & paragraph
+            = dynamic_cast <const ExpressionParagraph &> (**command.bodies.begin ());
+
+         for (const auto & expr_sptr : paragraph.expressions)
+         {
+            const auto & expr = *expr_sptr;
+
+            const auto * expr_text_ptr = dynamic_cast <const ExpressionText *> (&expr);
+
+            if (expr_text_ptr != nullptr)
+            {
+               ide += expr_text_ptr->body;
+            }
+         }
+      }
+      else
+      {
+         return;  // abort
+      }
+   }
+   else
+   {
+      ide = it->second;
+   }
 
    size_t level;
 
@@ -139,6 +167,10 @@ void  Toc::process (std::vector <std::string> & cur_id, const ExpressionCommand 
       level = 1;
    }
    else if (command.name == std::string (Token::chapter))
+   {
+      level = 2;
+   }
+   else if (command.name == std::string (Token::class_))
    {
       level = 2;
    }
