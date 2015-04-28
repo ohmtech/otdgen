@@ -779,6 +779,10 @@ std::string GeneratorGitHubMarkDown::make_href (const std::vector <std::string> 
    {
       ret += full_id [2] + ".md";
    }
+   else
+   {
+      ret += "README.md";
+   }
 
    for (size_t i = 3 ; i < full_id.size () ; ++i)
    {
