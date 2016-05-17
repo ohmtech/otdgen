@@ -310,7 +310,16 @@ std::string GeneratorBase::convert_pdf_to_png (const std::vector <std::string> &
 
    make_dirs (rel_path);
 
-   std::string png_path = _conf.output_path + "/" + cur [1] + "/" + rel_path;
+   std::string png_path;
+
+   if (conf ().format == Conf::Format::DocSet)
+   {
+      png_path = _conf.output_path + "/" + cur [0] + ".docset/Contents/Resources/Documents/" + cur [1] + "/" + rel_path;
+   }
+   else
+   {
+      png_path = _conf.output_path + "/" + cur [1] + "/" + rel_path;
+   }
 
    auto path_ref = CFStringCreateWithCString (0, pdf_path.c_str (), kCFStringEncodingUTF8);
    auto url_ref = CFURLCreateWithFileSystemPath (0, path_ref, kCFURLPOSIXPathStyle, 0);
