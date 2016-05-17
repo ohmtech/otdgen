@@ -743,6 +743,20 @@ void  GeneratorGitHubMarkDown::process (std::string & output, std::vector <std::
          process (output, cur, inlinee.node);
          output += "</a>";
          break;
+
+      case DocInline::Type::Image:
+         output += "<center>";
+         std::string rel_path = convert_pdf_to_png (cur, inlinee.meta);
+         output += "<img src=\"" + rel_path + "\" />";
+         if (!inlinee.node.empty ())
+         {
+            output += "<br />";
+            output += "<div class=\"caption\"><p>";
+            process (output, cur, inlinee.node);
+            output += "</p></div>";
+         }
+         output += "</center>";
+         break;
       }
    }
 }

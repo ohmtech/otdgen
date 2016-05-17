@@ -16,6 +16,11 @@
 #include <fstream>
 #include <iostream>
 
+#include <CoreFoundation/CoreFoundation.h>
+#include <CoreGraphics/CoreGraphics.h>
+#include <CoreServices/CoreServices.h>
+#include <ImageIO/ImageIO.h>
+
 #include <cassert>
 
 
@@ -264,6 +269,100 @@ std::string GeneratorBase::escape_pourcent (const std::string & txt)
    }
 
    return ret;
+}
+
+
+
+/*
+==============================================================================
+Name : convert_pdf_to_png
+==============================================================================
+*/
+
+std::string GeneratorBase::convert_pdf_to_png (const std::vector <std::string> & cur, const std::string & pdf_path)
+{
+   /*
+   --output=/Users/raf/Desktop/dev/otdgen/test
+   --format=html
+   /Users/raf/Desktop/dev/otdgen/test/test.otd
+   */
+
+   size_t pos = pdf_path.rfind ("/");
+   assert (pos != std::string::npos);
+   pos += 1;
+
+   size_t pos2 = pdf_path.rfind (".pdf");
+   assert (pos2 != std::string::npos);
+
+   std::string name = pdf_path.substr (pos, pos2 - pos);
+   std::string png_name = cur.back () + "." + name + ".png";
+
+   assert (cur.size () >= 2);
+   std::string rel_path = png_name;
+
+   if (_conf.output_path.empty ()) return rel_path;   // abort
+
+   make_dirs (rel_path);
+
+   std::string png_path = _conf.output_path + "/" + cur [1] + "/" + rel_path;
+
+   auto path_ref = CFStringCreateWithCString (0, pdf_path.c_str (), kCFStringEncodingUTF8);
+   auto url_ref = CFURLCreateWithFileSystemPath (0, path_ref, kCFURLPOSIXPathStyle, 0);
+   CFRelease (path_ref);
+   path_ref = 0;
+
+   auto document_ref = CGPDFDocumentCreateWithURL (url_ref);
+   CFRelease (url_ref);
+   url_ref = 0;
+
+   assert (CGPDFDocumentGetNumberOfPages (document_ref) == 1);
+
+   auto page_ref = CGPDFDocumentGetPage (document_ref, 1);
+   auto rect = CGPDFPageGetBoxRect (page_ref, kCGPDFMediaBox);
+
+   size_t width = size_t (ceil (rect.size.width));
+   size_t height = size_t (ceil (rect.size.height));
+
+   // draw
+
+   auto color_space_ref = CGColorSpaceCreateWithName (kCGColorSpaceSRGB);
+
+   std::vector <uint8_t> data;
+   data.resize (size_t (width * height * 4));
+
+   auto context_ref = CGBitmapContextCreate (
+      &data [0], width, height, 8, width * 4, color_space_ref, kCGImageAlphaPremultipliedLast
+   );
+
+   CGColorSpaceRelease (color_space_ref);
+
+   CGContextDrawPDFPage (context_ref, page_ref);
+
+   CGPDFDocumentRelease (document_ref);
+   document_ref = 0;
+
+   // save
+
+   auto image_ref = CGBitmapContextCreateImage (context_ref);
+
+   CGContextRelease (context_ref);
+
+   path_ref = CFStringCreateWithCString (0, png_path.c_str (), kCFStringEncodingUTF8);
+   url_ref = CFURLCreateWithFileSystemPath (0, path_ref, kCFURLPOSIXPathStyle, 0);
+   CFRelease (path_ref);
+   path_ref = 0;
+
+   auto destination_ref = CGImageDestinationCreateWithURL (url_ref, kUTTypePNG, 1, 0);
+   CFRelease (url_ref);
+   url_ref = 0;
+
+   CGImageDestinationAddImage (destination_ref, image_ref, 0);
+
+   CGImageDestinationFinalize (destination_ref);
+
+   CFRelease (destination_ref);
+
+   return rel_path;
 }
 
 
