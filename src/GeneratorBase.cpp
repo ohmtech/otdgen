@@ -301,7 +301,7 @@ std::string GeneratorBase::convert_pdf_to_png (const std::vector <std::string> &
    assert (pos2 != std::string::npos);
 
    std::string name = pdf_path.substr (pos, pos2 - pos);
-   std::string png_name = cur.back () + "." + name + ".png";
+   std::string png_name = name + ".png";
 
    assert (cur.size () >= 2);
    std::string rel_path = png_name;
