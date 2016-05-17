@@ -288,8 +288,14 @@ std::string GeneratorBase::convert_pdf_to_png (const std::vector <std::string> &
    */
 
    size_t pos = pdf_path.rfind ("/");
-   assert (pos != std::string::npos);
-   pos += 1;
+   if (pos == std::string::npos)
+   {
+      pos = 0;
+   }
+   else
+   {
+      pos += 1;
+   }
 
    size_t pos2 = pdf_path.rfind (".pdf");
    assert (pos2 != std::string::npos);
