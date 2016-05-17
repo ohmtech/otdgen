@@ -82,6 +82,7 @@ private:
                   _source;
    const std::string
                   _context;
+   std::string    _base_path;
 
    bool           _in_block_flag = false;
 

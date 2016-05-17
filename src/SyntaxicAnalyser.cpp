@@ -37,6 +37,11 @@ SyntaxicAnalyser::SyntaxicAnalyser (Tokens & tokens, const std::string & source,
 ,  _source (source)
 ,  _context (context)
 {
+   size_t pos = context.rfind ("/");
+   assert (pos != std::string::npos);
+
+   _base_path = context.substr (0, pos) + "/";
+
    _expressions_ptr_stack.push_back (&_root.expressions);
 }
 
@@ -361,6 +366,11 @@ void  SyntaxicAnalyser::process_command (Tokens::iterator & it)
          if (!token.is_value ()) error (it, "Wrong option value.");
 
          std::string value = token;
+
+         if (key == "path")
+         {
+            value = _base_path + value;
+         }
 
          command.options [key] = value;
 
