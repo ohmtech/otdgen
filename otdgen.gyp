@@ -1,6 +1,6 @@
 ##############################################################################
 #
-#     flip.gyp
+#     otdgen.gyp
 #     Copyright (c) 2014 Raphael DINGE
 #
 #Tab=3########################################################################
@@ -131,6 +131,15 @@
                ],
             },
          },
+
+        'link_settings': {
+            'libraries': [
+               '$(SDKROOT)/System/Library/Frameworks/CoreFoundation.framework',
+               '$(SDKROOT)/System/Library/Frameworks/CoreGraphics.framework',
+               '$(SDKROOT)/System/Library/Frameworks/CoreServices.framework',
+               '$(SDKROOT)/System/Library/Frameworks/ImageIO.framework',
+            ],
+        },
 
          'includes': [
             'src/src.gypi',

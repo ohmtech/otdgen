@@ -14,6 +14,7 @@
 /*\\\ INCLUDE FILES \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\*/
 
 #include <string>
+#include <vector>
 
 
 
@@ -52,6 +53,8 @@ protected:
 
    std::string    escape_xml (const std::string & txt);
    std::string    escape_pourcent (const std::string & txt);
+
+   std::string    convert_pdf_to_png (const std::vector <std::string> & cur, const std::string & path);
 
 
 

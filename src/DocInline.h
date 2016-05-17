@@ -37,6 +37,7 @@ public:
                   Code,
                   LinkId,
                   LinkUrl,
+                  Image,
    };
 
                   DocInline () = default;

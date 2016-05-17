@@ -656,6 +656,24 @@ void  StructuralAnalyser::process_block (const Expression & expression)
          process_block (**command.bodies.begin ());
          _inlines_ptr = cur_inlines_ptr;
       }
+      else if (command.name == std::string (Token::image))
+      {
+         DocInlines * cur_inlines_ptr = _inlines_ptr;
+         auto & inlinee = *_inlines_ptr->emplace (_inlines_ptr->end ());
+         inlinee.type = DocInline::Type::Image;
+
+         {
+            auto it = command.options.find ("path");
+            if (it != command.options.end ())
+            {
+               inlinee.meta = it->second;
+            }
+         }
+
+         _inlines_ptr = &inlinee.node;
+         process_block (**command.bodies.begin ());
+         _inlines_ptr = cur_inlines_ptr;
+      }
    }
 
    const ExpressionParagraph * paragraph_ptr = dynamic_cast <const ExpressionParagraph *> (&expression);

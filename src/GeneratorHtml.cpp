@@ -871,6 +871,20 @@ void  GeneratorHtml::process (std::string & output, std::vector <std::string> & 
          process (output, cur, inlinee.node);
          output += "</a>";
          break;
+
+      case DocInline::Type::Image:
+         output += "<center>";
+         std::string rel_path = convert_pdf_to_png (cur, inlinee.meta);
+         output += "<img src=\"" + rel_path + "\" />";
+         if (!inlinee.node.empty ())
+         {
+            output += "<br />";
+            output += "<div class=\"caption\"><p>";
+            process (output, cur, inlinee.node);
+            output += "</p></div>";
+         }
+         output += "</center>";
+         break;
       }
    }
 }
@@ -958,6 +972,7 @@ std::string GeneratorHtml::process_no_style (const DocInlines & inlines)
       case DocInline::Type::Code:
       case DocInline::Type::LinkId:
       case DocInline::Type::LinkUrl:
+      case DocInline::Type::Image:
          ret += process_no_style (inlinee.node);
          break;
       }
@@ -1074,6 +1089,8 @@ void  GeneratorHtml::process_header (std::string & output, const std::vector <st
    output += ".warning {margin-top:21px; margin-bottom:22px; padding-left: 8px; padding-right: 8px; background-color: #f8e3e1; border-color: #c5443e; border-style: solid; border-width: 1px; display: block;}\n";
    output += ".warning strong {margin-right: 8px;}\n";
    output += ".warning p {margin-top: 7px;}\n";
+
+   output += ".caption p {color: black; font-size: 10px; margin-bottom: 10px;}\n";
 
    output += "img {margin-top:10px; margin-bottom:10px;}\n";
 
