@@ -609,7 +609,7 @@ void  GeneratorHtml::process (std::string & output, std::vector <std::string> & 
    enum class State
    {
       None,
-      Functions,
+      Methods,
       Variables,
    };
 
@@ -631,7 +631,7 @@ void  GeneratorHtml::process (std::string & output, std::vector <std::string> & 
 
          switch (target)
          {
-         case State::Functions:
+         case State::Methods:
             output += "<h2>Member Functions Synopsys</h2>\n\n";
             break;
 
@@ -658,7 +658,7 @@ void  GeneratorHtml::process (std::string & output, std::vector <std::string> & 
    {
       if (member.type == DocMember::Type::Constructor)
       {
-         adjust_state (State::Functions);
+         adjust_state (State::Methods);
 
          output += "<tr>";
          output += "<td><p><a href=\"#member-function-constructor\">Constructor</a></p></td>";
@@ -669,7 +669,7 @@ void  GeneratorHtml::process (std::string & output, std::vector <std::string> & 
       }
       else if (member.type == DocMember::Type::Destructor)
       {
-         adjust_state (State::Functions);
+         adjust_state (State::Methods);
 
          output += "<tr>";
          output += "<td><p><a href=\"#member-function-destructor\">Destructor</a></p></td>";
@@ -678,9 +678,9 @@ void  GeneratorHtml::process (std::string & output, std::vector <std::string> & 
          output += "</p></td>";
          output += "</tr>\n";
       }
-      else if (member.type == DocMember::Type::Function)
+      else if (member.type == DocMember::Type::Method)
       {
-         adjust_state (State::Functions);
+         adjust_state (State::Methods);
 
          output += "<tr>";
          output += "<td><p><code><a href=\"#member-function-" + escape_pourcent (member.name) + "\">" + member.name + "</a></code></p></td>";
@@ -743,11 +743,11 @@ void  GeneratorHtml::process (std::string & output, std::vector <std::string> & 
 
       if (member.type == DocMember::Type::Constructor)
       {
-         if (state != State::Functions)
+         if (state != State::Methods)
          {
             output += "<h2>Member Functions</h2>\n\n";
 
-            state = State::Functions;
+            state = State::Methods;
          }
 
          if (conf ().format == Conf::Format::DocSet)
@@ -764,11 +764,11 @@ void  GeneratorHtml::process (std::string & output, std::vector <std::string> & 
       }
       else if (member.type == DocMember::Type::Destructor)
       {
-         if (state != State::Functions)
+         if (state != State::Methods)
          {
             output += "<h2>Member Functions</h2>\n\n";
 
-            state = State::Functions;
+            state = State::Methods;
          }
 
          if (conf ().format == Conf::Format::DocSet)
@@ -783,13 +783,13 @@ void  GeneratorHtml::process (std::string & output, std::vector <std::string> & 
 
          output += "<h3 id=\"member-function-destructor\">Destructor</h3>\n";
       }
-      else if (member.type == DocMember::Type::Function)
+      else if (member.type == DocMember::Type::Method)
       {
-         if (state != State::Functions)
+         if (state != State::Methods)
          {
             output += "<h2>Member Functions</h2>\n\n";
 
-            state = State::Functions;
+            state = State::Methods;
          }
 
          if (conf ().format == Conf::Format::DocSet)

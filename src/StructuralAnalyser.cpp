@@ -384,7 +384,7 @@ void  StructuralAnalyser::process (const ExpressionCommand & command)
    else if (command.name == std::string (Token::method))
    {
       auto & member = *_chapter_ptr->members.emplace (_chapter_ptr->members.end ());
-      member.type = DocMember::Type::Function;
+      member.type = DocMember::Type::Method;
       member.name = process_block_no_style (paragraph);
 
       _member_ptr = &member;

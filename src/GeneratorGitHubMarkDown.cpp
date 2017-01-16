@@ -529,7 +529,7 @@ void  GeneratorGitHubMarkDown::process (std::string & output, std::vector <std::
    enum class State
    {
       None,
-      Functions,
+      Methods,
       Variables,
    };
 
@@ -551,7 +551,7 @@ void  GeneratorGitHubMarkDown::process (std::string & output, std::vector <std::
 
          switch (target)
          {
-         case State::Functions:
+         case State::Methods:
             output += "<h2>Member Functions Synopsys</h2>\n\n";
             break;
 
@@ -578,7 +578,7 @@ void  GeneratorGitHubMarkDown::process (std::string & output, std::vector <std::
    {
       if (member.type == DocMember::Type::Constructor)
       {
-         adjust_state (State::Functions);
+         adjust_state (State::Methods);
 
          output += "<tr>";
          output += "<td><a href=\"#member-function-constructor\">Constructor</a></td>";
@@ -589,7 +589,7 @@ void  GeneratorGitHubMarkDown::process (std::string & output, std::vector <std::
       }
       else if (member.type == DocMember::Type::Destructor)
       {
-         adjust_state (State::Functions);
+         adjust_state (State::Methods);
 
          output += "<tr>";
          output += "<td><a href=\"#member-function-destructor\">Destructor</a></td>";
@@ -598,9 +598,9 @@ void  GeneratorGitHubMarkDown::process (std::string & output, std::vector <std::
          output += "</td>";
          output += "</tr>\n";
       }
-      else if (member.type == DocMember::Type::Function)
+      else if (member.type == DocMember::Type::Method)
       {
-         adjust_state (State::Functions);
+         adjust_state (State::Methods);
 
          output += "<tr>";
          output += "<td><code><a href=\"#member-function-" + escape_pourcent (member.name) + "\">" + member.name + "</a></code></td>";
@@ -655,33 +655,33 @@ void  GeneratorGitHubMarkDown::process (std::string & output, std::vector <std::
 
       if (member.type == DocMember::Type::Constructor)
       {
-         if (state != State::Functions)
+         if (state != State::Methods)
          {
             output += "<h2>Member Functions</h2>\n\n";
 
-            state = State::Functions;
+            state = State::Methods;
          }
 
          output += "<h3 id=\"member-function-constructor\">Constructor</h3>\n";
       }
       else if (member.type == DocMember::Type::Destructor)
       {
-         if (state != State::Functions)
+         if (state != State::Methods)
          {
             output += "<h2>Member Functions</h2>\n\n";
 
-            state = State::Functions;
+            state = State::Methods;
          }
 
          output += "<h3 id=\"member-function-destructor\">Destructor</h3>\n";
       }
-      else if (member.type == DocMember::Type::Function)
+      else if (member.type == DocMember::Type::Method)
       {
-         if (state != State::Functions)
+         if (state != State::Methods)
          {
             output += "<h2>Member Functions</h2>\n\n";
 
-            state = State::Functions;
+            state = State::Methods;
          }
 
          output += "<h3 id=\"member-function-" + escape_pourcent (member.name) + "\"><code>" + member.name + "</code></h3>\n";
