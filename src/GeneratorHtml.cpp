@@ -611,6 +611,7 @@ void  GeneratorHtml::process (std::string & output, std::vector <std::string> & 
       None,
       Methods,
       Variables,
+      Functions,
    };
 
    State state = State::None;
@@ -637,6 +638,10 @@ void  GeneratorHtml::process (std::string & output, std::vector <std::string> & 
 
          case State::Variables:
             output += "<h2>Member Variables Synopsys</h2>\n\n";
+            break;
+
+         case State::Functions:
+            output += "<h2>Non-member Functions Synopsys</h2>\n\n";
             break;
 
          default:
@@ -700,6 +705,17 @@ void  GeneratorHtml::process (std::string & output, std::vector <std::string> & 
          output += "</p></td>";
          output += "</tr>\n";
       }
+      else if (member.type == DocMember::Type::Function)
+      {
+         adjust_state (State::Functions);
+
+         output += "<tr>";
+         output += "<td><p><code><a href=\"#non-member-function-" + escape_pourcent (member.name) + "\">" + member.name + "</a></code></p></td>";
+         output += "<td><p>";
+         process (output, cur, member.brief);
+         output += "</p></td>";
+         output += "</tr>\n";
+      }
       else if (member.type == DocMember::Type::Division)
       {
          if (in_table_flag)
@@ -748,6 +764,7 @@ void  GeneratorHtml::process (std::string & output, std::vector <std::string> & 
             output += "<h2>Member Functions</h2>\n\n";
 
             state = State::Methods;
+            first_flag = true;
          }
 
          if (conf ().format == Conf::Format::DocSet)
@@ -769,6 +786,7 @@ void  GeneratorHtml::process (std::string & output, std::vector <std::string> & 
             output += "<h2>Member Functions</h2>\n\n";
 
             state = State::Methods;
+            first_flag = true;
          }
 
          if (conf ().format == Conf::Format::DocSet)
@@ -790,6 +808,7 @@ void  GeneratorHtml::process (std::string & output, std::vector <std::string> & 
             output += "<h2>Member Functions</h2>\n\n";
 
             state = State::Methods;
+            first_flag = true;
          }
 
          if (conf ().format == Conf::Format::DocSet)
@@ -811,6 +830,7 @@ void  GeneratorHtml::process (std::string & output, std::vector <std::string> & 
             output += "<h2>Member Variables</h2>\n\n";
 
             state = State::Variables;
+            first_flag = true;
          }
 
          if (conf ().format == Conf::Format::DocSet)
@@ -824,6 +844,28 @@ void  GeneratorHtml::process (std::string & output, std::vector <std::string> & 
          first_flag = false;
 
          output += "<h3 id=\"member-variable-" + escape_pourcent (member.name) + "\"><code>" + member.name + "</code></h3>\n";
+      }
+      else if (member.type == DocMember::Type::Function)
+      {
+         if (state != State::Functions)
+         {
+            output += "<h2>Non-member Functions</h2>\n\n";
+
+            state = State::Functions;
+            first_flag = true;
+         }
+
+         if (conf ().format == Conf::Format::DocSet)
+         {
+            output += "<a name=\"//apple_ref/cpp/Function/";
+            output += escape_pourcent (member.name);
+            output += "\" class=\"dashAnchor\"></a>\n";
+         }
+
+         if (!first_flag) output += "<hr />";
+         first_flag = false;
+
+         output += "<h3 id=\"non-member-function-" + escape_pourcent (member.name) + "\"><code>" + member.name + "</code></h3>\n";
       }
 
       process (output, cur, member.description);

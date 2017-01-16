@@ -531,6 +531,7 @@ void  GeneratorGitHubMarkDown::process (std::string & output, std::vector <std::
       None,
       Methods,
       Variables,
+      Functions,
    };
 
    State state = State::None;
@@ -557,6 +558,10 @@ void  GeneratorGitHubMarkDown::process (std::string & output, std::vector <std::
 
          case State::Variables:
             output += "<h2>Member Variables Synopsys</h2>\n\n";
+            break;
+
+         case State::Functions:
+            output += "<h2>Non-member Functions Synopsys</h2>\n\n";
             break;
 
          default:
@@ -615,6 +620,17 @@ void  GeneratorGitHubMarkDown::process (std::string & output, std::vector <std::
 
          output += "<tr>";
          output += "<td><code><a href=\"#member-variable-" + escape_pourcent (member.name) + "\">" + member.name + "</a></code></td>";
+         output += "<td>";
+         process (output, cur, member.brief);
+         output += "</td>";
+         output += "</tr>\n";
+      }
+      else if (member.type == DocMember::Type::Function)
+      {
+         adjust_state (State::Functions);
+
+         output += "<tr>";
+         output += "<td><code><a href=\"#non-member-function-" + escape_pourcent (member.name) + "\">" + member.name + "</a></code></td>";
          output += "<td>";
          process (output, cur, member.brief);
          output += "</td>";
@@ -696,6 +712,17 @@ void  GeneratorGitHubMarkDown::process (std::string & output, std::vector <std::
          }
 
          output += "<h3 id=\"member-variable-" + escape_pourcent (member.name) + "\"><code>" + member.name + "</code></h3>\n";
+      }
+      else if (member.type == DocMember::Type::Function)
+      {
+         if (state != State::Functions)
+         {
+            output += "<h2>Non-member Functions</h2>\n\n";
+
+            state = State::Functions;
+         }
+
+         output += "<h3 id=\"non-member-function-" + escape_pourcent (member.name) + "\"><code>" + member.name + "</code></h3>\n";
       }
 
       process (output, cur, member.description);

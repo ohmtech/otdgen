@@ -39,6 +39,7 @@ public:
                   Destructor,
                   Method,
                   Variable,
+                  Function,
                   Division,
    };
 
