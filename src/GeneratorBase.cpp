@@ -190,7 +190,11 @@ std::string GeneratorBase::escape_pourcent (const std::string & txt)
 
    for (auto && c : txt)
    {
-      if (c == '!')
+      if (c == ' ')
+      {
+         ret += "%20";
+      }
+      else if (c == '!')
       {
          ret += "%21";
       }
@@ -242,9 +246,17 @@ std::string GeneratorBase::escape_pourcent (const std::string & txt)
       {
          ret += "%3B";
       }
+      else if (c == '<')
+      {
+         ret += "%3C";
+      }
       else if (c == '=')
       {
          ret += "%3D";
+      }
+      else if (c == '>')
+      {
+         ret += "%3E";
       }
       else if (c == '?')
       {

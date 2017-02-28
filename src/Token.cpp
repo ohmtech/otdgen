@@ -245,6 +245,7 @@ const Token Token::constructor ("\\constructor");
 const Token Token::destructor ("\\destructor");
 const Token Token::method ("\\method");
 const Token Token::variable ("\\variable");
+const Token Token::function ("\\function");
 const Token Token::brief ("\\brief");
 const Token Token::division ("\\division");
 

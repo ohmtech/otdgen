@@ -68,6 +68,7 @@ Tokens  LexicalAnalyser::process (std::string txt)
    tokens_base.push_back (Token::destructor);
    tokens_base.push_back (Token::method);
    tokens_base.push_back (Token::variable);
+   tokens_base.push_back (Token::function);
    tokens_base.push_back (Token::brief);
    tokens_base.push_back (Token::division);
 

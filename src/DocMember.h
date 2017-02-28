@@ -37,8 +37,9 @@ public:
    {
                   Constructor,
                   Destructor,
-                  Function,
+                  Method,
                   Variable,
+                  Function,
                   Division,
    };
 

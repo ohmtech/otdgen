@@ -409,7 +409,7 @@ void  GeneratorGitHubMarkDown::process (std::string & output, std::vector <std::
    {
       output += "<tr>";
       output += "<td>Inherits from</td>";
-      output += "<td><code>" + cartouche.inherit + "</code></td>";
+      output += "<td><code>" + escape_xml (cartouche.inherit) + "</code></td>";
       output += "</tr>\n";
    }
 
@@ -417,7 +417,7 @@ void  GeneratorGitHubMarkDown::process (std::string & output, std::vector <std::
    {
       output += "<tr>";
       output += "<td>Declared in</td>";
-      output += "<td><code>" + cartouche.header + "</code></td>";
+      output += "<td><code>" + escape_xml (cartouche.header) + "</code></td>";
       output += "</tr>\n";
    }
 
@@ -466,7 +466,7 @@ void  GeneratorGitHubMarkDown::process (std::string & output, std::vector <std::
    for (auto && parameter : parameters)
    {
       output += "<tr>";
-      output += "<td><code>" + parameter.type + "</code></td>";
+      output += "<td><code>" + escape_xml (parameter.type) + "</code></td>";
       output += "<td>";
       process (output, cur, parameter.body);
       output += "</td>";
@@ -498,11 +498,11 @@ void  GeneratorGitHubMarkDown::process (std::string & output, std::vector <std::
 
       if (type.id.empty ())
       {
-         output += "<td><code>" + type.type + "</code></td>";
+         output += "<td><code>" + escape_xml (type.type) + "</code></td>";
       }
       else
       {
-         output += "<td><a href=\"" + make_href (cur, type.id) + "\"><code>" + type.type + "</code></a></td>";
+         output += "<td><a href=\"" + make_href (cur, type.id) + "\"><code>" + escape_xml (type.type) + "</code></a></td>";
       }
 
       output += "<td>";
@@ -529,8 +529,9 @@ void  GeneratorGitHubMarkDown::process (std::string & output, std::vector <std::
    enum class State
    {
       None,
-      Functions,
+      Methods,
       Variables,
+      Functions,
    };
 
    State state = State::None;
@@ -551,12 +552,16 @@ void  GeneratorGitHubMarkDown::process (std::string & output, std::vector <std::
 
          switch (target)
          {
-         case State::Functions:
+         case State::Methods:
             output += "<h2>Member Functions Synopsys</h2>\n\n";
             break;
 
          case State::Variables:
             output += "<h2>Member Variables Synopsys</h2>\n\n";
+            break;
+
+         case State::Functions:
+            output += "<h2>Non-member Functions Synopsys</h2>\n\n";
             break;
 
          default:
@@ -578,7 +583,7 @@ void  GeneratorGitHubMarkDown::process (std::string & output, std::vector <std::
    {
       if (member.type == DocMember::Type::Constructor)
       {
-         adjust_state (State::Functions);
+         adjust_state (State::Methods);
 
          output += "<tr>";
          output += "<td><a href=\"#member-function-constructor\">Constructor</a></td>";
@@ -589,7 +594,7 @@ void  GeneratorGitHubMarkDown::process (std::string & output, std::vector <std::
       }
       else if (member.type == DocMember::Type::Destructor)
       {
-         adjust_state (State::Functions);
+         adjust_state (State::Methods);
 
          output += "<tr>";
          output += "<td><a href=\"#member-function-destructor\">Destructor</a></td>";
@@ -598,12 +603,12 @@ void  GeneratorGitHubMarkDown::process (std::string & output, std::vector <std::
          output += "</td>";
          output += "</tr>\n";
       }
-      else if (member.type == DocMember::Type::Function)
+      else if (member.type == DocMember::Type::Method)
       {
-         adjust_state (State::Functions);
+         adjust_state (State::Methods);
 
          output += "<tr>";
-         output += "<td><code><a href=\"#member-function-" + escape_pourcent (member.name) + "\">" + member.name + "</a></code></td>";
+         output += "<td><code><a href=\"#member-function-" + escape_pourcent (member.name) + "\">" + escape_xml (member.name) + "</a></code></td>";
          output += "<td>";
          process (output, cur, member.brief);
          output += "</td>";
@@ -614,7 +619,18 @@ void  GeneratorGitHubMarkDown::process (std::string & output, std::vector <std::
          adjust_state (State::Variables);
 
          output += "<tr>";
-         output += "<td><code><a href=\"#member-variable-" + escape_pourcent (member.name) + "\">" + member.name + "</a></code></td>";
+         output += "<td><code><a href=\"#member-variable-" + escape_pourcent (member.name) + "\">" + escape_xml (member.name) + "</a></code></td>";
+         output += "<td>";
+         process (output, cur, member.brief);
+         output += "</td>";
+         output += "</tr>\n";
+      }
+      else if (member.type == DocMember::Type::Function)
+      {
+         adjust_state (State::Functions);
+
+         output += "<tr>";
+         output += "<td><code><a href=\"#non-member-function-" + escape_pourcent (member.name) + "\">" + escape_xml (member.name) + "</a></code></td>";
          output += "<td>";
          process (output, cur, member.brief);
          output += "</td>";
@@ -655,36 +671,36 @@ void  GeneratorGitHubMarkDown::process (std::string & output, std::vector <std::
 
       if (member.type == DocMember::Type::Constructor)
       {
-         if (state != State::Functions)
+         if (state != State::Methods)
          {
             output += "<h2>Member Functions</h2>\n\n";
 
-            state = State::Functions;
+            state = State::Methods;
          }
 
          output += "<h3 id=\"member-function-constructor\">Constructor</h3>\n";
       }
       else if (member.type == DocMember::Type::Destructor)
       {
-         if (state != State::Functions)
+         if (state != State::Methods)
          {
             output += "<h2>Member Functions</h2>\n\n";
 
-            state = State::Functions;
+            state = State::Methods;
          }
 
          output += "<h3 id=\"member-function-destructor\">Destructor</h3>\n";
       }
-      else if (member.type == DocMember::Type::Function)
+      else if (member.type == DocMember::Type::Method)
       {
-         if (state != State::Functions)
+         if (state != State::Methods)
          {
             output += "<h2>Member Functions</h2>\n\n";
 
-            state = State::Functions;
+            state = State::Methods;
          }
 
-         output += "<h3 id=\"member-function-" + escape_pourcent (member.name) + "\"><code>" + member.name + "</code></h3>\n";
+         output += "<h3 id=\"member-function-" + escape_pourcent (member.name) + "\"><code>" + escape_xml (member.name) + "</code></h3>\n";
       }
       else if (member.type == DocMember::Type::Variable)
       {
@@ -695,7 +711,18 @@ void  GeneratorGitHubMarkDown::process (std::string & output, std::vector <std::
             state = State::Variables;
          }
 
-         output += "<h3 id=\"member-variable-" + escape_pourcent (member.name) + "\"><code>" + member.name + "</code></h3>\n";
+         output += "<h3 id=\"member-variable-" + escape_pourcent (member.name) + "\"><code>" + escape_xml (member.name) + "</code></h3>\n";
+      }
+      else if (member.type == DocMember::Type::Function)
+      {
+         if (state != State::Functions)
+         {
+            output += "<h2>Non-member Functions</h2>\n\n";
+
+            state = State::Functions;
+         }
+
+         output += "<h3 id=\"non-member-function-" + escape_pourcent (member.name) + "\"><code>" + escape_xml (member.name) + "</code></h3>\n";
       }
 
       process (output, cur, member.description);
@@ -717,7 +744,7 @@ void  GeneratorGitHubMarkDown::process (std::string & output, std::vector <std::
       switch (inlinee.type)
       {
       case DocInline::Type::Text:
-         output += inlinee.text;
+         output += escape_xml (inlinee.text);
          break;
 
       case DocInline::Type::Emphasis:
