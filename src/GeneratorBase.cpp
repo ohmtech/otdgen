@@ -287,19 +287,13 @@ std::string GeneratorBase::escape_pourcent (const std::string & txt)
 
 /*
 ==============================================================================
-Name : convert_pdf_to_png
+Name : convert_image
 ==============================================================================
 */
 
-std::string GeneratorBase::convert_pdf_to_png (const std::vector <std::string> & cur, const std::string & pdf_path)
+std::string GeneratorBase::convert_image (const std::vector <std::string> & cur, const std::string & src_path)
 {
-   /*
-   --output=/Users/raf/Desktop/dev/otdgen/test
-   --format=html
-   /Users/raf/Desktop/dev/otdgen/test/test.otd
-   */
-
-   size_t pos = pdf_path.rfind ("/");
+   size_t pos = src_path.rfind ("/");
    if (pos == std::string::npos)
    {
       pos = 0;
@@ -309,31 +303,91 @@ std::string GeneratorBase::convert_pdf_to_png (const std::vector <std::string> &
       pos += 1;
    }
 
-   size_t pos2 = pdf_path.rfind (".pdf");
-   assert (pos2 != std::string::npos);
+   size_t pos_pdf = src_path.rfind (".pdf");
+   size_t pos_svg = src_path.rfind (".svg");
 
-   std::string name = pdf_path.substr (pos, pos2 - pos);
-   std::string png_name = name + ".png";
+   std::string filename;
 
-   assert (cur.size () >= 2);
-   std::string rel_path = png_name;
-
-   if (_conf.output_path.empty ()) return rel_path;   // abort
-
-   make_dirs (rel_path);
-
-   std::string png_path;
-
-   if (conf ().format == Conf::Format::DocSet)
+   if (pos_pdf != std::string::npos)
    {
-      png_path = _conf.output_path + "/" + cur [0] + ".docset/Contents/Resources/Documents/" + cur [1] + "/" + rel_path;
+      filename = src_path.substr (pos, pos_pdf - pos);
+   }
+   else if (pos_svg != std::string::npos)
+   {
+      filename = src_path.substr (pos, pos_svg - pos);
    }
    else
    {
-      png_path = _conf.output_path + "/" + cur [1] + "/" + rel_path;
+      return "";
    }
 
-   auto path_ref = CFStringCreateWithCString (0, pdf_path.c_str (), kCFStringEncodingUTF8);
+
+   assert (cur.size () >= 2);
+
+   std::string dst_base_path;
+
+   if (conf ().format == Conf::Format::DocSet)
+   {
+      dst_base_path = _conf.output_path + "/" + cur [0] + ".docset/Contents/Resources/Documents/" + cur [1] + "/";
+   }
+   else
+   {
+      dst_base_path = _conf.output_path + "/" + cur [1] + "/";
+   }
+
+   if (_conf.output_path.empty ()) return "";   // abort
+
+   //
+   std::string rel_path;
+
+   if (pos_pdf != std::string::npos)
+   {
+      rel_path = filename + ".png";
+      make_dirs (rel_path);
+
+      convert_pdf_to_png (dst_base_path + rel_path, src_path);
+   }
+   else if (pos_svg != std::string::npos)
+   {
+      if (conf ().format == Conf::Format::GitHubMarkDown)
+      {
+         // GitHub bug: https://github.com/isaacs/github/issues/316
+
+         rel_path = filename + ".png";
+         make_dirs (rel_path);
+
+         convert_svg_to_png (dst_base_path + rel_path, src_path);
+      }
+      else
+      {
+         rel_path = filename + ".svg";
+         make_dirs (rel_path);
+
+         std::string cmd = "cp " + src_path + " " + dst_base_path + rel_path;
+         system (cmd.c_str ());
+      }
+   }
+
+   return rel_path;
+}
+
+
+
+/*
+==============================================================================
+Name : convert_pdf_to_png
+==============================================================================
+*/
+
+void  GeneratorBase::convert_pdf_to_png (const std::string & dst_path, const std::string & src_path)
+{
+   /*
+   --output=/Users/raf/Desktop/dev/otdgen/test
+   --format=html
+   /Users/raf/Desktop/dev/otdgen/test/test.otd
+   */
+
+   auto path_ref = CFStringCreateWithCString (0, src_path.c_str (), kCFStringEncodingUTF8);
    auto url_ref = CFURLCreateWithFileSystemPath (0, path_ref, kCFURLPOSIXPathStyle, 0);
    CFRelease (path_ref);
    path_ref = 0;
@@ -374,7 +428,7 @@ std::string GeneratorBase::convert_pdf_to_png (const std::vector <std::string> &
 
    CGContextRelease (context_ref);
 
-   path_ref = CFStringCreateWithCString (0, png_path.c_str (), kCFStringEncodingUTF8);
+   path_ref = CFStringCreateWithCString (0, dst_path.c_str (), kCFStringEncodingUTF8);
    url_ref = CFURLCreateWithFileSystemPath (0, path_ref, kCFURLPOSIXPathStyle, 0);
    CFRelease (path_ref);
    path_ref = 0;
@@ -388,8 +442,23 @@ std::string GeneratorBase::convert_pdf_to_png (const std::vector <std::string> &
    CGImageDestinationFinalize (destination_ref);
 
    CFRelease (destination_ref);
+}
 
-   return rel_path;
+
+
+/*
+==============================================================================
+Name : convert_svg_to_png
+==============================================================================
+*/
+
+void  GeneratorBase::convert_svg_to_png (const std::string & dst_path, const std::string & src_path)
+{
+   // requires librsvg:
+   // brew install librsvg
+
+   std::string cmd = "/usr/local/bin/rsvg-convert " + src_path + " > " + dst_path;
+   system (cmd.c_str ());
 }
 
 

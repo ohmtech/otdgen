@@ -54,7 +54,9 @@ protected:
    std::string    escape_xml (const std::string & txt);
    std::string    escape_pourcent (const std::string & txt);
 
-   std::string    convert_pdf_to_png (const std::vector <std::string> & cur, const std::string & path);
+   std::string    convert_image (const std::vector <std::string> & cur, const std::string & src_path);
+   void           convert_pdf_to_png (const std::string & dst_path, const std::string & src_path);
+   void           convert_svg_to_png (const std::string & dst_path, const std::string & src_path);
 
 
 
