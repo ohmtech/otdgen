@@ -678,7 +678,7 @@ void  GeneratorGitHubMarkDown::process (std::string & output, std::vector <std::
             state = State::Methods;
          }
 
-         output += "<h3 id=\"member-function-constructor\">Constructor</h3>\n";
+         output += "<h3 id=\"member-function-constructor\">Constructor</h3>\n\n";
       }
       else if (member.type == DocMember::Type::Destructor)
       {
@@ -689,7 +689,7 @@ void  GeneratorGitHubMarkDown::process (std::string & output, std::vector <std::
             state = State::Methods;
          }
 
-         output += "<h3 id=\"member-function-destructor\">Destructor</h3>\n";
+         output += "<h3 id=\"member-function-destructor\">Destructor</h3>\n\n";
       }
       else if (member.type == DocMember::Type::Method)
       {
@@ -700,7 +700,7 @@ void  GeneratorGitHubMarkDown::process (std::string & output, std::vector <std::
             state = State::Methods;
          }
 
-         output += "<h3 id=\"member-function-" + escape_pourcent (member.name) + "\"><code>" + escape_xml (member.name) + "</code></h3>\n";
+         output += "<h3 id=\"member-function-" + escape_pourcent (member.name) + "\"><code>" + escape_xml (member.name) + "</code></h3>\n\n";
       }
       else if (member.type == DocMember::Type::Variable)
       {
@@ -711,7 +711,7 @@ void  GeneratorGitHubMarkDown::process (std::string & output, std::vector <std::
             state = State::Variables;
          }
 
-         output += "<h3 id=\"member-variable-" + escape_pourcent (member.name) + "\"><code>" + escape_xml (member.name) + "</code></h3>\n";
+         output += "<h3 id=\"member-variable-" + escape_pourcent (member.name) + "\"><code>" + escape_xml (member.name) + "</code></h3>\n\n";
       }
       else if (member.type == DocMember::Type::Function)
       {
@@ -722,7 +722,7 @@ void  GeneratorGitHubMarkDown::process (std::string & output, std::vector <std::
             state = State::Functions;
          }
 
-         output += "<h3 id=\"non-member-function-" + escape_pourcent (member.name) + "\"><code>" + escape_xml (member.name) + "</code></h3>\n";
+         output += "<h3 id=\"non-member-function-" + escape_pourcent (member.name) + "\"><code>" + escape_xml (member.name) + "</code></h3>\n\n";
       }
 
       process (output, cur, member.description);
