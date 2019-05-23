@@ -1,4 +1,4 @@
-// Intel Assembler language specs
+// Ohm Technologies Documentation language specs
 
 (
 
@@ -6,98 +6,125 @@
 // MARK: Keywords
 /****************************************************************************/
 
-    {
-        Identifier = "xcode.lang.otd.identifier";
-        Syntax = {
-            StartChars = "$";
-            Chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789$_.";
-            Type = "xcode.syntax.identifier";
-        };
-    },
+   {
+      Identifier = "xcode.lang.otd.directive";
+      Syntax = {
+         Words = (
+            "\\library",
+            "\\book",
+            "\\chapter",
+            "\\section",
+            "\\subsection",
+            "\\subsubsection",
 
-    {
-        Identifier = "xcode.lang.otd.directive";
-        Syntax = {
-            StartChars = "\\";
-            Chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_";
-            Type = "xcode.syntax.keyword";
-        };
-    },
+            "\\codeblock",
 
-    {
-        Identifier = "xcode.lang.otd.verbatim";
-        Syntax = {
-            Start = "***";
-            End = "***";
-            Type = "xcode.syntax.attribute";
-        };
-    },
+            "\\note",
+            "\\important",
+            "\\warning",
 
-    {
-        Identifier = "xcode.lang.otd.preprocessor";
-        Syntax = {
-            StartAtBOL = YES;
-            StartChars = "#";
-            Chars = "abcdefghijklmnopqrstuvwxyz.";
-            Type = "xcode.syntax.preprocessor";
-        };
-    },
+            "\\namespace",
+            "\\class",
+            "\\inherit",
+            "\\header",
+            "\\guide",
+            "\\declaration",
+            "\\parameter",
+            "\\type",
+            "\\constructor",
+            "\\destructor",
+            "\\method",
+            "\\variable",
+            "\\function",
+            "\\brief",
+            "\\division",
+
+            "\\itemize",
+            "\\enumerate",
+            "\\item",
+
+            "\\table",
+            "\\row",
+
+            "\\emph",
+            "\\code",
+            "\\image",
+            "\\link",
+         );
+         Type = "xcode.syntax.keyword";
+      };
+   },
+
+   {
+      Identifier = "xcode.lang.otd.verbatim";
+      Syntax = {
+         Start = "***";
+         End = "***";
+         IncludeRules = (
+            "xcode.lang.url",
+         );
+         Type = "xcode.syntax.attribute";
+      };
+   },
+
+   {
+      Identifier = "xcode.lang.otd.preprocessor";
+      Syntax = {
+         StartAtBOL = YES;
+         Words = (
+            "#include",
+         );
+         Type = "xcode.syntax.preprocessor";
+      };
+   },
+
+   {
+      Identifier = "xcode.lang.otd.block.brackets";
+      Syntax = {
+         Start = "[";
+         End = "]";
+         Type = "xcode.syntax.string";
+      };
+   },
+
+   {
+      Identifier = "xcode.lang.otd.block.braces";
+      Syntax = {
+         Start = "{";
+         End = "}";
+         Foldable = YES;
+         Recursive = YES;
+         IncludeRules = (
+            "xcode.lang.otd.directive",
+				"xcode.lang.otd.block.brackets",
+			);
+         Type = "xcode.syntax.character";
+      };
+   },
 
 /****************************************************************************/
 // MARK: Simple Syntax Coloring
 /****************************************************************************/
 
-    {
-        Identifier = "xcode.lang.otd";
-        Description = "Intel386 Assembler Coloring";
-        BasedOn = "xcode.lang.simpleColoring";
-        IncludeInMenu = YES;
-        Name = "Assembly (Intel)";
-        Syntax = {
-            Tokenizer = "xcode.lang.otd.lexer";
-            IncludeRules = (
-                "xcode.lang.otd.label"
-            );
-            Type = "xcode.syntax.plain";
-        };
-    },
-    {
-        Identifier = "xcode.lang.otd.lexer";
-        Syntax = {
-            IncludeRules = (
-                "xcode.lang.comment",
-                "xcode.lang.comment.singleline",
-                "xcode.lang.otd.directive",
-                "xcode.lang.otd.identifier",
-                "xcode.lang.otd.verbatim",
-                "xcode.lang.otd.preprocessor",
-            );
-        };
-    },
-    
-    {
-        Identifier = "xcode.lang.otd.label";
-        Syntax = {
-            StartAtBOL = YES;
-            Tokenizer = "xcode.lang.otd.lexer";
-            Rules = (
-                "xcode.lang.otd.label.name",
-                ":",
-            );
-            Type = "xcode.syntax.definition.function";
-        };
-    },
-    
-    {
-        Identifier = "xcode.lang.otd.label.name";
-        Syntax = {
-            StartAtBOL = YES;
-            Tokenizer = "xcode.lang.otd.lexer";
-            Rules = (
-                "xcode.lang.otd.identifier",
-            );
-            Type = "xcode.syntax.name.partial";
-        };
-    },
+   {
+      Identifier = "xcode.lang.otd";
+      Description = "Ohm Technologies Documentation Coloring";
+      BasedOn = "xcode.lang.simpleColoring";
+      IncludeInMenu = YES;
+      Name = "OTD";
+      Syntax = {
+         IncludeRules = (
+            "xcode.lang.comment",
+            "xcode.lang.url",
+            "xcode.lang.comment.singleline",
+            "xcode.lang.otd.directive",
+            "xcode.lang.otd.verbatim",
+            "xcode.lang.otd.preprocessor",
+            "xcode.lang.otd.block.brackets",
+            "xcode.lang.otd.block.braces",
+         );
+         Type = "xcode.syntax.plain";
+      };
+   },
 
 )
