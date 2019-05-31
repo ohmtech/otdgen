@@ -48,7 +48,7 @@ ExpressionCommand &  ExpressionRoot::add_command (std::string name)
    ExpressionCommand * ptr = new ExpressionCommand;
    ptr->name = name;
 
-   expressions.push_back (std::move (std::unique_ptr <Expression> (ptr)));
+   expressions.emplace_back (std::unique_ptr <Expression> (ptr));
 
    return *ptr;
 }
@@ -65,7 +65,7 @@ ExpressionCodeBlock &   ExpressionRoot::add_codeblock ()
 {
    ExpressionCodeBlock * ptr = new ExpressionCodeBlock;
 
-   expressions.push_back (std::move (std::unique_ptr <Expression> (ptr)));
+   expressions.emplace_back (std::unique_ptr <Expression> (ptr));
 
    return *ptr;
 }
@@ -83,7 +83,7 @@ ExpressionInclude &  ExpressionRoot::add_include (std::string path)
    ExpressionInclude * ptr = new ExpressionInclude;
    ptr->path = path;
 
-   expressions.push_back (std::move (std::unique_ptr <Expression> (ptr)));
+   expressions.emplace_back (std::unique_ptr <Expression> (ptr));
 
    return *ptr;
 }
@@ -100,7 +100,7 @@ ExpressionParagraph &   ExpressionRoot::add_paragraph ()
 {
    ExpressionParagraph * ptr = new ExpressionParagraph;
 
-   expressions.push_back (std::move (std::unique_ptr <Expression> (ptr)));
+   expressions.emplace_back (std::unique_ptr <Expression> (ptr));
 
    return *ptr;
 }
@@ -118,7 +118,7 @@ ExpressionList &  ExpressionRoot::add_list_itemize ()
    ExpressionList * ptr = new ExpressionList;
    ptr->type = ExpressionList::Type::Itemize;
 
-   expressions.push_back (std::move (std::unique_ptr <Expression> (ptr)));
+   expressions.emplace_back (std::unique_ptr <Expression> (ptr));
 
    return *ptr;
 }
@@ -136,7 +136,7 @@ ExpressionList &  ExpressionRoot::add_list_enumerate ()
    ExpressionList * ptr = new ExpressionList;
    ptr->type = ExpressionList::Type::Enumerate;
 
-   expressions.push_back (std::move (std::unique_ptr <Expression> (ptr)));
+   expressions.emplace_back (std::unique_ptr <Expression> (ptr));
 
    return *ptr;
 }
@@ -153,7 +153,7 @@ ExpressionTable & ExpressionRoot::add_table ()
 {
    ExpressionTable * ptr = new ExpressionTable;
 
-   expressions.push_back (std::move (std::unique_ptr <Expression> (ptr)));
+   expressions.emplace_back (std::unique_ptr <Expression> (ptr));
 
    return *ptr;
 }
@@ -228,7 +228,7 @@ ExpressionCommand &  ExpressionCommand::add_command (std::string name_)
    ExpressionCommand * ptr = new ExpressionCommand;
    ptr->name = name_;
 
-   bodies.push_back (std::move (std::unique_ptr <Expression> (ptr)));
+   bodies.emplace_back (std::unique_ptr <Expression> (ptr));
 
    return *ptr;
 }
@@ -245,7 +245,7 @@ ExpressionParagraph &   ExpressionCommand::add_paragraph ()
 {
    ExpressionParagraph * ptr = new ExpressionParagraph;
 
-   bodies.push_back (std::move (std::unique_ptr <Expression> (ptr)));
+   bodies.emplace_back (std::unique_ptr <Expression> (ptr));
 
    return *ptr;
 }
@@ -343,7 +343,7 @@ ExpressionParagraph &   ExpressionList::add_item ()
 {
    ExpressionParagraph * ptr = new ExpressionParagraph;
 
-   items.push_back (std::move (std::unique_ptr <Expression> (ptr)));
+   items.emplace_back (std::unique_ptr <Expression> (ptr));
 
    return *ptr;
 }
@@ -433,7 +433,7 @@ ExpressionRow &   ExpressionTable::add_row ()
 {
    ExpressionRow * ptr = new ExpressionRow;
 
-   rows.push_back (std::move (std::unique_ptr <Expression> (ptr)));
+   rows.emplace_back (std::unique_ptr <Expression> (ptr));
 
    return *ptr;
 }
@@ -512,7 +512,7 @@ ExpressionParagraph &   ExpressionRow::add_cell ()
 {
    ExpressionParagraph * ptr = new ExpressionParagraph;
 
-   cells.push_back (std::move (std::unique_ptr <Expression> (ptr)));
+   cells.emplace_back (std::unique_ptr <Expression> (ptr));
 
    return *ptr;
 }
@@ -604,7 +604,7 @@ ExpressionParagraph &   ExpressionCodeBlock::add_paragraph ()
 {
    ExpressionParagraph * ptr = new ExpressionParagraph;
 
-   captions.push_back (std::move (std::unique_ptr <Expression> (ptr)));
+   captions.emplace_back (std::unique_ptr <Expression> (ptr));
 
    return *ptr;
 }
@@ -768,7 +768,7 @@ ExpressionText &  ExpressionParagraph::add_text (std::string text)
    ExpressionText * ptr = new ExpressionText;
    ptr->body = text;
 
-   expressions.push_back (std::move (std::unique_ptr <Expression> (ptr)));
+   expressions.emplace_back (std::unique_ptr <Expression> (ptr));
 
    return *ptr;
 }
@@ -787,7 +787,7 @@ ExpressionCommand &  ExpressionParagraph::add_command (std::string name)
 
    ptr->name = name;
 
-   expressions.push_back (std::move (std::unique_ptr <Expression> (ptr)));
+   expressions.emplace_back (std::unique_ptr <Expression> (ptr));
 
    return *ptr;
 }
