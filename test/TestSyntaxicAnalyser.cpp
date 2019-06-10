@@ -82,7 +82,7 @@ void  TestSyntaxicAnalyser::run_001 ()
    LexicalAnalyser lexical;
    auto tokens = lexical.process (source);
 
-   SyntaxicAnalyser syntaxic (tokens, source, "<context>");
+   SyntaxicAnalyser syntaxic (tokens, source, "/<context>");
    syntaxic.process ();
    auto tokens2 = syntaxic.tokens ();
 
@@ -106,7 +106,7 @@ void  TestSyntaxicAnalyser::run_002 ()
    LexicalAnalyser lexical;
    auto tokens = lexical.process (source);
 
-   SyntaxicAnalyser syntaxic (tokens, source, "<context>");
+   SyntaxicAnalyser syntaxic (tokens, source, "/<context>");
    syntaxic.process ();
    auto tokens2 = syntaxic.tokens ();
 
@@ -131,7 +131,7 @@ void  TestSyntaxicAnalyser::run_003 ()
    LexicalAnalyser lexical;
    auto tokens = lexical.process (source);
 
-   SyntaxicAnalyser syntaxic (tokens, source, "<context>");
+   SyntaxicAnalyser syntaxic (tokens, source, "/<context>");
    syntaxic.process ();
    auto tokens2 = syntaxic.tokens ();
 
@@ -155,7 +155,7 @@ void  TestSyntaxicAnalyser::run_004 ()
    LexicalAnalyser lexical;
    auto tokens = lexical.process (source);
 
-   SyntaxicAnalyser syntaxic (tokens, source, "<context>");
+   SyntaxicAnalyser syntaxic (tokens, source, "/<context>");
    syntaxic.process ();
    auto tokens2 = syntaxic.tokens ();
 
@@ -180,7 +180,7 @@ void  TestSyntaxicAnalyser::run_005 ()
    LexicalAnalyser lexical;
    auto tokens = lexical.process (source);
 
-   SyntaxicAnalyser syntaxic (tokens, source, "<context>");
+   SyntaxicAnalyser syntaxic (tokens, source, "/<context>");
    syntaxic.process ();
 
    ExpressionRoot root;
@@ -206,7 +206,7 @@ void  TestSyntaxicAnalyser::run_006 ()
    LexicalAnalyser lexical;
    auto tokens = lexical.process (source);
 
-   SyntaxicAnalyser syntaxic (tokens, source, "<context>");
+   SyntaxicAnalyser syntaxic (tokens, source, "/<context>");
    syntaxic.process ();
 
    ExpressionRoot root;
@@ -232,7 +232,7 @@ void  TestSyntaxicAnalyser::run_007 ()
    LexicalAnalyser lexical;
    auto tokens = lexical.process (source);
 
-   SyntaxicAnalyser syntaxic (tokens, source, "<context>");
+   SyntaxicAnalyser syntaxic (tokens, source, "/<context>");
    syntaxic.process ();
 
    ExpressionRoot root;
@@ -260,7 +260,7 @@ void  TestSyntaxicAnalyser::run_008 ()
    LexicalAnalyser lexical;
    auto tokens = lexical.process (source);
 
-   SyntaxicAnalyser syntaxic (tokens, source, "<context>");
+   SyntaxicAnalyser syntaxic (tokens, source, "/<context>");
    syntaxic.process ();
 
    ExpressionRoot root;
@@ -289,7 +289,7 @@ void  TestSyntaxicAnalyser::run_009 ()
    LexicalAnalyser lexical;
    auto tokens = lexical.process (source);
 
-   SyntaxicAnalyser syntaxic (tokens, source, "<context>");
+   SyntaxicAnalyser syntaxic (tokens, source, "/<context>");
    syntaxic.process ();
 
    ExpressionRoot root;
@@ -315,7 +315,7 @@ void  TestSyntaxicAnalyser::run_010 ()
    LexicalAnalyser lexical;
    auto tokens = lexical.process (source);
 
-   SyntaxicAnalyser syntaxic (tokens, source, "<context>");
+   SyntaxicAnalyser syntaxic (tokens, source, "/<context>");
    syntaxic.process ();
 
    ExpressionRoot root;
@@ -342,7 +342,7 @@ void  TestSyntaxicAnalyser::run_011 ()
    LexicalAnalyser lexical;
    auto tokens = lexical.process (source);
 
-   SyntaxicAnalyser syntaxic (tokens, source, "<context>");
+   SyntaxicAnalyser syntaxic (tokens, source, "/<context>");
    syntaxic.process ();
 
    ExpressionRoot root;
@@ -370,7 +370,7 @@ void  TestSyntaxicAnalyser::run_012 ()
    LexicalAnalyser lexical;
    auto tokens = lexical.process (source);
 
-   SyntaxicAnalyser syntaxic (tokens, source, "<context>");
+   SyntaxicAnalyser syntaxic (tokens, source, "/<context>");
    syntaxic.process ();
 
    ExpressionRoot root;
@@ -401,7 +401,7 @@ void  TestSyntaxicAnalyser::run_013 ()
    LexicalAnalyser lexical;
    auto tokens = lexical.process (source);
 
-   SyntaxicAnalyser syntaxic (tokens, source, "<context>");
+   SyntaxicAnalyser syntaxic (tokens, source, "/<context>");
    syntaxic.process ();
 
    ExpressionRoot root;
@@ -429,7 +429,7 @@ void  TestSyntaxicAnalyser::run_014 ()
    LexicalAnalyser lexical;
    auto tokens = lexical.process (source);
 
-   SyntaxicAnalyser syntaxic (tokens, source, "<context>");
+   SyntaxicAnalyser syntaxic (tokens, source, "/<context>");
    syntaxic.process ();
 
    ExpressionRoot root;
@@ -457,7 +457,7 @@ void  TestSyntaxicAnalyser::run_015 ()
    LexicalAnalyser lexical;
    auto tokens = lexical.process (source);
 
-   SyntaxicAnalyser syntaxic (tokens, source, "<context>");
+   SyntaxicAnalyser syntaxic (tokens, source, "/<context>");
    syntaxic.process ();
 
    ExpressionRoot root;
@@ -492,7 +492,7 @@ void  TestSyntaxicAnalyser::run_016 ()
    LexicalAnalyser lexical;
    auto tokens = lexical.process (source);
 
-   SyntaxicAnalyser syntaxic (tokens, source, "<context>");
+   SyntaxicAnalyser syntaxic (tokens, source, "/<context>");
    syntaxic.process ();
 
    ExpressionRoot root;
@@ -524,7 +524,7 @@ void  TestSyntaxicAnalyser::run_017 ()
    LexicalAnalyser lexical;
    auto tokens = lexical.process (source);
 
-   SyntaxicAnalyser syntaxic (tokens, source, "<context>");
+   SyntaxicAnalyser syntaxic (tokens, source, "/<context>");
    syntaxic.process ();
 
    ExpressionRoot root;
@@ -550,7 +550,7 @@ void  TestSyntaxicAnalyser::run_018 ()
    LexicalAnalyser lexical;
    auto tokens = lexical.process (source);
 
-   SyntaxicAnalyser syntaxic (tokens, source, "<context>");
+   SyntaxicAnalyser syntaxic (tokens, source, "/<context>");
    syntaxic.process ();
 
    ExpressionRoot root;
@@ -578,7 +578,7 @@ void  TestSyntaxicAnalyser::run_019 ()
    LexicalAnalyser lexical;
    auto tokens = lexical.process (source);
 
-   SyntaxicAnalyser syntaxic (tokens, source, "<context>");
+   SyntaxicAnalyser syntaxic (tokens, source, "/<context>");
    syntaxic.process ();
 
    ExpressionRoot root;
@@ -607,7 +607,7 @@ void  TestSyntaxicAnalyser::run_020 ()
    LexicalAnalyser lexical;
    auto tokens = lexical.process (source);
 
-   SyntaxicAnalyser syntaxic (tokens, source, "<context>");
+   SyntaxicAnalyser syntaxic (tokens, source, "/<context>");
    syntaxic.process ();
 
    ExpressionRoot root;
@@ -638,7 +638,7 @@ void  TestSyntaxicAnalyser::run_021 ()
    LexicalAnalyser lexical;
    auto tokens = lexical.process (source);
 
-   SyntaxicAnalyser syntaxic (tokens, source, "<context>");
+   SyntaxicAnalyser syntaxic (tokens, source, "/<context>");
    syntaxic.process ();
 
    ExpressionRoot root;
@@ -668,7 +668,7 @@ void  TestSyntaxicAnalyser::run_022 ()
    LexicalAnalyser lexical;
    auto tokens = lexical.process (source);
 
-   SyntaxicAnalyser syntaxic (tokens, source, "<context>");
+   SyntaxicAnalyser syntaxic (tokens, source, "/<context>");
    syntaxic.process ();
 
    ExpressionRoot root;
