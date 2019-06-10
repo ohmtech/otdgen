@@ -62,13 +62,16 @@ Name : process
 ==============================================================================
 """
 
-def process ():
+def process (args):
    gyp_args = [
       '--depth=.',
       '--generator-output=%s' % PATH_OTDGEN_PROJECTS
    ]
 
-   return gyp.main (gyp_args + ['otdgen.gyp'])
+   gyp.main (gyp_args + ['otdgen.gyp'])
+
+   if platform.system () == 'Darwin':
+      post_process_xcode (args)
 
 
 
@@ -78,26 +81,14 @@ Name : post_process_xcode
 ==============================================================================
 """
 
-def post_process_xcode ():
+def post_process_xcode (args):
    file = os.path.join (PATH_OTDGEN_PROJECTS, 'otdgen.xcodeproj', 'project.pbxproj')
 
    for line in fileinput.input (file, inplace = 1):
       print line,
 
       if 'BuildIndependentTargetsInParallel' in line:
-         print '\t\t\t\tLastUpgradeCheck = 1000;'
-
-
-"""
-==============================================================================
-Name : post_process
-==============================================================================
-"""
-
-def post_process ():
-   if platform.system () == 'Darwin':
-      post_process_xcode ()
-
+         print '\t\t\t\tLastUpgradeCheck = 2000;'
 
 
 """
@@ -107,8 +98,7 @@ Name : configure
 """
 
 def configure (args):
-   process ()
-   post_process ()
+   process (args)
 
 
 

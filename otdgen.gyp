@@ -57,6 +57,8 @@
             'CLANG_CXX_LANGUAGE_STANDARD': 'c++0x',
             'CLANG_CXX_LIBRARY': 'libc++',
 
+            'ALWAYS_SEARCH_USER_PATHS': 'NO',
+
             'CLANG_WARN__EXIT_TIME_DESTRUCTORS': 'NO',
 
             'CLANG_WARN__ARC_BRIDGE_CAST_NONARC': 'YES',
