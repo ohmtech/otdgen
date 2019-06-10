@@ -8,6 +8,10 @@
 
 
 {
+   'variables': {
+      'XCODE_ARCHS%': 'i386+x86_64',
+   },
+
    'targets':
    [
       {
@@ -52,7 +56,14 @@
          },
 
          'xcode_settings': {
-            'ARCHS': ['x86_64', 'i386'],
+            'conditions': [
+               ["XCODE_ARCHS == 'x86_64'", {
+                  'ARCHS': ['x86_64'],
+               }],
+               ["XCODE_ARCHS == 'i386+x86_64'", {
+                  'ARCHS': ['i386', 'x86_64'],
+               }],
+            ],
 
             'CLANG_CXX_LANGUAGE_STANDARD': 'c++0x',
             'CLANG_CXX_LIBRARY': 'libc++',

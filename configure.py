@@ -52,6 +52,14 @@ def parse_args ():
       help = 'Provides more output.'
    )
 
+   if platform.system () == 'Darwin':
+      arg_parser.add_argument (
+         '--archs',
+         choices = ['i386+x86_64', 'x86_64'],
+         default = 'i386+x86_64',
+         help = 'The architectures to use. Defaults to i386+x86_64.'
+      )
+
    return arg_parser.parse_args (sys.argv[1:])
 
 
@@ -67,6 +75,14 @@ def process (args):
       '--depth=.',
       '--generator-output=%s' % PATH_OTDGEN_PROJECTS
    ]
+
+   variables = dict ()
+
+   if platform.system () == 'Darwin':
+      variables ['XCODE_ARCHS'] = args.archs
+
+   for key, value in variables.items ():
+      gyp_args += ['-D', '%s=%s' % (key, value)]
 
    gyp.main (gyp_args + ['otdgen.gyp'])
 
