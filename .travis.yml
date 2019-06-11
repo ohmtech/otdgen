@@ -1,0 +1,28 @@
+language: cpp
+dist: trusty
+sudo: required
+
+
+matrix:
+   include:
+      -  os: osx
+         osx_image: xcode10.2
+         compiler: clang
+         env: CONFIGURATION=Debug   ARCHS=x86_64
+         install:
+            - git clone https://chromium.googlesource.com/external/gyp
+            - export PYTHONPATH=$PYTHONPATH:$(pwd)/gyp/pylib
+            - export PATH=$PATH:$(pwd)/gyp
+
+      -  os: osx
+         osx_image: xcode9.3
+         compiler: clang
+         env: CONFIGURATION=Debug
+         install:
+            - git clone https://chromium.googlesource.com/external/gyp
+            - export PYTHONPATH=$PYTHONPATH:$(pwd)/gyp/pylib
+            - export PATH=$PATH:$(pwd)/gyp
+
+
+script:
+   - python check.py
