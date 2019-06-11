@@ -124,5 +124,9 @@
             'src/main.cpp',
          ],
       },
+   ],
+
+   'includes': [
+      'test/test.gypi',
    ]
 }
