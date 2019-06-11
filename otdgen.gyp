@@ -22,20 +22,9 @@
          {
             'Debug':
             {
-               'defines': [
-                  '_SCL_SECURE_NO_WARNINGS',
-               ],
-
                'xcode_settings':
                {
                   'GCC_OPTIMIZATION_LEVEL': '0', # -O0
-               },
-
-               'msvs_settings': {
-                  'VCCLCompilerTool': {
-                     'Optimization': 0, # Disabled (/Od)
-                     'RuntimeLibrary': 3, # Multi-threaded Debug DLL (/MDd)
-                  },
                },
             },
 
@@ -44,13 +33,6 @@
                'xcode_settings':
                {
                   'GCC_OPTIMIZATION_LEVEL': 's', # -Os
-               },
-
-               'msvs_settings': {
-                  'VCCLCompilerTool': {
-                     'Optimization': 2, # Maximize Speed (/O2)
-                     'RuntimeLibrary': 2, # Multi-threaded DLL (/MD)
-                  },
                },
             },
          },
@@ -125,24 +107,6 @@
             'GCC_WARN_UNUSED_PARAMETER': 'YES',
             'GCC_WARN_UNUSED_VALUE': 'YES',
             'GCC_WARN_UNUSED_VARIABLE': 'YES',
-         },
-
-         'msvs_configuration_platform': 'Win32', # for now 'x64'
-
-         'msvs_settings': {
-            'VCCLCompilerTool': {
-               'ExceptionHandling': '1', # Yes (/EHsc)
-               'WarningLevel': '4',
-            },
-
-            'VCLinkerTool': {
-               'GenerateDebugInformation': 'true',
-               'target_conditions': [
-                  ['_type=="executable"', {
-                     'SubSystem': 1,  # /SUBSYSTEM:CONSOLE
-                  }],
-               ],
-            },
          },
 
         'link_settings': {

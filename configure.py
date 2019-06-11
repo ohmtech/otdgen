@@ -24,6 +24,10 @@ if sys.version_info < (2, 7):
    print >>sys.stderr, 'This script requires python 2.7 or greater.'
    sys.exit (1)
 
+if platform.system () != 'Darwin':
+   print >>sys.stderr, 'Unsupported platform. Otdgen is macOS only for now.'
+   sys.exit (1)
+
 PATH_OTDGEN = os.path.dirname (__file__)
 PATH_OTDGEN_PROJECTS = os.path.join (PATH_OTDGEN, 'projects')
 
