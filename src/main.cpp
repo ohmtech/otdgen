@@ -100,7 +100,12 @@ int   main (int argc, const char * argv[])
 {
    otdgen::Conf conf;
 
-   bool ok_flag = conf.parse (argc, argv);
+   bool ok_flag = argc > 1;
+
+   if (ok_flag)
+   {
+      ok_flag = conf.parse (argc, argv);
+   }
 
    if (!ok_flag)
    {
