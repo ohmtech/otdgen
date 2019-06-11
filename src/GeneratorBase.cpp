@@ -9,9 +9,9 @@
 
 /*\\\ INCLUDE FILES \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\*/
 
-#include "GeneratorBase.h"
+#include "otdgen/GeneratorBase.h"
 
-#include "Conf.h"
+#include "otdgen/Conf.h"
 
 #include <fstream>
 #include <iostream>

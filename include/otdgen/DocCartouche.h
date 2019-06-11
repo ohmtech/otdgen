@@ -1,6 +1,6 @@
 /*****************************************************************************
 
-      DocParameter.h
+      DocCartouche.h
       Copyright (c) 2015 Raphael DINGE
 
 *Tab=3***********************************************************************/
@@ -13,10 +13,8 @@
 
 /*\\\ INCLUDE FILES \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\*/
 
-#include "DocBlock.h"
-#include "DocInline.h"
-
-#include <list>
+#include "otdgen/DocBlock.h"
+#include "otdgen/DocInline.h"
 
 
 
@@ -25,7 +23,7 @@ namespace otdgen
 
 
 
-class DocParameter
+class DocCartouche
 :  public DocBlock
 {
 
@@ -33,16 +31,20 @@ class DocParameter
 
 public:
 
-                  DocParameter () = default;
-                  DocParameter (const DocParameter & rhs) = default;
-                  DocParameter (DocParameter && rhs) = default;
-   virtual        ~DocParameter () = default;
+                  DocCartouche () = default;
+                  DocCartouche (const DocCartouche & rhs) = default;
+                  DocCartouche (DocCartouche && rhs) = default;
+   virtual        ~DocCartouche () = default;
 
-   DocParameter & operator = (const DocParameter & rhs) = default;
-   DocParameter & operator = (DocParameter && rhs) = default;
+   DocCartouche & operator = (const DocCartouche & rhs) = default;
+   DocCartouche & operator = (DocCartouche && rhs) = default;
 
-   std::string    type;
-   DocInlines     body;
+   std::string    inherit;
+   std::string    header;
+   std::string    guide_id;
+   DocInlines     guide;
+   std::list <std::string>
+                  declarations;
 
 
 
@@ -65,21 +67,20 @@ private:
 /*\\\ FORBIDDEN MEMBER FUNCTIONS \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\*/
 
 private:
-   bool           operator == (const DocParameter & rhs);
-   bool           operator != (const DocParameter & rhs);
+   bool           operator == (const DocCartouche & rhs);
+   bool           operator != (const DocCartouche & rhs);
 
 
 
-}; // class DocParameter
+}; // class DocCartouche
 
-using DocParameters = std::list <DocParameter>;
 
 
 }  // namespace otdgen
 
 
 
-// #include "DocParameter.hpp"
+// #include "DocCartouche.hpp"
 
 
 

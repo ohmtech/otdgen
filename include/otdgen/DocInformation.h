@@ -1,6 +1,6 @@
 /*****************************************************************************
 
-      Central.h
+      DocInformation.h
       Copyright (c) 2015 Raphael DINGE
 
 *Tab=3***********************************************************************/
@@ -13,9 +13,8 @@
 
 /*\\\ INCLUDE FILES \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\*/
 
-#include "Expression.h"
-
-#include <string>
+#include "otdgen/DocBlock.h"
+#include "otdgen/DocInline.h"
 
 
 
@@ -24,17 +23,31 @@ namespace otdgen
 
 
 
-class Central
+class DocInformation
+:  public DocBlock
 {
 
 /*\\\ PUBLIC \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\*/
 
 public:
 
-                  Central () = default;
-   virtual        ~Central () = default;
+   enum class Level
+   {
+                  Note,
+                  Important,
+                  Warning,
+   };
 
-   ExpressionRoot process (const std::string & path);
+                  DocInformation () = default;
+                  DocInformation (const DocInformation & rhs) = default;
+                  DocInformation (DocInformation && rhs) = default;
+   virtual        ~DocInformation () = default;
+
+   DocInformation &   operator = (const DocInformation & rhs) = default;
+   DocInformation &   operator = (DocInformation && rhs) = default;
+
+   Level          level;
+   DocInlines     body;
 
 
 
@@ -52,24 +65,17 @@ protected:
 
 private:
 
-   bool           read (std::string & content, const std::string & path);
-   std::string    resolve (const std::string & rel_path, const std::string & path);
-
 
 
 /*\\\ FORBIDDEN MEMBER FUNCTIONS \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\*/
 
 private:
-                  Central (const Central & rhs) = delete;
-                  Central (Central && rhs) = delete;
-   Central &      operator = (const Central & rhs) = delete;
-   Central &      operator = (Central && rhs) = delete;
-   bool           operator == (const Central & rhs);
-   bool           operator != (const Central & rhs);
+   bool           operator == (const DocInformation & rhs);
+   bool           operator != (const DocInformation & rhs);
 
 
 
-}; // class Central
+}; // class DocInformation
 
 
 
@@ -77,7 +83,7 @@ private:
 
 
 
-// #include "Central.hpp"
+// #include "DocInformation.hpp"
 
 
 

@@ -11,8 +11,8 @@
 
 #include "TestSyntaxicAnalyser.h"
 
-#include "LexicalAnalyser.h"
-#include "SyntaxicAnalyser.h"
+#include "otdgen/LexicalAnalyser.h"
+#include "otdgen/SyntaxicAnalyser.h"
 
 #include <cassert>
 

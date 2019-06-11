@@ -9,10 +9,10 @@
 
 /*\\\ INCLUDE FILES \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\*/
 
-#include "Central.h"
+#include "otdgen/Central.h"
 
-#include "LexicalAnalyser.h"
-#include "SyntaxicAnalyser.h"
+#include "otdgen/LexicalAnalyser.h"
+#include "otdgen/SyntaxicAnalyser.h"
 
 #include <fstream>
 #include <iostream>

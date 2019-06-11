@@ -1,6 +1,6 @@
 /*****************************************************************************
 
-      DocCodeBlock.h
+      DocTable.h
       Copyright (c) 2015 Raphael DINGE
 
 *Tab=3***********************************************************************/
@@ -13,8 +13,8 @@
 
 /*\\\ INCLUDE FILES \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\*/
 
-#include "DocBlock.h"
-#include "DocInline.h"
+#include "otdgen/DocBlock.h"
+#include "otdgen/DocInline.h"
 
 
 
@@ -23,7 +23,7 @@ namespace otdgen
 
 
 
-class DocCodeBlock
+class DocTable
 :  public DocBlock
 {
 
@@ -31,31 +31,16 @@ class DocCodeBlock
 
 public:
 
-   enum class Type
-   {
-                  None,
-                  Cpp,
-   };
+                  DocTable () = default;
+                  DocTable (const DocTable & rhs) = default;
+                  DocTable (DocTable && rhs) = default;
+   virtual        ~DocTable () = default;
 
-   enum class LineType
-   {
-                  Normal,
-                  Emphasis,
-                  Fade,
-   };
+   DocTable &   operator = (const DocTable & rhs) = default;
+   DocTable &   operator = (DocTable && rhs) = default;
 
-                  DocCodeBlock () = default;
-                  DocCodeBlock (const DocCodeBlock & rhs) = default;
-                  DocCodeBlock (DocCodeBlock && rhs) = default;
-   virtual        ~DocCodeBlock () = default;
-
-   DocCodeBlock &   operator = (const DocCodeBlock & rhs) = default;
-   DocCodeBlock &   operator = (DocCodeBlock && rhs) = default;
-
-   Type           type;
-   std::list <std::pair <std::string, LineType>>
-                  lines;
-
+   std::list <std::list <DocInlines>>
+                  rows;
 
 
 
@@ -78,12 +63,12 @@ private:
 /*\\\ FORBIDDEN MEMBER FUNCTIONS \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\*/
 
 private:
-   bool           operator == (const DocCodeBlock & rhs);
-   bool           operator != (const DocCodeBlock & rhs);
+   bool           operator == (const DocTable & rhs);
+   bool           operator != (const DocTable & rhs);
 
 
 
-}; // class DocCodeBlock
+}; // class DocTable
 
 
 
@@ -91,7 +76,7 @@ private:
 
 
 
-// #include "DocCodeBlock.hpp"
+// #include "DocTable.hpp"
 
 
 

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
-      DocParagraph.h
+      Central.h
       Copyright (c) 2015 Raphael DINGE
 
 *Tab=3***********************************************************************/
@@ -13,8 +13,9 @@
 
 /*\\\ INCLUDE FILES \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\*/
 
-#include "DocBlock.h"
-#include "DocInline.h"
+#include "otdgen/Expression.h"
+
+#include <string>
 
 
 
@@ -23,23 +24,17 @@ namespace otdgen
 
 
 
-class DocParagraph
-:  public DocBlock
+class Central
 {
 
 /*\\\ PUBLIC \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\*/
 
 public:
 
-                  DocParagraph () = default;
-                  DocParagraph (const DocParagraph & rhs) = default;
-                  DocParagraph (DocParagraph && rhs) = default;
-   virtual        ~DocParagraph () = default;
+                  Central () = default;
+   virtual        ~Central () = default;
 
-   DocParagraph & operator = (const DocParagraph & rhs) = default;
-   DocParagraph & operator = (DocParagraph && rhs) = default;
-
-   DocInlines     body;
+   ExpressionRoot process (const std::string & path);
 
 
 
@@ -57,17 +52,24 @@ protected:
 
 private:
 
+   bool           read (std::string & content, const std::string & path);
+   std::string    resolve (const std::string & rel_path, const std::string & path);
+
 
 
 /*\\\ FORBIDDEN MEMBER FUNCTIONS \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\*/
 
 private:
-   bool           operator == (const DocParagraph & rhs);
-   bool           operator != (const DocParagraph & rhs);
+                  Central (const Central & rhs) = delete;
+                  Central (Central && rhs) = delete;
+   Central &      operator = (const Central & rhs) = delete;
+   Central &      operator = (Central && rhs) = delete;
+   bool           operator == (const Central & rhs);
+   bool           operator != (const Central & rhs);
 
 
 
-}; // class DocParagraph
+}; // class Central
 
 
 
@@ -75,7 +77,7 @@ private:
 
 
 
-// #include "DocParagraph.hpp"
+// #include "Central.hpp"
 
 
 

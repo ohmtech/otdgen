@@ -11,7 +11,7 @@
 
 #include "TestLexicalAnalyser.h"
 
-#include "LexicalAnalyser.h"
+#include "otdgen/LexicalAnalyser.h"
 
 #include <cassert>
 

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
-      DocTable.h
+      DocList.h
       Copyright (c) 2015 Raphael DINGE
 
 *Tab=3***********************************************************************/
@@ -13,8 +13,8 @@
 
 /*\\\ INCLUDE FILES \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\*/
 
-#include "DocBlock.h"
-#include "DocInline.h"
+#include "otdgen/DocBlock.h"
+#include "otdgen/DocInline.h"
 
 
 
@@ -23,7 +23,7 @@ namespace otdgen
 
 
 
-class DocTable
+class DocList
 :  public DocBlock
 {
 
@@ -31,16 +31,23 @@ class DocTable
 
 public:
 
-                  DocTable () = default;
-                  DocTable (const DocTable & rhs) = default;
-                  DocTable (DocTable && rhs) = default;
-   virtual        ~DocTable () = default;
+   enum class Type
+   {
+                  Itemization,
+                  Enumeration,
+   };
 
-   DocTable &   operator = (const DocTable & rhs) = default;
-   DocTable &   operator = (DocTable && rhs) = default;
+                  DocList () = default;
+                  DocList (const DocList & rhs) = default;
+                  DocList (DocList && rhs) = default;
+   virtual        ~DocList () = default;
 
-   std::list <std::list <DocInlines>>
-                  rows;
+   DocList &   operator = (const DocList & rhs) = default;
+   DocList &   operator = (DocList && rhs) = default;
+
+   Type           type;
+   std::list <DocInlines>
+                  items;
 
 
 
@@ -63,12 +70,12 @@ private:
 /*\\\ FORBIDDEN MEMBER FUNCTIONS \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\*/
 
 private:
-   bool           operator == (const DocTable & rhs);
-   bool           operator != (const DocTable & rhs);
+   bool           operator == (const DocList & rhs);
+   bool           operator != (const DocList & rhs);
 
 
 
-}; // class DocTable
+}; // class DocList
 
 
 
@@ -76,7 +83,7 @@ private:
 
 
 
-// #include "DocTable.hpp"
+// #include "DocList.hpp"
 
 
 

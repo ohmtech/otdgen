@@ -1,6 +1,6 @@
 /*****************************************************************************
 
-      DocType.h
+      DocSection.h
       Copyright (c) 2015 Raphael DINGE
 
 *Tab=3***********************************************************************/
@@ -13,10 +13,8 @@
 
 /*\\\ INCLUDE FILES \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\*/
 
-#include "DocBlock.h"
-#include "DocInline.h"
-
-#include <list>
+#include "otdgen/DocBlock.h"
+#include "otdgen/DocInline.h"
 
 
 
@@ -25,7 +23,7 @@ namespace otdgen
 
 
 
-class DocType
+class DocSection
 :  public DocBlock
 {
 
@@ -33,17 +31,26 @@ class DocType
 
 public:
 
-                  DocType () = default;
-                  DocType (const DocType & rhs) = default;
-                  DocType (DocType && rhs) = default;
-   virtual        ~DocType () = default;
+   enum class Level
+   {
+                  Section,
+                  SubSection,
+                  SubSubSection,
+   };
 
-   DocType & operator = (const DocType & rhs) = default;
-   DocType & operator = (DocType && rhs) = default;
+                  DocSection () = default;
+                  DocSection (const DocSection & rhs) = default;
+                  DocSection (DocSection && rhs) = default;
+   virtual        ~DocSection () = default;
 
+   DocSection &   operator = (const DocSection & rhs) = default;
+   DocSection &   operator = (DocSection && rhs) = default;
+
+   Level          level;
+   DocInlines     title;
    std::string    id;
-   std::string    type;
-   DocInlines     body;
+   std::string    id_sub;
+   std::string    id_subsub;
 
 
 
@@ -66,14 +73,12 @@ private:
 /*\\\ FORBIDDEN MEMBER FUNCTIONS \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\*/
 
 private:
-   bool           operator == (const DocType & rhs);
-   bool           operator != (const DocType & rhs);
+   bool           operator == (const DocSection & rhs);
+   bool           operator != (const DocSection & rhs);
 
 
 
-}; // class DocType
-
-using DocTypes = std::list <DocType>;
+}; // class DocSection
 
 
 
@@ -81,7 +86,7 @@ using DocTypes = std::list <DocType>;
 
 
 
-// #include "DocType.hpp"
+// #include "DocSection.hpp"
 
 
 

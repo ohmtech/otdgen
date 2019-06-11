@@ -9,20 +9,20 @@
 
 /*\\\ INCLUDE FILES \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\*/
 
-#include "GeneratorGitHubMarkDown.h"
+#include "otdgen/GeneratorGitHubMarkDown.h"
 
-#include "Conf.h"
-#include "DocBlocks.h"
-#include "DocBook.h"
-#include "DocChapter.h"
-#include "DocCodeBlock.h"
-#include "DocInformation.h"
-#include "DocLibrary.h"
-#include "DocList.h"
-#include "DocParagraph.h"
-#include "DocSection.h"
-#include "DocTable.h"
-#include "Toc.h"
+#include "otdgen/Conf.h"
+#include "otdgen/DocBlocks.h"
+#include "otdgen/DocBook.h"
+#include "otdgen/DocChapter.h"
+#include "otdgen/DocCodeBlock.h"
+#include "otdgen/DocInformation.h"
+#include "otdgen/DocLibrary.h"
+#include "otdgen/DocList.h"
+#include "otdgen/DocParagraph.h"
+#include "otdgen/DocSection.h"
+#include "otdgen/DocTable.h"
+#include "otdgen/Toc.h"
 
 #include <cstdlib>
 #include <cassert>

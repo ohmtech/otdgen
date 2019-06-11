@@ -13,12 +13,12 @@
 
 /*\\\ INCLUDE FILES \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\*/
 
-#include "DocBlocks.h"
-#include "DocCartouche.h"
-#include "DocInline.h"
-#include "DocMember.h"
-#include "DocParameter.h"
-#include "DocType.h"
+#include "otdgen/DocBlocks.h"
+#include "otdgen/DocCartouche.h"
+#include "otdgen/DocInline.h"
+#include "otdgen/DocMember.h"
+#include "otdgen/DocParameter.h"
+#include "otdgen/DocType.h"
 
 #include <list>
 #include <string>

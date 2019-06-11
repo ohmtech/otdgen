@@ -9,13 +9,13 @@
 
 /*\\\ INCLUDE FILES \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\*/
 
-#include "Central.h"
-#include "Conf.h"
-#include "GeneratorGitHubMarkDown.h"
-#include "GeneratorHtml.h"
-#include "LexicalAnalyser.h"
-#include "StructuralAnalyser.h"
-#include "Toc.h"
+#include "otdgen/Central.h"
+#include "otdgen/Conf.h"
+#include "otdgen/GeneratorGitHubMarkDown.h"
+#include "otdgen/GeneratorHtml.h"
+#include "otdgen/LexicalAnalyser.h"
+#include "otdgen/StructuralAnalyser.h"
+#include "otdgen/Toc.h"
 
 #include <iostream>
 #include <set>
