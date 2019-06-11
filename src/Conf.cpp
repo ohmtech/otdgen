@@ -72,17 +72,12 @@ bool  Conf::parse (int argc, const char * argv[])
       auto && option = option_pair.first;
 
       bool ok_flag = false;
-      ok_flag |= option == "selftest";
       ok_flag |= option == "output";
       ok_flag |= option == "format";
 
       if (!ok_flag) return false;
 
-      if (option == "selftest")
-      {
-         self_test = true;
-      }
-      else if (option == "output")
+      if (option == "output")
       {
          output_path = option_pair.second;
       }

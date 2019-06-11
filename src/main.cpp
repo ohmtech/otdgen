@@ -17,9 +17,6 @@
 #include "StructuralAnalyser.h"
 #include "Toc.h"
 
-#include "TestLexicalAnalyser.h"
-#include "TestSyntaxicAnalyser.h"
-
 #include <iostream>
 #include <set>
 #include <string>
@@ -28,38 +25,8 @@
 
 /*\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\*/
 
-void  test ();
 void  run (const otdgen::Conf & conf, const std::string & path);
 void  usage ();
-
-/*
-==============================================================================
-Name : run
-==============================================================================
-*/
-
-void  test ()
-{
-   using namespace otdgen;
-
-   {
-      std::cout << "TestLexicalAnalyser\n";
-
-      TestLexicalAnalyser test;
-      test.run ();
-
-      std::cout << "   OK\n";
-   }
-
-   {
-      std::cout << "TestSyntaxicAnalyser\n";
-
-      TestSyntaxicAnalyser test;
-      test.run ();
-
-      std::cout << "   OK\n";
-   }
-}
 
 
 
@@ -118,7 +85,6 @@ Name : usage
 void  usage ()
 {
    std::cout << "usage:\n";
-   std::cout << "  otdgen --selftest\n";
    std::cout << "  otdgen --format=<format> --output=<output> source_file\n";
 }
 
@@ -142,15 +108,7 @@ int   main (int argc, const char * argv[])
       return -1;
    }
 
-
-   if (conf.self_test)
-   {
-      test ();
-   }
-   else
-   {
-      run (conf, conf.file);
-   }
+   run (conf, conf.file);
 
    return 0;
 }

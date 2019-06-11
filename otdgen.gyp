@@ -120,7 +120,6 @@
 
          'includes': [
             'src/src.gypi',
-            'test/test.gypi',
          ],
       }
    ]
