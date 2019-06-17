@@ -1,6 +1,6 @@
 /*****************************************************************************
 
-      DocMember.h
+      DocType.h
       Copyright (c) 2015 Raphael DINGE
 
 *Tab=3***********************************************************************/
@@ -13,8 +13,8 @@
 
 /*\\\ INCLUDE FILES \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\*/
 
-#include "DocBlocks.h"
-#include "DocInline.h"
+#include "otdgen/DocBlock.h"
+#include "otdgen/DocInline.h"
 
 #include <list>
 
@@ -25,7 +25,7 @@ namespace otdgen
 
 
 
-class DocMember
+class DocType
 :  public DocBlock
 {
 
@@ -33,28 +33,17 @@ class DocMember
 
 public:
 
-   enum class Type
-   {
-                  Constructor,
-                  Destructor,
-                  Method,
-                  Variable,
-                  Function,
-                  Division,
-   };
+                  DocType () = default;
+                  DocType (const DocType & rhs) = default;
+                  DocType (DocType && rhs) = default;
+   virtual        ~DocType () = default;
 
-                  DocMember () = default;
-                  DocMember (const DocMember & rhs) = default;
-                  DocMember (DocMember && rhs) = default;
-   virtual        ~DocMember () = default;
+   DocType & operator = (const DocType & rhs) = default;
+   DocType & operator = (DocType && rhs) = default;
 
-   DocMember &    operator = (const DocMember & rhs) = default;
-   DocMember &    operator = (DocMember && rhs) = default;
-
-   Type           type;
-   std::string    name;
-   DocInlines     brief;
-   DocBlocks      description;
+   std::string    id;
+   std::string    type;
+   DocInlines     body;
 
 
 
@@ -77,14 +66,14 @@ private:
 /*\\\ FORBIDDEN MEMBER FUNCTIONS \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\*/
 
 private:
-   bool           operator == (const DocMember & rhs);
-   bool           operator != (const DocMember & rhs);
+   bool           operator == (const DocType & rhs);
+   bool           operator != (const DocType & rhs);
 
 
 
-}; // class DocMember
+}; // class DocType
 
-using DocMembers = std::list <DocMember>;
+using DocTypes = std::list <DocType>;
 
 
 
@@ -92,7 +81,7 @@ using DocMembers = std::list <DocMember>;
 
 
 
-// #include "DocMember.hpp"
+// #include "DocType.hpp"
 
 
 

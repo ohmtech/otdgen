@@ -1,6 +1,6 @@
 /*****************************************************************************
 
-      DocType.h
+      Central.h
       Copyright (c) 2015 Raphael DINGE
 
 *Tab=3***********************************************************************/
@@ -13,10 +13,9 @@
 
 /*\\\ INCLUDE FILES \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\*/
 
-#include "DocBlock.h"
-#include "DocInline.h"
+#include "otdgen/Expression.h"
 
-#include <list>
+#include <string>
 
 
 
@@ -25,25 +24,17 @@ namespace otdgen
 
 
 
-class DocType
-:  public DocBlock
+class Central
 {
 
 /*\\\ PUBLIC \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\*/
 
 public:
 
-                  DocType () = default;
-                  DocType (const DocType & rhs) = default;
-                  DocType (DocType && rhs) = default;
-   virtual        ~DocType () = default;
+                  Central () = default;
+   virtual        ~Central () = default;
 
-   DocType & operator = (const DocType & rhs) = default;
-   DocType & operator = (DocType && rhs) = default;
-
-   std::string    id;
-   std::string    type;
-   DocInlines     body;
+   ExpressionRoot process (const std::string & path);
 
 
 
@@ -61,19 +52,24 @@ protected:
 
 private:
 
+   bool           read (std::string & content, const std::string & path);
+   std::string    resolve (const std::string & rel_path, const std::string & path);
+
 
 
 /*\\\ FORBIDDEN MEMBER FUNCTIONS \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\*/
 
 private:
-   bool           operator == (const DocType & rhs);
-   bool           operator != (const DocType & rhs);
+                  Central (const Central & rhs) = delete;
+                  Central (Central && rhs) = delete;
+   Central &      operator = (const Central & rhs) = delete;
+   Central &      operator = (Central && rhs) = delete;
+   bool           operator == (const Central & rhs);
+   bool           operator != (const Central & rhs);
 
 
 
-}; // class DocType
-
-using DocTypes = std::list <DocType>;
+}; // class Central
 
 
 
@@ -81,7 +77,7 @@ using DocTypes = std::list <DocType>;
 
 
 
-// #include "DocType.hpp"
+// #include "Central.hpp"
 
 
 

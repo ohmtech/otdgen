@@ -1,6 +1,6 @@
 /*****************************************************************************
 
-      DocLibrary.h
+      DocParagraph.h
       Copyright (c) 2015 Raphael DINGE
 
 *Tab=3***********************************************************************/
@@ -13,9 +13,8 @@
 
 /*\\\ INCLUDE FILES \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\*/
 
-#include "DocBlocks.h"
-#include "DocBook.h"
-#include "DocInline.h"
+#include "otdgen/DocBlock.h"
+#include "otdgen/DocInline.h"
 
 
 
@@ -24,26 +23,23 @@ namespace otdgen
 
 
 
-class DocLibrary
+class DocParagraph
+:  public DocBlock
 {
 
 /*\\\ PUBLIC \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\*/
 
 public:
 
-                  DocLibrary () = default;
-                  DocLibrary (const DocLibrary & rhs) = default;
-                  DocLibrary (DocLibrary && rhs) = default;
-   virtual        ~DocLibrary () = default;
+                  DocParagraph () = default;
+                  DocParagraph (const DocParagraph & rhs) = default;
+                  DocParagraph (DocParagraph && rhs) = default;
+   virtual        ~DocParagraph () = default;
 
-   DocLibrary &   operator = (const DocLibrary & rhs) = default;
-   DocLibrary &   operator = (DocLibrary && rhs) = default;
+   DocParagraph & operator = (const DocParagraph & rhs) = default;
+   DocParagraph & operator = (DocParagraph && rhs) = default;
 
-   DocInlines     title;
-   std::string    id;
-
-   DocBlocks      overview;
-   DocBooks       books;
+   DocInlines     body;
 
 
 
@@ -63,16 +59,15 @@ private:
 
 
 
-
 /*\\\ FORBIDDEN MEMBER FUNCTIONS \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\*/
 
 private:
-   bool           operator == (const DocLibrary & rhs);
-   bool           operator != (const DocLibrary & rhs);
+   bool           operator == (const DocParagraph & rhs);
+   bool           operator != (const DocParagraph & rhs);
 
 
 
-}; // class DocLibrary
+}; // class DocParagraph
 
 
 
@@ -80,7 +75,7 @@ private:
 
 
 
-// #include "DocLibrary.hpp"
+// #include "DocParagraph.hpp"
 
 
 

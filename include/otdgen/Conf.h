@@ -1,6 +1,6 @@
 /*****************************************************************************
 
-      DocParagraph.h
+      Conf.h
       Copyright (c) 2015 Raphael DINGE
 
 *Tab=3***********************************************************************/
@@ -13,8 +13,7 @@
 
 /*\\\ INCLUDE FILES \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\*/
 
-#include "DocBlock.h"
-#include "DocInline.h"
+#include <string>
 
 
 
@@ -23,23 +22,31 @@ namespace otdgen
 
 
 
-class DocParagraph
-:  public DocBlock
+class Conf
 {
 
 /*\\\ PUBLIC \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\*/
 
 public:
 
-                  DocParagraph () = default;
-                  DocParagraph (const DocParagraph & rhs) = default;
-                  DocParagraph (DocParagraph && rhs) = default;
-   virtual        ~DocParagraph () = default;
+   enum class Format
+   {
+                  Html,
+                  HtmlSinglePage,
+                  Pdf,
+                  GitHubMarkDown,
+                  DocSet,
+   };
 
-   DocParagraph & operator = (const DocParagraph & rhs) = default;
-   DocParagraph & operator = (DocParagraph && rhs) = default;
+                  Conf () = default;
+   virtual        ~Conf () = default;
 
-   DocInlines     body;
+   bool           parse (int argc, const char * argv[]);
+
+   std::string    file;
+   Format         format = Format::GitHubMarkDown;
+   bool           single_page = false;
+   std::string    output_path;
 
 
 
@@ -62,12 +69,16 @@ private:
 /*\\\ FORBIDDEN MEMBER FUNCTIONS \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\*/
 
 private:
-   bool           operator == (const DocParagraph & rhs);
-   bool           operator != (const DocParagraph & rhs);
+                  Conf (const Conf & rhs) = delete;
+                  Conf (Conf && rhs) = delete;
+   Conf &         operator = (const Conf & rhs) = delete;
+   Conf &         operator = (Conf && rhs) = delete;
+   bool           operator == (const Conf & rhs);
+   bool           operator != (const Conf & rhs);
 
 
 
-}; // class DocParagraph
+}; // class Conf
 
 
 
@@ -75,7 +86,7 @@ private:
 
 
 
-// #include "DocParagraph.hpp"
+// #include "Conf.hpp"
 
 
 

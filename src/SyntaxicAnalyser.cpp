@@ -9,9 +9,9 @@
 
 /*\\\ INCLUDE FILES \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\*/
 
-#include "SyntaxicAnalyser.h"
+#include "otdgen/SyntaxicAnalyser.h"
 
-#include "Error.h"
+#include "otdgen/Error.h"
 
 #include <iostream>
 

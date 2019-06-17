@@ -1,6 +1,6 @@
 /*****************************************************************************
 
-      DocInformation.h
+      DocCodeBlock.h
       Copyright (c) 2015 Raphael DINGE
 
 *Tab=3***********************************************************************/
@@ -13,8 +13,8 @@
 
 /*\\\ INCLUDE FILES \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\*/
 
-#include "DocBlock.h"
-#include "DocInline.h"
+#include "otdgen/DocBlock.h"
+#include "otdgen/DocInline.h"
 
 
 
@@ -23,7 +23,7 @@ namespace otdgen
 
 
 
-class DocInformation
+class DocCodeBlock
 :  public DocBlock
 {
 
@@ -31,23 +31,31 @@ class DocInformation
 
 public:
 
-   enum class Level
+   enum class Type
    {
-                  Note,
-                  Important,
-                  Warning,
+                  None,
+                  Cpp,
    };
 
-                  DocInformation () = default;
-                  DocInformation (const DocInformation & rhs) = default;
-                  DocInformation (DocInformation && rhs) = default;
-   virtual        ~DocInformation () = default;
+   enum class LineType
+   {
+                  Normal,
+                  Emphasis,
+                  Fade,
+   };
 
-   DocInformation &   operator = (const DocInformation & rhs) = default;
-   DocInformation &   operator = (DocInformation && rhs) = default;
+                  DocCodeBlock () = default;
+                  DocCodeBlock (const DocCodeBlock & rhs) = default;
+                  DocCodeBlock (DocCodeBlock && rhs) = default;
+   virtual        ~DocCodeBlock () = default;
 
-   Level          level;
-   DocInlines     body;
+   DocCodeBlock &   operator = (const DocCodeBlock & rhs) = default;
+   DocCodeBlock &   operator = (DocCodeBlock && rhs) = default;
+
+   Type           type;
+   std::list <std::pair <std::string, LineType>>
+                  lines;
+
 
 
 
@@ -70,12 +78,12 @@ private:
 /*\\\ FORBIDDEN MEMBER FUNCTIONS \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\*/
 
 private:
-   bool           operator == (const DocInformation & rhs);
-   bool           operator != (const DocInformation & rhs);
+   bool           operator == (const DocCodeBlock & rhs);
+   bool           operator != (const DocCodeBlock & rhs);
 
 
 
-}; // class DocInformation
+}; // class DocCodeBlock
 
 
 
@@ -83,7 +91,7 @@ private:
 
 
 
-// #include "DocInformation.hpp"
+// #include "DocCodeBlock.hpp"
 
 
 

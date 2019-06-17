@@ -1,6 +1,6 @@
 /*****************************************************************************
 
-      DocList.h
+      DocMember.h
       Copyright (c) 2015 Raphael DINGE
 
 *Tab=3***********************************************************************/
@@ -13,8 +13,10 @@
 
 /*\\\ INCLUDE FILES \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\*/
 
-#include "DocBlock.h"
-#include "DocInline.h"
+#include "otdgen/DocBlocks.h"
+#include "otdgen/DocInline.h"
+
+#include <list>
 
 
 
@@ -23,7 +25,7 @@ namespace otdgen
 
 
 
-class DocList
+class DocMember
 :  public DocBlock
 {
 
@@ -33,21 +35,26 @@ public:
 
    enum class Type
    {
-                  Itemization,
-                  Enumeration,
+                  Constructor,
+                  Destructor,
+                  Method,
+                  Variable,
+                  Function,
+                  Division,
    };
 
-                  DocList () = default;
-                  DocList (const DocList & rhs) = default;
-                  DocList (DocList && rhs) = default;
-   virtual        ~DocList () = default;
+                  DocMember () = default;
+                  DocMember (const DocMember & rhs) = default;
+                  DocMember (DocMember && rhs) = default;
+   virtual        ~DocMember () = default;
 
-   DocList &   operator = (const DocList & rhs) = default;
-   DocList &   operator = (DocList && rhs) = default;
+   DocMember &    operator = (const DocMember & rhs) = default;
+   DocMember &    operator = (DocMember && rhs) = default;
 
    Type           type;
-   std::list <DocInlines>
-                  items;
+   std::string    name;
+   DocInlines     brief;
+   DocBlocks      description;
 
 
 
@@ -70,12 +77,14 @@ private:
 /*\\\ FORBIDDEN MEMBER FUNCTIONS \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\*/
 
 private:
-   bool           operator == (const DocList & rhs);
-   bool           operator != (const DocList & rhs);
+   bool           operator == (const DocMember & rhs);
+   bool           operator != (const DocMember & rhs);
 
 
 
-}; // class DocList
+}; // class DocMember
+
+using DocMembers = std::list <DocMember>;
 
 
 
@@ -83,7 +92,7 @@ private:
 
 
 
-// #include "DocList.hpp"
+// #include "DocMember.hpp"
 
 
 

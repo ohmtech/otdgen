@@ -13,9 +13,9 @@
 
 /*\\\ INCLUDE FILES \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\*/
 
-#include "DocBlock.h"
-#include "DocChapter.h"
-#include "DocInline.h"
+#include "otdgen/DocBlock.h"
+#include "otdgen/DocChapter.h"
+#include "otdgen/DocInline.h"
 
 #include <list>
 #include <string>

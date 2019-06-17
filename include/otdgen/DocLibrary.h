@@ -1,6 +1,6 @@
 /*****************************************************************************
 
-      DocSection.h
+      DocLibrary.h
       Copyright (c) 2015 Raphael DINGE
 
 *Tab=3***********************************************************************/
@@ -13,8 +13,9 @@
 
 /*\\\ INCLUDE FILES \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\*/
 
-#include "DocBlock.h"
-#include "DocInline.h"
+#include "otdgen/DocBlocks.h"
+#include "otdgen/DocBook.h"
+#include "otdgen/DocInline.h"
 
 
 
@@ -23,34 +24,26 @@ namespace otdgen
 
 
 
-class DocSection
-:  public DocBlock
+class DocLibrary
 {
 
 /*\\\ PUBLIC \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\*/
 
 public:
 
-   enum class Level
-   {
-                  Section,
-                  SubSection,
-                  SubSubSection,
-   };
+                  DocLibrary () = default;
+                  DocLibrary (const DocLibrary & rhs) = default;
+                  DocLibrary (DocLibrary && rhs) = default;
+   virtual        ~DocLibrary () = default;
 
-                  DocSection () = default;
-                  DocSection (const DocSection & rhs) = default;
-                  DocSection (DocSection && rhs) = default;
-   virtual        ~DocSection () = default;
+   DocLibrary &   operator = (const DocLibrary & rhs) = default;
+   DocLibrary &   operator = (DocLibrary && rhs) = default;
 
-   DocSection &   operator = (const DocSection & rhs) = default;
-   DocSection &   operator = (DocSection && rhs) = default;
-
-   Level          level;
    DocInlines     title;
    std::string    id;
-   std::string    id_sub;
-   std::string    id_subsub;
+
+   DocBlocks      overview;
+   DocBooks       books;
 
 
 
@@ -70,15 +63,16 @@ private:
 
 
 
+
 /*\\\ FORBIDDEN MEMBER FUNCTIONS \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\*/
 
 private:
-   bool           operator == (const DocSection & rhs);
-   bool           operator != (const DocSection & rhs);
+   bool           operator == (const DocLibrary & rhs);
+   bool           operator != (const DocLibrary & rhs);
 
 
 
-}; // class DocSection
+}; // class DocLibrary
 
 
 
@@ -86,7 +80,7 @@ private:
 
 
 
-// #include "DocSection.hpp"
+// #include "DocLibrary.hpp"
 
 
 

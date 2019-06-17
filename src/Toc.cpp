@@ -9,11 +9,11 @@
 
 /*\\\ INCLUDE FILES \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\*/
 
-#include "Toc.h"
+#include "otdgen/Toc.h"
 
-#include "Conf.h"
-#include "Expression.h"
-#include "Token.h"
+#include "otdgen/Conf.h"
+#include "otdgen/Expression.h"
+#include "otdgen/Token.h"
 
 #include <cassert>
 

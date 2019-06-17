@@ -1,6 +1,6 @@
 /*****************************************************************************
 
-      Conf.h
+      DocSection.h
       Copyright (c) 2015 Raphael DINGE
 
 *Tab=3***********************************************************************/
@@ -13,7 +13,8 @@
 
 /*\\\ INCLUDE FILES \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\*/
 
-#include <string>
+#include "otdgen/DocBlock.h"
+#include "otdgen/DocInline.h"
 
 
 
@@ -22,33 +23,34 @@ namespace otdgen
 
 
 
-class Conf
+class DocSection
+:  public DocBlock
 {
 
 /*\\\ PUBLIC \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\*/
 
 public:
 
-   enum class Format
+   enum class Level
    {
-                  Html,
-                  HtmlSinglePage,
-                  Pdf,
-                  GitHubMarkDown,
-                  DocSet,
+                  Section,
+                  SubSection,
+                  SubSubSection,
    };
 
-                  Conf () = default;
-   virtual        ~Conf () = default;
+                  DocSection () = default;
+                  DocSection (const DocSection & rhs) = default;
+                  DocSection (DocSection && rhs) = default;
+   virtual        ~DocSection () = default;
 
-   bool           parse (int argc, const char * argv[]);
+   DocSection &   operator = (const DocSection & rhs) = default;
+   DocSection &   operator = (DocSection && rhs) = default;
 
-   bool           self_test = false;
-
-   std::string    file;
-   Format         format = Format::GitHubMarkDown;
-   bool           single_page = false;
-   std::string    output_path;
+   Level          level;
+   DocInlines     title;
+   std::string    id;
+   std::string    id_sub;
+   std::string    id_subsub;
 
 
 
@@ -71,16 +73,12 @@ private:
 /*\\\ FORBIDDEN MEMBER FUNCTIONS \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\*/
 
 private:
-                  Conf (const Conf & rhs) = delete;
-                  Conf (Conf && rhs) = delete;
-   Conf &         operator = (const Conf & rhs) = delete;
-   Conf &         operator = (Conf && rhs) = delete;
-   bool           operator == (const Conf & rhs);
-   bool           operator != (const Conf & rhs);
+   bool           operator == (const DocSection & rhs);
+   bool           operator != (const DocSection & rhs);
 
 
 
-}; // class Conf
+}; // class DocSection
 
 
 
@@ -88,7 +86,7 @@ private:
 
 
 
-// #include "Conf.hpp"
+// #include "DocSection.hpp"
 
 
 

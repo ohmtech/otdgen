@@ -13,16 +13,16 @@
 
 /*\\\ INCLUDE FILES \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\*/
 
-#include "DocInline.h"
-#include "DocMember.h"
-#include "DocParameter.h"
-#include "DocType.h"
-#include "GeneratorBase.h"
+#include "otdgen/DocInline.h"
+#include "otdgen/DocMember.h"
+#include "otdgen/DocParameter.h"
+#include "otdgen/DocType.h"
+#include "otdgen/GeneratorBase.h"
 
 #include <string>
 #include <vector>
 
-#include "sqlite3.h"
+#include "otdgen/sqlite3.h"
 
 
 

@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 #
-#     configure.py
+#     build.py
 #     Copyright (c) 2014 Raphael DINGE
 #
 #Tab=3########################################################################
@@ -10,10 +10,11 @@
 
 import argparse
 import fileinput
-import gyp
 import logging
+import multiprocessing
 import os
 import platform
+import subprocess
 import sys
 
 
@@ -28,8 +29,7 @@ if platform.system () != 'Darwin':
    print >>sys.stderr, 'Unsupported platform. Otdgen is macOS only for now.'
    sys.exit (1)
 
-PATH_OTDGEN = os.path.dirname (__file__)
-PATH_OTDGEN_PROJECTS = os.path.join (PATH_OTDGEN, 'projects')
+PATH_OTDGEN = os.path.abspath (os.path.dirname (__file__))
 
 
 
@@ -56,13 +56,24 @@ def parse_args ():
       help = 'Provides more output.'
    )
 
-   if platform.system () == 'Darwin':
-      arg_parser.add_argument (
-         '--archs',
-         choices = ['i386+x86_64', 'x86_64'],
-         default = 'i386+x86_64',
-         help = 'The architectures to use. Defaults to i386+x86_64.'
-      )
+   arg_parser.add_argument(
+      '-c', '--configuration',
+      default = 'Release',
+      choices = ['Debug', 'Release'],
+      help = 'The build configuration to use. Defaults to Release'
+   )
+
+   arg_parser.add_argument(
+      '-t', '--target',
+      default = '',
+      help = 'The build target to use.'
+   )
+
+   arg_parser.add_argument (
+      '--output-path',
+      default = 'projects',
+      help = 'The relative path from this folder to output the project. Defaults to projects'
+   )
 
    return arg_parser.parse_args (sys.argv[1:])
 
@@ -70,59 +81,59 @@ def parse_args ():
 
 """
 ==============================================================================
-Name : process
+Name : get_path_otdgen_projects
 ==============================================================================
 """
 
-def process (args):
-   gyp_args = [
-      '--depth=.',
-      '--generator-output=%s' % PATH_OTDGEN_PROJECTS
-   ]
+def get_path_otdgen_projects (args):
+   return os.path.join (PATH_OTDGEN, args.output_path)
 
-   variables = dict ()
 
+
+"""
+==============================================================================
+Name : build_osx
+==============================================================================
+"""
+
+def build_osx (args):
+   conf_dir = os.path.join (get_path_otdgen_projects (args), 'build', args.configuration)
+
+   if not os.path.exists (conf_dir):
+      os.makedirs (conf_dir)
+
+   cmd = '/Applications/Xcode.app/Contents/Developer/usr/bin/xcodebuild '
+   cmd += '-project %s ' % os.path.join (get_path_otdgen_projects (args), 'otdgen.xcodeproj')
+   cmd += '-configuration %s ' % args.configuration
+
+   if args.target:
+      cmd += '-target %s ' % args.target
+      cmd += '-parallelizeTargets '
+
+   cmd += 'SYMROOT=%s ' % os.path.join (get_path_otdgen_projects (args), 'build')
+   cmd += '| xcpretty -c && exit ${PIPESTATUS[0]}'
+
+   return subprocess.check_call (cmd, shell = True)
+
+
+
+"""
+==============================================================================
+Name : build
+==============================================================================
+"""
+
+def build (args):
    if platform.system () == 'Darwin':
-      variables ['XCODE_ARCHS'] = args.archs
-
-   for key, value in variables.items ():
-      gyp_args += ['-D', '%s=%s' % (key, value)]
-
-   gyp.main (gyp_args + ['otdgen.gyp'])
-
-   if platform.system () == 'Darwin':
-      post_process_xcode (args)
-
-
-
-"""
-==============================================================================
-Name : post_process_xcode
-==============================================================================
-"""
-
-def post_process_xcode (args):
-   file = os.path.join (PATH_OTDGEN_PROJECTS, 'otdgen.xcodeproj', 'project.pbxproj')
-
-   for line in fileinput.input (file, inplace = 1):
-      print line,
-
-      if 'BuildIndependentTargetsInParallel' in line:
-         print '\t\t\t\tLastUpgradeCheck = 2000;'
-
-
-"""
-==============================================================================
-Name : configure
-==============================================================================
-"""
-
-def configure (args):
-   process (args)
+      return build_osx (args)
 
 
 
 ##############################################################################
 
 if __name__ == '__main__':
-   sys.exit (configure (parse_args ()))
+   try:
+      sys.exit (build (parse_args ()))
+   except subprocess.CalledProcessError as error:
+      print >>sys.stderr, 'Build command exited with %d' % error.returncode
+      sys.exit (1)

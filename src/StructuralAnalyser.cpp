@@ -9,16 +9,16 @@
 
 /*\\\ INCLUDE FILES \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\*/
 
-#include "StructuralAnalyser.h"
+#include "otdgen/StructuralAnalyser.h"
 
-#include "DocCodeBlock.h"
-#include "DocInformation.h"
-#include "DocList.h"
-#include "DocParagraph.h"
-#include "DocSection.h"
-#include "DocTable.h"
-#include "Expression.h"
-#include "Token.h"
+#include "otdgen/DocCodeBlock.h"
+#include "otdgen/DocInformation.h"
+#include "otdgen/DocList.h"
+#include "otdgen/DocParagraph.h"
+#include "otdgen/DocSection.h"
+#include "otdgen/DocTable.h"
+#include "otdgen/Expression.h"
+#include "otdgen/Token.h"
 
 #include <cassert>
 
