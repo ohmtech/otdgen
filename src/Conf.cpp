@@ -105,6 +105,10 @@ bool  Conf::parse (int argc, const char * argv[])
          {
             format = Format::DocSet;
          }
+         else if (value == "plain-text")
+         {
+            format = Format::PlainText;
+         }
          else
          {
             return false;

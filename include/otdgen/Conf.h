@@ -36,6 +36,7 @@ public:
                   Pdf,
                   GitHubMarkDown,
                   DocSet,
+                  PlainText,
    };
 
                   Conf () = default;

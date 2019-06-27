@@ -13,6 +13,7 @@
 #include "otdgen/Conf.h"
 #include "otdgen/GeneratorGitHubMarkDown.h"
 #include "otdgen/GeneratorHtml.h"
+#include "otdgen/GeneratorPlainText.h"
 #include "otdgen/LexicalAnalyser.h"
 #include "otdgen/StructuralAnalyser.h"
 #include "otdgen/Toc.h"
@@ -65,6 +66,11 @@ void  run (const otdgen::Conf & conf, const std::string & path)
       else if (conf.format == Conf::Format::DocSet)
       {
          GeneratorHtml generator (conf, toc);
+         generator.process (library);
+      }
+      else if (conf.format == Conf::Format::PlainText)
+      {
+         GeneratorPlainText generator (conf, toc);
          generator.process (library);
       }
    }

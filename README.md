@@ -37,6 +37,7 @@ The `--format` option allows to specify the output format of the generated docum
 - `markdown`
 - `html`
 - `docset`
+- `plain-text`
 
 ##### `--output`
 
