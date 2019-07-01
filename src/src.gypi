@@ -35,6 +35,7 @@
       '../include/otdgen/GeneratorBase.h',
       '../include/otdgen/GeneratorGitHubMarkDown.h',
       '../include/otdgen/GeneratorHtml.h',
+      '../include/otdgen/GeneratorPlainText.h',
       '../include/otdgen/LexicalAnalyser.h',
       '../include/otdgen/SyntaxicAnalyser.h',
       '../include/otdgen/SyntaxicAnalyser.hpp',
@@ -55,6 +56,7 @@
       'GeneratorBase.cpp',
       'GeneratorGitHubMarkDown.cpp',
       'GeneratorHtml.cpp',
+      'GeneratorPlainText.cpp',
       'LexicalAnalyser.cpp',
       # 'main.cpp'
       'SyntaxicAnalyser.cpp',
