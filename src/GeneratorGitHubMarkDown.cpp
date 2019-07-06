@@ -357,17 +357,10 @@ Name : process
 
 void  GeneratorGitHubMarkDown::process (std::string & output, std::vector <std::string> & /* cur */, const DocCodeBlock & codeblock)
 {
-   switch (codeblock.type)
-   {
-   case DocCodeBlock::Type::None:
-      output += "```\n";
-      break;
-
-   case DocCodeBlock::Type::Cpp:
-      output += "```c++\n";
-      break;
-   }
-
+   output += "```";
+   output += codeblock.type;
+   output += "\n";
+   
    for (auto && line : codeblock.lines)
    {
       output += line.first + "\n";

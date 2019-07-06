@@ -31,12 +31,6 @@ class DocCodeBlock
 
 public:
 
-   enum class Type
-   {
-                  None,
-                  Cpp,
-   };
-
    enum class LineType
    {
                   Normal,
@@ -52,7 +46,7 @@ public:
    DocCodeBlock &   operator = (const DocCodeBlock & rhs) = default;
    DocCodeBlock &   operator = (DocCodeBlock && rhs) = default;
 
-   Type           type;
+   std::string    type;
    std::list <std::pair <std::string, LineType>>
                   lines;
 

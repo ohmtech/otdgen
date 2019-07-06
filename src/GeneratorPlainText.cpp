@@ -322,16 +322,14 @@ void  GeneratorPlainText::process (std::string & output, std::vector <std::strin
 
    output += std::string (repetitions, '*');
 
-   switch (codeblock.type)
-   {
-   case DocCodeBlock::Type::None:
-      output += " code (unspecified language): \n";
-      break;
+   output += " code";
 
-   case DocCodeBlock::Type::Cpp:
-      output += " code (c++): \n";
-      break;
+   if (!codeblock.type.empty())
+   {
+      output += " (" + codeblock.type + ")";
    }
+
+   output += ":\n";
 
    for (auto && line : codeblock.lines)
    {
