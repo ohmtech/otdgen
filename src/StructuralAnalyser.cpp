@@ -518,16 +518,13 @@ void  StructuralAnalyser::process (const ExpressionCodeBlock & codeblock)
          _blocks_ptr->_content.end (), std::make_shared <DocCodeBlock> ()
       ));
 
-      block.type = DocCodeBlock::Type::None;
+      block.type = "";
 
       auto it = codeblock.options.find ("language");
 
       if (it != codeblock.options.end ())
       {
-         if (it->second == "c++")
-         {
-            block.type = DocCodeBlock::Type::Cpp;
-         }
+         block.type = it->second;
       }
 
       for (auto && line : codeblock.lines)
